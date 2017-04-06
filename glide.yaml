@@ -1,0 +1,23 @@
+package: github.com/manifoldco/grafton
+import:
+- package: github.com/go-openapi/runtime
+  subpackages:
+  - client
+- package: github.com/go-openapi/strfmt
+- package: github.com/go-zoo/bone
+  version: ^1.2.0
+- package: github.com/manifoldco/go-base64
+  version: ^1.0.0
+- package: github.com/manifoldco/go-signature
+  version: ^1.0.0
+- package: github.com/manifoldco/torus-cli
+  version: ^0.23.0-rc
+  subpackages:
+  - promptui
+- package: github.com/onsi/gomega
+  version: ^1.1.0
+- package: github.com/urfave/cli
+  version: ^1.19.1
+- package: golang.org/x/crypto
+  subpackages:
+  - ed25519

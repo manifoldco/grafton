@@ -1,0 +1,1016 @@
+swagger: "2.0"
+info:
+  title: Manifold Provider API
+  description: |
+    # Introduction
+    The Manifold Provider API is a set of HTTP endpoints a developer services
+    provider implements as a part of their application stack in order to
+    integrate with Manifold's identity, billing, and provisioning
+    features.
+
+    By implementing resource and credential provisioning, deprovisioning, and
+    single sign-on, a provider is capable of offering a complete end-to-end
+    experience for developers to buy and integrate their products using a
+    Manifold account, without having to implement billing or identity.
+
+    The Connector API allows Providers to query Manifold for data related to
+    provisioned resources and users of those resources. For more information,
+    please read the Connector documentation.
+
+    # Getting Started
+    Manifold provides a CLI tool called Grafton for locally testing a
+    Provider's implementation of resource and credential provisioning,
+    resizing, deprovision, and sign in.
+
+    While the tests are running through grafton test, a local version of
+    Manifold's Connector API is ran for retrieving user or resource data as
+    well as completing asynchronous operations.
+
+    Currently, Grafton is only given to Providers who are working with us
+    during our closed beta period. Please contact [Manifold
+    Support](mailto:support@manifold.co) to retrieve the latest version.
+
+    ## Using Grafton
+    The first step to use Grafton is to generate as a test master key which is
+    used for signing requests.
+
+    ```bash
+    $ grafton generate
+    Generating Master Keypair
+    Writing master keypair to file: masterkey.json
+    Success.
+    ```
+
+    Use the public master key contained in the generated file to validate
+    requests created by Grafton during testing. Once you've integrated, to
+    validate requests coming from the Manifold servers, you must use Manifold's
+    Master Public Signing Key.
+
+
+    To perform OAuth operations and subsequent requests against the local
+    Manifold Connector API ran by Grafton you can use the following set of
+    OAuth Credentials. These must be provided to Grafton and used by your
+    server during local testing.
+
+    ```bash
+    CLIENT_ID=21jtaatqj8y5t0kctb2ejr6jev5w8
+    CLIENT_SECRET=3yTKSiJ6f5V5Bq-kWF0hmdrEUep3m3HKPTcPX7CdBZw
+    ```
+
+    Once you've configured your server with the generated signing key and oauth
+    credentials, you can begin testing with Grafton. Invoke the test command
+    and supply the product, plan, region, oauth credentials, and connector port
+    as flags.
+
+    ```bash
+    $ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
+        --client-id=21jtaatqj8y5t0kctb2ejr6jev5w8 \
+        --client-secret=3yTKSiJ6f5V5Bq-kWF0hmdrEUep3m3HKPTcPX7CdBZw \
+        --connector-port=3000 \ # Port used by Grafton to serve Connector API
+        --new-plan=large \ # Plan to upgrade to once the resource has been provsisioned
+        http://localhost:4567/v1 # Full URL of the API implementation
+    ```
+
+    Green check marks will be shown once for each passing test. Once all the
+    tests pass, you're ready to move onto the next phase of integration.
+
+    An example integration using Ruby and the Sinatra framework is available on
+    [GitHub](https://github.com/manifoldco/ruby-sinatra-sample-provider).
+
+    Grafton and this documentation is a work in progress, we appreciate and
+    welcome all feedback!
+
+    ## Frequently Asked Questions
+
+    **Why does the API separate Resource and Credential creation?**
+
+    Over time, as Manifold evolves, we want to tackle the problem of credential
+    management for both providers and developers. To achieve this, credentials
+    must be a first class citizen of our platform which are addressable so they
+    can added, removed, and updated independent of the Resource lifecycle.
+
+    **What's the difference between the `id` in the path and body of a PUT request?**
+
+    They are the same, the `id` is provided in the body for completeness *and*
+    convenience.
+
+    **Which identifier should be used for reference?**
+
+    All Resource and Credential IDs are globally unique and can be used for
+    tracking internal data structures against their Manifold counterparts.
+
+    A Credential ID should only be used in relation to a set of Credentials
+    (username and password or connection url) belonging to a Resource (e.g. a
+    database instance).
+
+    **What if my product does not support regions?**
+
+    For simplicity, a Resource will always have a region property. Products
+    which do not support a region will receive the `all::global` region in the
+    Provision request payload.
+
+    # Authentication
+    In order to provision, deprovision, or resize resources and credentials
+    Manifold performs HTTP calls against the Provider's API. All requests sent
+    by Manifold are signed, allowing a Provider to validate that the requests
+    were made by Manifold.
+
+    The signature of the request is relayed in the `X-Signature` header. This
+    header contains the signature of the request, the public key of the
+    [ed25519](https://ed25519.cr.yp.to/) keypair used to sign the request, and
+    the signature of this public key signed by the Manifold master offline
+    signing key.
+
+    This provides a complete chain of trust from the signature of the request
+    all the way to the root signing key allowing a Provider to verify the
+    integrity and authenticity of the request from Manifold.
+
+    Included in the signature is the request method, path, query parameters,
+    various headers (including the Date and Host headers), and the request
+    body.
+
+    ## The Request Signing Process
+
+    Manifold takes two steps to sign all outgoing requests to providers:
+    - Create the canonical form of the request.
+    - Sign the request.
+
+    ### Create the Canonical Form of the Request
+
+    Begin by writing the target of the signature:
+    > `lower(METHOD) < space > PATH <'?'> canonical(QUERY) <newline>`
+
+    Where `canonical(QUERY)` contains the query parameters, lexicographically
+    sorted in ascending order (including param name, `=` sign, and value),
+    and delimited by an `&`. If no query params are set, the `?` after the
+    `PATH` is omitted.
+
+    **Example:**
+    > `put /v1/resources?foo=bar\n`
+
+    Next, add all headers. These are the headers listed in the
+    `X-Signed-Headers`  header, in the order they are listed, followed by the
+    `X-Signed-Headers` header itself.
+
+    Headers are written in the form:
+    > `lower(NAME) <colon> <space> VALUES <newline>`
+
+    `VALUES` have all optional whitespace removed. If the header occurs multiple
+    times on the request, the values are included delimited by `, `
+    (comma space), in the order they appear on the request.
+
+    The `X-Signed-Headers` header includes the list of all headers included in
+    the canonical request form, lowercased, and delimited by a space. Only one
+    occurrence of `X-Signed-Headers` should exist on a request. If more than one
+    exists, The first is used.
+
+    Manifold includes all headers that are explicitly set on any request we
+    send, including the callback related headers.
+
+    **Example:**
+    > `content-type: application/json\n`
+
+    Finally, the contents of the request body is added to the canonical request
+    form.
+
+    ### Sign the Request
+
+    The request signature is created by creating an Ed25519 signature of the
+    canonical request form, using a live signing key pair. This key pair's
+    public key is signed by Manifold's offline master key, and the master key
+    signature is included with each signature.
+
+    The signature is included in the `X-Signature` header, which has the form:
+    > `X-Signature: <request_signature> <live_public_key> <master_key_signature>`
+
+    ## Verifying a Request
+
+    Verifying a request follows similar steps to signing a request:
+    - Verify the request age.
+    - Create the canonical form of the request. This is identical to the
+      request signing step.
+    - Verify the signature.
+
+    ### Verify the Request Age
+
+    To prevent reply attacks, all providers should verify that value relayed
+    within the `Date` ([RFC3339 Format](https://www.ietf.org/rfc/rfc3339.txt))
+    header is within 5 minutes of the current time. If it is not, a 401
+    error should be returned to the caller.
+
+    ### Verify the Signature
+
+    To verify a request signature, first verify that the signature of the
+    public key included in the header is valid and signed by Manifold's offline
+    signing key. Then verify that the signature of the request is a valid
+    signature on the canonical form of the request, and that it was signed by
+    the public key included in the `X-Signature` header.
+
+    ## Supported languages
+    Manifold provides the following SDKs, making it easy for a provider to verify
+    any incoming requests from Manifold:
+    - [Go](https://github.com/manifoldco/go-signature)
+    - [Node.js](https://github.com/manifoldco/node-signature)
+    - [Ruby](https://github.com/manifoldco/ruby-manifoldco-signature)
+
+    Please reach out to [Manifold](mailto:support@manifold.co) if we're missing
+    the language of your choice.
+
+    ## Public Master Key
+    The following is the public key used for generating endorsements encoded in
+    base64.
+
+    ```
+    PtISNzqQmQPBxNlUw3CdxsWczXbIwyExxlkRqZ7E690
+    ```
+
+    This key is included as the default key in our signature checking libraries.
+
+    The Manifold master key was generated using a high quality entropy source
+    on an air-gapped system. Access to the private portion of the key is
+    restricted; 3 of the 5 members of Manifold that have access to it must be
+    present to unencrypt the key (portions of the key are distributed to each
+    member through [Shamir's Secret
+    Sharing](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing) and
+    uniquely encrypted for each member). The master key is only used to sign
+    live signing keys, which will in turn be used to sign the requests made to
+    providers.
+
+    # Repeatable Actions
+    In the case of network or other unexpected errors (such as a `500 Internal
+    Server Error`), Manifold may issue a request more than once with the same
+    payload. In such cases the result returned should always be the same -
+    therefore, we require the APIs a Provider implements to be idempotent.
+
+    Manifold uses only idempotent HTTP methods to perform calls that provision,
+    modify, or deprovision resources and credentials, specifically.
+
+    * `PUT`: To create a resource or credential, Manifold will issue a PUT
+    request. The unique identifier provided in the URL must be used by the
+    provider for identifying the created entity.
+    * `PATCH`: To update a resource or credential, Manifold will issue a PATCH
+      request against the targeted entity.
+
+    In the case of a `PUT`, if the entity does not exist a `201 Created` or
+    `204 No Content` Response must be returned to Manifold. If the entity does
+    exist, but the provided properties match the entity stored by the Provider
+    then the request must be treated as a success (returning a 201 or 204
+    Response).  However, if the entity does exist and the properties do not
+    match a `409 Conflict` response must be returned by the provider.
+
+    In the case of a `PATCH`, a `200 Success` or `204 No Content` response must
+    be returned if the entity exists and the update was successful.  However if
+    the entity does not exist a `404 Not Found` error must be returned.
+
+    For example, if a `PUT /v1/resources/:id` is received twice with the same
+    `id` value, a Provider should ensure that the `plan`, `product`, and
+    `region` (if applicable) values are the exact same. If they are the same a
+    `201 Created` or `204 No Content` response should be returned. Otherwise, a
+    `409 Conflict` must be returned.
+
+    # Callbacks
+    Some requests cannot be completed by the provider within 60 seconds, such
+    as provisioning a large database instance. To support these use cases,
+    Manifold allows the provider to return a `202 Accepted` response with a
+    message to be displayed to the user. The default integration does not
+    require support for callbacks; a Provider must decide if long running
+    provisioning must be supported by their implementation of the API.
+
+    Once the provider has completed the provision, plan change, or deprovision
+    operation they must send the outcome to the callback url provided on the
+    initial request to Manifold's Connector API.
+
+    In the event that the Connector API can't be reached *or* an unexpected
+    response (e.g. `500 Internal Server Error`) is returned, the provider
+    should attempt to invoke the callback in the future to the best of their
+    abilities.
+
+    The Connector API Callback route matches the "Repeatable Actions"
+    specification. If the callback has already been received and the payload
+    matches the previous request a `204 No Content` response will be returned.
+    However, if the payloads do not match a `409 Conflict` error response will
+    be returned.
+
+    If Manifold does not receive the callback within 24 hours, the request will
+    be performed again. As a result of supporting repeatable actions, the
+    provider should return whether or not the operation was succesful to
+    Manifold. Expected behaviour in this scenario is documented on a route by
+    route basis.
+
+    The callback url and a unique identifier for the callback are sent along in
+    the request as defined below.
+
+    * `X-Callback-ID`: A unique 18 byte base32 encoded unique identifier sent
+      to the provider for the purposes of logging and debugging.
+    * `X-Callback-URL`: The URL to call to complete the operation and report
+      the outcome to Manifold.
+
+    The callback request is authenticated using an access token granted using
+    the `client_credentials` OAuth 2.0 flow. Please see the Connector API
+    documentation for more information.
+
+    # Errors
+    In the case of an error, Manifold requires the provider to return a
+    relevant HTTP Status Code with an appropriate error message. The message
+    should be human readable and follow the format described below. This
+    message may be displayed back to the user inside the Manifold dashboard.
+
+    **Example Response**
+
+    ```json
+    {
+        "message": "Cannot upgrade to the cookies plan from chocolate-bars."
+    }
+    ```
+
+    Depending on the route, the response status code and corresponding message
+    may be interpreted differently. These differences are documented on a
+    per-route basis.
+
+    # Single-Sign On
+    Users can sign in to a dashboard for provisioned resources managed by the
+    provider. The resulting user session on the provider's side is restricted to
+    the resource but allows the user to access provider-specific features.
+
+    This flow is built on top of [OAuth 2.0](https://oauth.net/2/) using the
+    `authorization_code` grant type flow for granting a provider an access
+    token scoped to the user and the selected resource.
+
+    Manifold is responsible for creating a scoped `authorization_code` and
+    forwarding the user to the Provider's implementation of the `GET /v1/sso`
+    (Single Sign-On) route. The `code` to grant an access token and the
+    selected `resource_id` are included as query parameters to the request.
+
+    An access token can be created by the provider by issuing a `POST` request
+    to `/v1/oauth/tokens` which is a part of the Manifold Connector API.
+
+    Once an access token has been granted, the provider can issue requests on
+    behalf of the user to the Connector API to retrieve information about the
+    current user and the resource in question.
+
+    The provider *must* create their own login session with the user for
+    further authentication for accessing the resources dashboard. The granted
+    access token should be stored securely and only used by the provider's
+    server to request data from Manifold to render or implement any dashboard
+    functionality.
+
+    The granted access token will only be valid for 24hours. After the token
+    has expired, the user must complete the Sign-On flow from the Manifold
+    dashboard to grant a new token.
+  version: 1.0.0
+host: yourdomain.com
+schemes:
+- https
+produces:
+- application/json
+consumes:
+- application/json
+parameters:
+  date:
+    name: Date
+    in: header
+    description: Timestamp of when the request was issued from Manifold in UTC.
+    type: string
+    format: datetime
+    required: true
+  signed_headers:
+    name: X-Signed-Headers
+    in: header
+    description: |
+      Comma delimited ordered list of header fields used in generating
+      the request signature.
+    collectionFormat: csv
+    type: string
+    required: true
+  signature:
+    name: X-Signature
+    in: header
+    description: |
+      Header containing the signature, ephemeral public key, and
+      signature of the used public key signed by the Manifold root
+      signing key to prove authenticity of the request.
+
+      ```
+      X-Signature: [request-signature] [public-key-value] [signature-of-public-key]
+      ```
+
+      examples:
+
+      ```
+      X-Signature: 96afMc5FVZjhGQ4YLPyRW9tcYoPKyj1EMUxkzma_Q4c WydEYGQb7Y4ER6KPAc-YuIwAqFUpII5P9U3MAZ3wxAQ ozhcosOmuWltP8r1BAs-0kccV1AkbHcKYLSjU0dGUHY
+      ```
+    type: string
+    pattern: ^[a-zA-Z0-9_-]{86} [a-zA-Z0-9_-]{43} [a-zA-Z0-9_-]{86}$
+    required: true
+  x_callback_id:
+    name: X-Callback-ID
+    in: header
+    description: |
+      ID of the Callback for completing this request if the provider returns a
+      `202 Accepted`, stored as a base 32 encoded 18 byte identifier.
+    type: string
+    required: true
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+    format: base32ID
+  x_callback_url:
+    name: X-Callback-URL
+    in: header
+    required: true
+    description: |
+      The URL the provider calls to complete the request if a `202 Accepted` is
+      returned.
+    type: string
+    format: url
+  resource_id:
+    name: id
+    in: path
+    description: |
+      ID of a Resource object, stored as a base32 encoded 18 byte identifier.
+    required: true
+    type: string
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+    format: base32ID
+  credential_id:
+    name: id
+    in: path
+    description: |
+      ID of a Credential object, stored as a base32 encoded 18 byte identifier.
+    required: true
+    type: string
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+    format: base32ID
+responses:
+  BadRequest:
+    description: Request denied due to invalid request body.
+    schema:
+      $ref: '#/definitions/ProviderError'
+    examples:
+      application/json:
+        message: Unknown plan name
+  Unauthorized:
+    description: Request authenticity could not be validated.
+    schema:
+      $ref: '#/definitions/ProviderError'
+    examples:
+      application/json:
+        message: Signature did not validate
+  NotFound:
+    description: Requested entity could not be found.
+    schema:
+      $ref: '#/definitions/ProviderError'
+    examples:
+      application/json:
+        message: Could not find Resource
+  Conflict:
+    description: |
+      An entity already exists with that identifier and the request contents do
+      not match the current object. If an entity does exist with that
+      identifier and the request contents do match then a success response
+      should be returned.
+    schema:
+      $ref: '#/definitions/ProviderError'
+    examples:
+      application/json:
+        message: Could not create resource, one already exists with that id.
+  Internal:
+    description: Request failed due to an internal server error.
+    schema:
+      $ref: '#/definitions/ProviderError'
+    examples:
+      application/json:
+        message: Internal Server Error
+basePath: /v1
+paths:
+  /resources/{id}:
+    parameters:
+    - $ref: '#/parameters/resource_id'
+    - $ref: '#/parameters/date'
+    - $ref: '#/parameters/signed_headers'
+    - $ref: '#/parameters/signature'
+    - $ref: '#/parameters/x_callback_id'
+    - $ref: '#/parameters/x_callback_url'
+    put:
+      summary: Provision
+      description: |
+        Manifold will call this endpoint to request the provisiong of a
+        resource using the provided identifier. This route must support being
+        called more than once with the same payload.
+
+        The `id` property is the unique identifier Manifold will map to this
+        resource. Providers should use this value for mapping Manifold
+        Resources to data inside their systems.
+
+        The `product`, `plan`, and `region` properties are machine readable
+        names for the type of product, its plan, and the region in which the
+        request resource is to be provisioned. These values map to
+        configuration stored inside the Manifold Catalog.
+
+        A response should only be returned once an error has occurred *or* the
+        provisioned resource is ready for a user to use. If a requested action
+        could take longer than 60s to complete, a callback *must* be used.
+
+        **Request Timeout**
+
+        If the request takes longer than 60 seconds, then it is assumed to have
+        failed. Manifold will retry the request again in the future.
+
+        **Callback Timeout**
+
+        If a `202 Accepted` response is returned, Manifold will expect the
+        provider to complete the provision flow by calling the callback url
+        within 24 hours. If the callback is not invoked, Manifold will retry
+        the request again.
+
+        If the resource has been provisioned successfully with properties that
+        match the request, then the provider should return a `201 Created` or
+        `204 No Content` response. However, if the resource provisiong failed,
+        a corresponding error should be returned.
+      tags:
+      - Resource
+      parameters:
+      - name: body
+        in: body
+        description: Resource Provisioning Request
+        required: true
+        schema:
+          $ref: '#/definitions/ResourceRequest'
+      responses:
+        201:
+          description: |
+            Successful provisioning request, with an attached message to be
+            displayed to the user.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: Your database is ready to use!
+        202:
+          description: |
+            Acknowledgement of the provisioning request with a corresponding
+            message to be displayed to the user. The provider will call the
+            callback url once provisioning has succeed or a failure has
+            occurred.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: We're racking servers to service your request!
+        204:
+          description: |
+            Successful provisioning request, with no message to be
+            displayed to the user.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        409:
+          $ref: '#/responses/Conflict'
+        500:
+          $ref: '#/responses/Internal'
+    patch:
+      summary: Change Plan
+      description: |
+        Manifold will call this endpoint to request a change in plan of a
+        resource (either an upgrade or downgrade). This route must support
+        being called more than once with the same payload.
+
+        The `plan` property is the machine readable name of the plan that the
+        resource is being resized to. The list of possible values are provided
+        by the provider and stored in the Manifold Catalog.
+
+        A response should only be returned once an error has occurred *or* when
+        the plan change has been completed. If a requested action could take
+        longer than 60s to complete, a callback *must* be used.
+
+        **Request Timeout**
+
+        If the request takes longer than 60 seconds, then it is assumed to have
+        failed. Manifold will retry the request again in the future.
+
+        **Callback Timeout**
+
+        If a `202 Accepted` response is returned, Manifold will expect the
+        provider to complete the plan change flow by calling the callback url
+        within 24 hours. If the callback is not invoked, Manifold will retry
+        the request again.
+
+        If the resource's plan matches the given plan then a `200 Success` or
+        `204 No Content` response should be returned.
+      tags:
+      - Resource
+      parameters:
+      - name: body
+        in: body
+        description: Resource Provisioning Request
+        required: true
+        schema:
+          $ref: '#/definitions/ResourcePlanChangeRequest'
+      responses:
+        200:
+          description: |
+            The plan has been changed successfully. The corresponding message
+            is to be displayed to the user on the Manifold dashboard.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: Your database has been resized to 512GB from 256GB
+        202:
+          description: |
+            Acknowledgement of the plan change request with a corresponding
+            message to be displayed to the user. The provider will call the
+            callback url once resource's plan has been changed successfully or
+            a failure has occurred.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: We're racking servers to service your request!
+        204:
+          description: |
+            The plan has been changed successfully and there is no message to
+            display to the user.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+    delete:
+      summary: Deprovision
+      description: |
+        Manifold calls this endpoint to request a resource be deprovisioned.
+        When a resource is deprovisioned, all attached credentials are assumed
+        to be deprovisioned as well.
+
+        If the resource has already been deprovisioned, then the provider
+        should return a 404 response.
+
+        A response should only be returned once an error has occurred *or* when
+        the resource is no longer accessible by the user. If a requested action
+        could take longer than 60s to complete, a callback *must* be used.
+
+        **Request Timeout**
+
+        If the request takes longer than 60 seconds, then it is assumed to have
+        failed. Manifold will retry the request again in the future.
+
+        **Callback Timeout**
+
+        If a `202 Accepted` response is returned, Manifold will expect the
+        provider to complete the deprovision flow by calling the callback url
+        within 24 hours. If the callback is not invoked, Manifold will retry
+        the request again.
+
+        If the deprovision was successful, then a `404 Not Found` response
+        should be returned to Manifold.
+      tags:
+      - Resource
+      responses:
+        202:
+          description: |
+            Acknowledgement of the deprovision request with a corresponding
+            message to be displayed to the user. The provider will call the
+            callback url once resource has been deprovisioned successfully or a
+            failure has occurred.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: We're unplugging servers to service your request!
+        204:
+          description: |
+            Resource deprovisioned successfully.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+  /credentials/{id}:
+    parameters:
+    - $ref: '#/parameters/credential_id'
+    - $ref: '#/parameters/date'
+    - $ref: '#/parameters/signed_headers'
+    - $ref: '#/parameters/signature'
+    - $ref: '#/parameters/x_callback_id'
+    - $ref: '#/parameters/x_callback_url'
+    put:
+      summary: Provision
+      description: |
+        Manifold calls this endpoint to request the provisioning of a set of
+        Credentials for the specified Resource. This route must support being
+        called more than once with the same payload.
+
+        The `id` property is the unique identifier Manifold will map to
+        the returned set of Credentials. Use this value for mapping Manifold
+        Credentials to data inside your system.
+
+        The `resource_id` property is the unique identifier for the
+        Resource the requested set of Credentials grant access to.
+
+        The provider can return multiple key-value pairs that represent this
+        set of Credentials. However, if a url form exists (e.g.
+        `postgres://user:pw@host:5432/db`), please provide the credentials in
+        that form.
+
+        **Request Timeout**
+
+        If the request takes longer than 60 seconds, then it is assumed to have
+        failed. Manifold will retry the request again in the future.
+
+        **Callback Timeout**
+
+        If a `202 Accepted` response is returned, Manifold will expect the
+        provider to complete the provision flow by calling the callback url
+        within 24 hours. If the callback is not invoked, Manifold will retry
+        the request again.
+
+        If the credentials have been provisioned successfully with properties
+        that match the request, then the provider should return a `201 Created`
+        response. However, if provisioning failed, a corresponding error should
+        be returned.
+      tags:
+      - Credential
+      parameters:
+      - name: body
+        in: body
+        description: |
+          Credential provisioning request, containing the target Resource
+          identifier.
+        required: true
+        schema:
+          $ref: '#/definitions/CredentialRequest'
+      responses:
+        201:
+          description: |
+            Successful credential provisioning request with associated secrets.
+          schema:
+            $ref: '#/definitions/CredentialResponse'
+          examples:
+            application/json:
+              credentials:
+                mysql_url: mysql://user:pass@host.com:3211/mydatabase
+        202:
+          description: |
+            Acknowledgement of the provision request with a corresponding
+            message to be displayed to the user. The provider will call the
+            callback url once credentials have been provisioned successfully or
+            a failure has occurred.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: We're walking over to the rack now to type in your new password!
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        409:
+          $ref: '#/responses/Conflict'
+        500:
+          $ref: '#/responses/Internal'
+    delete:
+      summary: Deprovision
+      description: |
+        Manifold calls this endpoint to request the deprovisioning the
+        specified set of Credentials.
+
+        When a Resource is deprovisioned, Manifold assumes that *all*
+        associated Credentials are deprovisioned by the provider as well.
+
+        If the credentials have already been deprovisioned, then the provider
+        must return a 404 response.
+
+        **Request Timeout**
+
+        If the request takes longer than 60 seconds, then it is assumed to have
+        failed. Manifold will retry the request again in the future.
+
+        **Callback Timeout**
+
+        If a `202 Accepted` response is returned, Manifold will expect the
+        provider to complete the deprovision flow by calling the callback url
+        within 24 hours. If the callback is not invoked, Manifold will retry
+        the request again.
+
+        If the deprovision was successful, then a `404 Not Found` response
+        should be returned to Manifold.
+      tags:
+      - Credential
+      responses:
+        202:
+          description: |
+            Acknowledgement of the deprovision request with a corresponding
+            message to be displayed to the user. The provider will call the
+            callback url once the credentials have been deprovisioned
+            successfully or a failure has occurred.
+          schema:
+            $ref: '#/definitions/SuccessMessage'
+          examples:
+            application/json:
+              message: We're unplugging servers to service your request!
+        204:
+          description: |
+            The set of credentials have been deprovisioned successfully.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+  /sso/:
+    get:
+      summary: Single Sign-On
+      description: |
+        The Manifold Dashboard forwards a user to this route during single
+        sign-on to a resource's dashboard.
+
+        A `code` and `resource_id` are sent as query parameters allowing the
+        provider to request an access token.
+
+        The `code` is scoped to the initiating user and resource being accessed
+        and is only valid for five minutes. It cannot be used more than once.
+
+        Once an access token has been acquired for this user's session by
+        the provider's server, the user should be forwarded to the
+        resource's dashboard.
+
+        The provider should associate the access token with the user for
+        the duration of their session.
+
+        The access token is sensitive data that grants access to a user's
+        data within Manifold. It should be treated with care.
+      parameters:
+      - name: code
+        in: query
+        description: |
+          The authorization code sent along with the SSO request which a
+          provider uses to create an access token.
+        required: true
+        type: string
+      - name: resource_id
+        in: query
+        description: |
+          ID of the Resource the user is attempting to access. This ID is a
+          base32 encoded 18 byte identifier.
+        required: true
+        type: string
+        pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+        format: base32ID
+      tags:
+      - Single Sign-On
+      responses:
+        200:
+          description: |
+            If the request was successful and an access token has been acquired
+            for the user, the dashboard can be returned *or* they can be
+            forwarded to the dashboard using an HTML redirect.
+        302:
+          description: |
+            If the request was successful and an access token has been acquired
+            for the user, the user can be forwarded to the requested dashboard
+            using an HTTP redirect.
+
+            *NOTE*: `303 See Other` is the preferred method for redirecting a user
+            to their dashboard via HTTP.
+          headers:
+            Location:
+              description: Location of the Resources' dashboard.
+              type: string
+        303:
+          description: |
+            If the request was successful and an access token has been acquired
+            for the user, the user can be forwarded to the requested dashboard
+            using an HTTP redirect.
+
+            This is the preferred method for redirecting user's to their
+            dashboards via HTTP.
+          headers:
+            Location:
+              description: Location of the Resources' dashboard.
+              type: string
+        default:
+          description: |
+            If the request could not be processed successfully, a useful error
+            message should be displayed to the user.
+definitions:
+  ID:
+    type: string
+    description: A base32 encoded 18 byte identifier.
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+    format: base32ID
+    x-go-type:
+      type: ID
+      import:
+        package: github.com/manifoldco/go-manifold
+        alias: manifold
+  Label:
+    type: string
+    description: A machine readable unique label, which is url safe.
+    pattern: ^[a-z0-9][a-z0-9\-\_]{1,128}$
+    x-go-type:
+      type: Label
+      import:
+        package: github.com/manifoldco/go-manifold
+        alias: manifold
+  RegionSlug:
+    type: string
+    description: |
+      Combination of the cloud platform and location to provision this
+      resource within.
+    pattern: ^([a-z0-9][a-z0-9\-_]{1,63})::([a-z0-9][a-z0-9\-_]{1,63})$
+  Message:
+    type: string
+    minLength: 3
+    maxLength: 256
+  ProviderError:
+    type: object
+    properties:
+      message:
+        $ref: '#/definitions/Message'
+    additionalProperties: false
+    required:
+    - message
+    x-go-type:
+      type: Error
+      import:
+        package: github.com/manifoldco/grafton
+  ResourceRequest:
+    type: object
+    description: |
+      The information sent along to a Provider to provision a resource.
+    properties:
+      id:
+        $ref: '#/definitions/ID'
+      product:
+        $ref: '#/definitions/Label'
+      plan:
+        $ref: '#/definitions/Label'
+      region:
+        $ref: '#/definitions/RegionSlug'
+    additionalProperties: false
+    required:
+    - id
+    - product
+    - plan
+    - region
+  ResourcePlanChangeRequest:
+    type: object
+    description: |
+      The information sent along to a Provider to request
+      a resources' plan be changed.
+    properties:
+      plan:
+        $ref: '#/definitions/Label'
+    additionalProperties: false
+    required:
+    - plan
+  CredentialRequest:
+    type: object
+    description: |
+      The information sent along to a Provider to provision a set of
+      Credentials for a resource.
+    properties:
+      id:
+        $ref: '#/definitions/ID'
+      resource_id:
+        $ref: '#/definitions/ID'
+    additionalProperties: false
+    required:
+    - id
+    - resource_id
+  CredentialResponse:
+    type: object
+    description: |
+      The response expected back from a Provider to provision a set of
+      Credentials for a resource.
+    properties:
+      message:
+        $ref: '#/definitions/Message'
+      credentials:
+        type: object
+        additionalProperties:
+          type: string
+    additionalProperties: false
+    required:
+    - credentials
+  SuccessMessage:
+    type: object
+    description: |
+      Object used to display a message back to the user after a change has been
+      made to a Resource.
+    properties:
+      message:
+        $ref: '#/definitions/Message'
+    additionalProperties: false
+    required:
+    - message
