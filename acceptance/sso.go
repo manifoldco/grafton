@@ -43,7 +43,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 
 		capturer, err := fakeConnector.GetCapturer("/v1/oauth/tokens")
 		if err != nil {
@@ -114,7 +114,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 		defer resp.Body.Close()
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
@@ -156,7 +156,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 		defer resp.Body.Close()
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
@@ -194,7 +194,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 		defer resp.Body.Close()
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
@@ -235,7 +235,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 		defer resp.Body.Close()
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
@@ -277,7 +277,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		logRequest(req)
 		logResponse(resp)
 
-		gm.Expect(err).To(gm.BeNil())
+		gm.Expect(err).To(notError())
 		defer resp.Body.Close()
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(

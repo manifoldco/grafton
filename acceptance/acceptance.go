@@ -72,7 +72,7 @@ func Run(ctx context.Context, runErrorCases bool, exclude []string) bool {
 	fakeConnector.Start()
 	defer fakeConnector.Stop()
 
-	ok := walkGraph(ctx, exclude, execute)
+	ok := walkGraph(ctx, exclude, false, execute)
 	printSummary(failures, success)
 	return ok
 }
@@ -96,7 +96,7 @@ func Validate(ctx context.Context, cctx *cli.Context, exclude []string) []error 
 		return true
 	}
 
-	walkGraph(ctx, exclude, visitorFunc)
+	walkGraph(ctx, exclude, true, visitorFunc)
 
 	var i int
 	errs := make([]error, len(validationErrors))
@@ -111,9 +111,9 @@ func Validate(ctx context.Context, cctx *cli.Context, exclude []string) []error 
 // the children. If a feature is marked to be excluded, the feature is skipped,
 // otherwise, the visitorFunc is performed with the Feature Implementation.
 //
-// walkGraph returns a boolean with wether or not there were any errors running
+// walkGraph returns a boolean indicating if there were any errors running
 // the visitorFuncs.
-func walkGraph(ctx context.Context, exclude []string, visitor visitorFunc) bool {
+func walkGraph(ctx context.Context, exclude []string, descendOnErr bool, visitor visitorFunc) bool {
 	root := buildGraph(features)
 	stack := root.children
 	failures := false
@@ -126,10 +126,15 @@ func walkGraph(ctx context.Context, exclude []string, visitor visitorFunc) bool 
 			continue
 		}
 
-		stack = append(n.children, stack...)
 		ok := visitor(ctx, n.f)
 		if !ok {
 			n.f.failed = true
+		}
+
+		// we only run children if the parent passed when descendOnErr is false.
+		// this handles the RunsInside logic.
+		if ok || descendOnErr {
+			stack = append(n.children, stack...)
 		}
 
 		failures = failures || ok

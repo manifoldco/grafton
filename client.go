@@ -5,6 +5,7 @@ package grafton
 
 import (
 	"context"
+	"errors"
 	nurl "net/url"
 	"path/filepath"
 
@@ -18,6 +19,8 @@ import (
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
 	"github.com/manifoldco/grafton/generated/provider/models"
 )
+
+var errMissingMsg = errors.New("`message` field was missing from the response")
 
 // Client is a wrapper around the generated provisioning api client, providing
 // convenience methods, and signing outgoing requests.
@@ -61,14 +64,23 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 	p.SetContext(ctx)
 	res, acceptedRes, _, err := c.api.Resource.PutResourcesID(p)
 
-	var msg string
+	var msgPtr *string
 	callback := false
 	switch {
 	case res != nil:
-		msg = *res.Payload.Message
+		msgPtr = res.Payload.Message
 	case acceptedRes != nil:
 		callback = true
-		msg = *acceptedRes.Payload.Message
+		msgPtr = acceptedRes.Payload.Message
+	}
+
+	var msg string
+	switch {
+	case err != nil:
+	case msgPtr == nil:
+		err = errMissingMsg
+	default:
+		msg = *msgPtr
 	}
 
 	return msg, callback, err
@@ -104,6 +116,7 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 	res, accepted, err := c.api.Credential.PutCredentialsID(p)
 
 	var msg string
+	var msgPtr *string
 	var creds map[string]string
 	callback := accepted != nil
 	switch {
@@ -111,15 +124,23 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 		return creds, msg, callback, err
 	case !callback:
 		if res.Payload.Message != nil {
-			msg = *res.Payload.Message
+			msgPtr = res.Payload.Message
 		}
 
 		creds = res.Payload.Credentials
 	case callback && accepted.Payload.Message != nil:
-		msg = *accepted.Payload.Message
+		msgPtr = accepted.Payload.Message
 	}
 
-	return creds, msg, callback, nil
+	switch {
+	case err != nil:
+	case msgPtr == nil:
+		err = errMissingMsg
+	default:
+		msg = *msgPtr
+	}
+
+	return creds, msg, callback, err
 }
 
 // ChangePlan makes a patch call to change the resource's plan.

@@ -26,7 +26,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		defer cancel()
 		var err error
 		curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, region)
-		gm.Expect(err).To(gm.BeNil(), "Expected a successful provision of a resource")
+		gm.Expect(err).To(notError(), "Expected a successful provision of a resource")
 
 		if async {
 			c := fakeConnector.GetCallback(callbackID)
@@ -139,7 +139,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 			gm.BeFalse(),
 			"Same content should be evaluated during the initial call from Manifold",
 		)
-		gm.Expect(err).To(gm.BeNil(), "Create response should be returned (Repeatable Action)")
+		gm.Expect(err).To(notError(), "Create response should be returned (Repeatable Action)")
 	})
 
 	ErrorCase("with an already provisioned resource - different content results in conflict", func() {
@@ -169,7 +169,7 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 		defer cancel()
 		callbackID, async, err := deprovisionResource(ctx, api, resourceID)
 
-		gm.Expect(err).To(gm.BeNil(), "No error is expected")
+		gm.Expect(err).To(notError(), "No error is expected")
 		if async {
 			c := fakeConnector.GetCallback(callbackID)
 
