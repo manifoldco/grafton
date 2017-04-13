@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Initial release from our public git repository.
 
+### Removed
+
+- The credentials flag on grafton test, which was not used, has been removed.
+
 ### Fixed
 
 - Correct the RunsInside logic, so dependent features are not run when an outer

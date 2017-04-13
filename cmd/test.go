@@ -47,12 +47,6 @@ func init() {
 				Usage:  "The label of the region which the resource will be provision in",
 				EnvVar: "REGION",
 			},
-			cli.UintFlag{
-				Name:   "credentials",
-				Usage:  "The number of credential sets to request",
-				EnvVar: "CREDENTIALS",
-				Value:  2,
-			},
 			cli.StringSliceFlag{
 				Name:   "exclude",
 				Usage:  "Exlude running these feature tests (and those that depend on it)",
@@ -105,7 +99,6 @@ func testCmd(ctx *cli.Context) error {
 	newPlan := ctx.String("new-plan")
 	product := ctx.String("product")
 	region := ctx.String("region")
-	credCount := ctx.Uint("credentials")
 	excludeFeatures := ctx.StringSlice("exclude")
 
 	clientID := ctx.String("client-id")
@@ -176,7 +169,6 @@ func testCmd(ctx *cli.Context) error {
 	fmt.Fprintf(w, "\tProduct:\t%s\n", faint(product))
 	fmt.Fprintf(w, "\tPlan:\t%s\n", faint(plan))
 	fmt.Fprintf(w, "\tRegion:\t%s\n", faint(region))
-	fmt.Fprintf(w, "\tCredentials:\t%s\n", faint(fmt.Sprintf("%d", credCount)))
 	fmt.Fprintf(w, "\tResizing?\t%s\n", faint(yn(willChangePlan)))
 
 	if willChangePlan {
