@@ -1,4 +1,5 @@
 # CHANGELOG
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
@@ -9,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Initial release from our public git repository.
+- Detect, display, and fail on invalid status code responses during grafton
+  test.
 
 ### Removed
 

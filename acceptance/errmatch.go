@@ -1,10 +1,12 @@
 package acceptance
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"os"
 
+	"github.com/go-openapi/runtime"
 	"github.com/onsi/gomega/format"
 )
 
@@ -31,6 +33,12 @@ func (ne notErrorMatcher) FailureMessage(actual interface{}) string {
 		default:
 			return ne.FailureMessage(t.Err)
 		}
+	case *runtime.APIError:
+		if t.OperationName == "unknown error" {
+			return fmt.Sprintf("unexpected status code '%d' on response", t.Code)
+		}
+
+		return t.Error()
 	case error:
 		return t.Error()
 	}
