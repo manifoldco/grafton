@@ -21,7 +21,7 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 		defer cancel()
 		callbackID, async, err := changePlan(ctx, api, resourceID, newPlan)
 
-		gm.Expect(err).To(gm.BeNil(), "Expected a successful plan change of a resource")
+		gm.Expect(err).To(notError(), "Expected a successful plan change of a resource")
 
 		if async {
 			c := fakeConnector.GetCallback(callbackID)
@@ -48,7 +48,7 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 			gm.BeFalse(),
 			"Same content should be evaluated during the initial call from Manifold",
 		)
-		gm.Expect(err).To(gm.BeNil(),
+		gm.Expect(err).To(notError(),
 			"If the current plan matches the requested plan a 204 No Content should be returned (Repeatable Action)")
 	})
 

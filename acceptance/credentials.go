@@ -23,7 +23,7 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 		defer cancel()
 
 		cID, creds, callbackID, async, err := provisionCredentials(ctx, api, resourceID)
-		gm.Expect(err).To(gm.BeNil(), "Expected a successful provision of Credentials")
+		gm.Expect(err).To(notError(), "Expected a successful provision of Credentials")
 
 		if async {
 			c := fakeConnector.GetCallback(callbackID)
@@ -83,7 +83,7 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 			"Same content should be evaluated during the initial call from Manifold",
 		)
 		gm.Expect(err).To(
-			gm.BeNil(),
+			notError(),
 			"Create response should be returned (Repeatable Action)",
 		)
 	})
@@ -114,7 +114,7 @@ var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		callbackID, async, err := deprovisionCredentials(ctx, api, credentialID)
-		gm.Expect(err).To(gm.BeNil(), "No error is expected")
+		gm.Expect(err).To(notError(), "No error is expected")
 
 		if async {
 			c := fakeConnector.GetCallback(callbackID)
@@ -134,7 +134,7 @@ var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 		}
 	})
 
-	ErrorCase("delete an unexisting credential", func() {
+	ErrorCase("delete credentials that do not exist", func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 

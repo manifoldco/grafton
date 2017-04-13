@@ -14,3 +14,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Correct the RunsInside logic, so dependent features are not run when an outer
   feature fails.
+- Display cleaner error messages when grafton fails to connect to your provider
+  implementation.
