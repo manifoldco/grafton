@@ -20,3 +20,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   feature fails.
 - Display cleaner error messages when grafton fails to connect to your provider
   implementation.
+- Handle and report on missing `message` fields in provider responses.

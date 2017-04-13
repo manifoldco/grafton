@@ -31,9 +31,7 @@ func (ne notErrorMatcher) FailureMessage(actual interface{}) string {
 		default:
 			return ne.FailureMessage(t.Err)
 		}
-	case *net.DNSError:
-		return t.Error()
-	case *os.SyscallError:
+	case error:
 		return t.Error()
 	}
 
