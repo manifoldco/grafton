@@ -105,11 +105,15 @@ func Default(fn func()) {
 
 // ErrorCase represents an error case for a feature. These are optionally tested
 // based on command line flags.
+//
+// Failure of an error case does not prevent further error cases or RunsInside
+// features from running.
 func ErrorCase(name string, fn func()) {
 	if !shouldRunErrorCases {
 		return
 	}
 
+	defer func() { recover() }()
 	block("Error case: "+name, fn)
 }
 
