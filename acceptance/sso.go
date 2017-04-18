@@ -119,7 +119,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
 			gm.BeNumerically("==", 401),
-		), "Status code should be success or redirect")
+		), "Status code should be 401 unauthorized")
 	})
 
 	ErrorCase("with wrong client secret", func() {
@@ -161,7 +161,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
 			gm.BeNumerically("==", 401),
-		), "Status code should be success or redirect")
+		), "Status code should be 401 unauthorized")
 	})
 
 	ErrorCase("with expired token", func() {
@@ -199,7 +199,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
 			gm.BeNumerically("==", 401),
-		), "Status code should be success or redirect")
+		), "Status code should be 401 unauthorized")
 	})
 
 	ErrorCase("with non-existing code", func() {
@@ -240,7 +240,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
 			gm.BeNumerically("==", 401),
-		), "Status code should be success or redirect")
+		), "Status code should be 401 unauthorized")
 	})
 
 	ErrorCase("with connector response error", func() {
@@ -282,7 +282,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		gm.Expect(resp.StatusCode).To(gm.SatisfyAll(
 			gm.BeNumerically("==", 401),
-		), "Status code should be success or redirect")
+		), "Status code should be 401 unauthorized")
 	})
 })
 
