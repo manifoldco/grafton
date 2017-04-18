@@ -30,6 +30,22 @@ by the Provisioning service. Using this tool, a provider should be able to
 implement and test their integration without needing real requests from any
 Manifold services.
 
+## Installation
+
+Precompiled binaries are build for each release of Grafton for the following
+platforms:
+- `linux / amd64`
+- `darwin (macos) / amd64`
+- `windows / amd64`
+
+The zip files of these binaries are in the downloads section of each release
+(i.e. the
+[latest release](https://github.com/manifoldco/grafton/releases/latest)).
+
+To install, download and unzip the appropriate binary for your system, and run
+the `grafton` program inside. You may want to add it to a directory in your
+`PATH` for ease of use.
+
 ## Usage
 
 1. **Generate Keypair**
