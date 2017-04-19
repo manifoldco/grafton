@@ -89,7 +89,14 @@ generated: generated/provider/client generated/provider/models
 # Building
 #################################################
 
-build: bin/grafton
+PREFIX?=
+
+SUFFIX=
+ifeq ($(GOOS),windows)
+SUFFIX=.exe
+endif
+
+build: $(PREFIX)bin/grafton
 
 GRAFTON_DEPS=\
 	vendor \
@@ -100,14 +107,44 @@ GRAFTON_DEPS=\
 	generated/provider/client \
 	generated/provider/models
 
-bin/grafton: $(GRAFTON_DEPS)
-	$(GO_BUILD) -o bin/grafton ./cmd
+$(PREFIX)bin/grafton$(SUFFIX): $(GRAFTON_DEPS)
+	$(GO_BUILD) -o $(PREFIX)bin/grafton$(SUFFIX) ./cmd
 
 .PHONY: build
+
+
+#################################################
+# Releasing
+#################################################
+
+NO_WINDOWS= \
+	darwin_amd64 \
+	linux_amd64
+OS_ARCH= \
+	$(NO_WINDOWS) \
+	windows_amd64
+
+os=$(word 1,$(subst _, ,$1))
+arch=$(word 2,$(subst _, ,$1))
+
+os-build/windows_amd64/bin/grafton: os-build/%/bin/grafton:
+	PREFIX=build/$*/ GOOS=$(call os,$*) GOARCH=$(call arch,$*) make build/$*/bin/grafton.exe
+$(NO_WINDOWS:%=os-build/%/bin/grafton): os-build/%/bin/grafton:
+	PREFIX=build/$*/ GOOS=$(call os,$*) GOARCH=$(call arch,$*) make build/$*/bin/grafton
+
+build/grafton_$(VERSION)_windows_amd64.zip: build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
+	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton.exe
+$(NO_WINDOWS:%=build/grafton_$(VERSION)_%.zip): build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
+	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton
+
+zips: $(OS_ARCH:%=build/grafton_$(VERSION)_%.zip)
+
+.PHONY: zips $(OS_ARCH:%=os-build/%/bin/grafton)
 
 #################################################
 # Cleaning
 #################################################
 
 clean:
-	rm bin/grafton
+	rm -rf bin/grafton
+	rm -rf build
