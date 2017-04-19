@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.3] - 2017-04-19
+
 ### Fixed
 
 - A failing ErrorCase will not cause the rest of the test runs to abort early.
