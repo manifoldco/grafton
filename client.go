@@ -62,28 +62,27 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
-	res, acceptedRes, _, err := c.api.Resource.PutResourcesID(p)
+	res, acceptedRes, noContent, err := c.api.Resource.PutResourcesID(p)
 
 	var msgPtr *string
 	callback := false
 	switch {
+	case err != nil:
+		return "", false, err
 	case res != nil:
 		msgPtr = res.Payload.Message
 	case acceptedRes != nil:
 		callback = true
 		msgPtr = acceptedRes.Payload.Message
+	case noContent != nil:
+		return "", false, nil
 	}
 
-	var msg string
-	switch {
-	case err != nil:
-	case msgPtr == nil:
-		err = errMissingMsg
-	default:
-		msg = *msgPtr
+	if msgPtr == nil {
+		return "", callback, errMissingMsg
 	}
 
-	return msg, callback, err
+	return *msgPtr, callback, nil
 }
 
 func deriveCallbackURL(connectorURL *nurl.URL, cbID manifold.ID) (string, error) {
@@ -116,28 +115,22 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 	res, accepted, err := c.api.Credential.PutCredentialsID(p)
 
 	var msg string
-	var msgPtr *string
 	var creds map[string]string
-	callback := accepted != nil
+	callback := false
 	switch {
 	case err != nil:
-		return creds, msg, callback, err
-	case !callback:
+		return nil, "", false, err
+	case accepted != nil && accepted.Payload.Message == nil:
+		return nil, "", false, errMissingMsg
+	case res != nil:
 		if res.Payload.Message != nil {
-			msgPtr = res.Payload.Message
+			msg = *res.Payload.Message
 		}
 
 		creds = res.Payload.Credentials
-	case callback && accepted.Payload.Message != nil:
-		msgPtr = accepted.Payload.Message
-	}
-
-	switch {
-	case err != nil:
-	case msgPtr == nil:
-		err = errMissingMsg
-	default:
-		msg = *msgPtr
+	case accepted != nil:
+		msg = *accepted.Payload.Message
+		callback = true
 	}
 
 	return creds, msg, callback, err
