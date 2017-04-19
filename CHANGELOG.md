@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - A failing ErrorCase will not cause the rest of the test runs to abort early.
 - Make the error messages for SSO error cases match the status code they're
   looking for.
+- Don't require a message on 204 responses, which won't have a body.
 
 ## [0.6.2] - 2017-04-13
 
