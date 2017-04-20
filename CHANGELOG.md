@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- A resource can now be queried *during* the provisioning flow instead of after
+  it's completed.
+
 ## [0.6.3] - 2017-04-19
 
 ### Fixed
