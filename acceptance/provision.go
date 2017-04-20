@@ -46,7 +46,6 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		}
 
 		resourceID = curResource.ID
-		fakeConnector.AddResource(curResource)
 	})
 
 	ErrorCase("with a faulty product name", func() {
@@ -247,6 +246,27 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		return nil, c.ID, false, err
 	}
 
+	r := &connector.Resource{
+		ID:        id,
+		Product:   product,
+		Plan:      plan,
+		Region:    region,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}
+
+	// Ensure we remove the resource from the connector *if* the resource was
+	// not successfully provisioned.
+	success := false
+	fakeConnector.AddResource(r)
+	defer func() {
+		if success {
+			return
+		}
+
+		fakeConnector.RemoveResource(r.ID)
+	}()
+
 	msg, callback, err := api.ProvisionResource(ctx, c.ID, id, product, plan, region)
 	if err != nil {
 		return nil, c.ID, false, err
@@ -268,14 +288,8 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		Infoln("Message: ", msg)
 	}
 
-	return &connector.Resource{
-		ID:        id,
-		Product:   product,
-		Plan:      plan,
-		Region:    region,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-	}, c.ID, callback, nil
+	success = true
+	return r, c.ID, callback, nil
 }
 
 func deprovisionResource(ctx context.Context, api *grafton.Client, resourceID manifold.ID) (manifold.ID, bool, error) {

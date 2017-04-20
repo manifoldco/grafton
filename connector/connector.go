@@ -25,6 +25,10 @@ var ErrCallbackNotFound = errors.New("Callback Not Found")
 // has already been resolved
 var ErrCallbackAlreadyResolved = errors.New("Callback Already Resolved")
 
+// ErrResourceNotFound represents an error which occurrs if the resource does
+// not exist
+var ErrResourceNotFound = errors.New("Resource Not Found")
+
 // RequestCapturer represents functionality for capturing and storing requests
 // for a specific route
 type RequestCapturer struct {
@@ -99,6 +103,18 @@ func (c *FakeConnector) GetCapturer(route string) (*RequestCapturer, error) {
 // AddResource stores a resource inside the connector
 func (c *FakeConnector) AddResource(r *Resource) {
 	c.resources = append(c.resources, r)
+}
+
+// RemoveResource deletes a resource stored inside the connector
+func (c *FakeConnector) RemoveResource(ID manifold.ID) error {
+	for i, r := range c.resources {
+		if r.ID == ID {
+			c.resources = append(c.resources[:i], c.resources[i+1:]...)
+			return nil
+		}
+	}
+
+	return ErrResourceNotFound
 }
 
 // GetResource returns a Resource for the ID or nil
