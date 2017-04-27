@@ -73,8 +73,12 @@ deprovision those before resizing the resource. Finally, Grafton will
 deprovision the resource.
 
 ```
-$ grafton test --product=generators --plan=low --new-plan=high \
-  --region=aws::us-east-1 http://localhost:3000
+grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
+    --client-id=21jtaatqj8y5t0kctb2ejr6jev5w8 \
+    --client-secret=3yTKSiJ6f5V5Bq-kWF0hmdrEUep3m3HKPTcPX7CdBZw \
+    --connector-port=3001 \
+    --new-plan=large \
+    http://localhost:4567
 ```
 
 ## On editing the OpenAPI spec
