@@ -131,9 +131,8 @@ func testCmd(ctx *cli.Context) error {
 		return cli.NewExitError("unable to parse url", -1)
 	}
 
-	if purl.Path == "" {
-		purl.Path = "/v1"
-	}
+	// Always append the '/v1' to the path
+	purl.Path = path.Join(purl.Path, "/v1")
 
 	k, err := getKeypair()
 	if err != nil {
