@@ -6,6 +6,7 @@ import (
 	"fmt"
 	nurl "net/url"
 	"os"
+	"path"
 	"strings"
 	"text/tabwriter"
 
@@ -128,7 +129,7 @@ func testCmd(ctx *cli.Context) error {
 
 	purl, err := nurl.Parse(url)
 	if err != nil {
-		return cli.NewExitError("unable to parse url", -1)
+		return cli.NewExitError("unable to parse url: "+url, -1)
 	}
 
 	// Always append the '/v1' to the path
