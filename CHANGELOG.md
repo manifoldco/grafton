@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Fixed
+
+- If a trailing slash is provided for the base url, Grafton will no longer
+  generate urls with duplicate `/` between path segments.
+
 ## [0.6.4] - 2017-04-20
 
 ### Fixed

@@ -10,6 +10,7 @@ import (
 	gm "github.com/onsi/gomega"
 
 	"github.com/manifoldco/go-manifold"
+	"github.com/manifoldco/go-manifold/idtype"
 	"github.com/manifoldco/go-signature"
 )
 
@@ -36,6 +37,80 @@ func callProvisionCredentials(rawURL string) (map[string]string, string, bool, e
 	resID := manifold.ID{}
 	credID := manifold.ID{}
 	return c.ProvisionCredentials(ctx, cbID, resID, credID)
+}
+
+func testCallbackURL(base string) (string, manifold.ID, error) {
+	ID, err := manifold.NewID(idtype.Callback)
+	if err != nil {
+		return "", ID, err
+	}
+
+	b, err := url.Parse(base)
+	if err != nil {
+		return "", ID, err
+	}
+
+	c, err := deriveCallbackURL(b, ID)
+	if err != nil {
+		return "", ID, err
+	}
+
+	return c, ID, err
+}
+
+func testCreateSSOURL(base, code string) (string, manifold.ID, error) {
+	ID, err := manifold.NewID(idtype.OAuthAuthorizationCode)
+	if err != nil {
+		return "", ID, err
+	}
+
+	u, err := url.Parse(base)
+	if err != nil {
+		return "", ID, err
+	}
+
+	c := New(u, &url.URL{}, stubSigner{})
+	return c.CreateSsoURL(code, ID).String(), ID, nil
+}
+
+func TestDerivingCallbackURL(t *testing.T) {
+	t.Run("base url with trailing slash", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		u, ID, err := testCallbackURL("http://my.host.com/v1/")
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(u).To(gm.Equal("http://my.host.com/v1/callbacks/" + ID.String()))
+	})
+
+	t.Run("base url without trailing slash", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		u, ID, err := testCallbackURL("http://my.host.com/v1")
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(u).To(gm.Equal("http://my.host.com/v1/callbacks/" + ID.String()))
+	})
+}
+
+func TestDerivingSSOURL(t *testing.T) {
+	t.Run("base url with trailing slash", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		u, ID, err := testCreateSSOURL("http://my.sso.url/v1/", "sdfsd")
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(u).To(gm.Equal("http://my.sso.url/v1/sso?code=sdfsd&resource_id=" + ID.String()))
+	})
+
+	t.Run("base url with no trailing slash", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		u, ID, err := testCreateSSOURL("http://my.sso.url/v1", "sdfsd")
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(u).To(gm.Equal("http://my.sso.url/v1/sso?code=sdfsd&resource_id=" + ID.String()))
+	})
 }
 
 func TestProvisionResource(t *testing.T) {

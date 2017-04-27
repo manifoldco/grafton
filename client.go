@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	nurl "net/url"
-	"path/filepath"
+	"path"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -91,7 +91,7 @@ func deriveCallbackURL(connectorURL *nurl.URL, cbID manifold.ID) (string, error)
 		return "", err
 	}
 
-	u.Path = u.Path + "/callbacks/" + cbID.String()
+	u.Path = path.Join(u.Path, "callbacks/"+cbID.String())
 	return u.String(), nil
 }
 
@@ -215,7 +215,7 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 func (c *Client) CreateSsoURL(code string, resourceID manifold.ID) *nurl.URL {
 	url := *c.url
 
-	url.Path = filepath.Join(url.Path, "/sso/")
+	url.Path = path.Join(url.Path, "sso/")
 	q := nurl.Values{}
 	q.Set("code", code)
 	q.Set("resource_id", resourceID.String())
