@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Improvements
+
+- The main `grafton` package now exports a function `CreateSsoURL` for deriving
+  an SSO URL.
+
 ## [0.6.6] - 2017-04-27
 
 ### Fixed
