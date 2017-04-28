@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.6.6] - 2017-04-27
+
 ### Fixed
 
 - A backwards incompatible change was accidently introduced in `v0.6.5`, `/v1`
