@@ -213,7 +213,13 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 // CreateSsoURL Generates and returns a *url.URL to initiate single sign-on against
 // the provider for this client.
 func (c *Client) CreateSsoURL(code string, resourceID manifold.ID) *nurl.URL {
-	url := *c.url
+	return CreateSsoURL(c.url, code, resourceID)
+}
+
+// CreateSsoURL generates and returns a *url.URL to initiate a single sign-on
+// request against the provided base url, code, and resourceID.
+func CreateSsoURL(base *nurl.URL, code string, resourceID manifold.ID) *nurl.URL {
+	url := *base
 
 	url.Path = path.Join(url.Path, "sso/")
 	q := nurl.Values{}
