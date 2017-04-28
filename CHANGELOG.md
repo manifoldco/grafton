@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.6.5] - 2017-04-27
+
 ### Fixed
 
 - If a trailing slash is provided for the base url, Grafton will no longer
