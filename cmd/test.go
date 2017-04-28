@@ -133,7 +133,9 @@ func testCmd(ctx *cli.Context) error {
 	}
 
 	// Always append the '/v1' to the path
-	purl.Path = path.Join(purl.Path, "/v1")
+	if !strings.HasSuffix(purl.Path, "/v1") {
+		purl.Path = path.Join(purl.Path, "/v1")
+	}
 
 	k, err := getKeypair()
 	if err != nil {
