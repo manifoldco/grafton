@@ -26,9 +26,9 @@ info:
     Manifold's Connector API is ran for retrieving user or resource data as
     well as completing asynchronous operations.
 
-    Currently, Grafton is only given to Providers who are working with us
-    during our closed beta period. Please contact [Manifold
-    Support](mailto:support@manifold.co) to retrieve the latest version.
+    Grafton is [open source](https://github.com/manifoldco/grafton) with
+    releases available on
+    [GitHub](https://github.com/manifoldco/grafton/releases).
 
     ## Using Grafton
     The first step to use Grafton is to generate as a test master key which is
@@ -358,6 +358,11 @@ info:
     The granted access token will only be valid for 24hours. After the token
     has expired, the user must complete the Sign-On flow from the Manifold
     dashboard to grant a new token.
+
+    **IMPORTANT**: A malicious user *could* tamper with the `resource_id` query
+    parameter. To prevent this, the provider *must* validate that the user has
+    access to the targeted resource by requesting information about it from the
+    Connector API using the granted access token.
   version: 1.0.0
 host: yourdomain.com
 schemes:
@@ -850,6 +855,11 @@ paths:
 
         The access token is sensitive data that grants access to a user's
         data within Manifold. It should be treated with care.
+
+        **IMPORTANT**: A malicious user *could* tamper with the `resource_id`
+        query parameter. To prevent this, the provider *must* validate that the
+        user has access to the targeted resource by requesting information
+        about it from the Connector API using the granted access token.
       parameters:
       - name: code
         in: query
