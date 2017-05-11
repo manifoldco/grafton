@@ -5,7 +5,6 @@ package grafton
 
 import (
 	"context"
-	"errors"
 	nurl "net/url"
 	"path"
 
@@ -13,14 +12,13 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/manifoldco/go-manifold"
+	merrors "github.com/manifoldco/go-manifold/errors"
 
 	"github.com/manifoldco/grafton/generated/provider/client"
 	"github.com/manifoldco/grafton/generated/provider/client/credential"
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
 	"github.com/manifoldco/grafton/generated/provider/models"
 )
-
-var errMissingMsg = errors.New("`message` field was missing from the response")
 
 // Client is a wrapper around the generated provisioning api client, providing
 // convenience methods, and signing outgoing requests.
@@ -64,11 +62,27 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 	p.SetContext(ctx)
 	res, acceptedRes, noContent, err := c.api.Resource.PutResourcesID(p)
 
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *resource.PutResourcesIDBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *resource.PutResourcesIDUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *resource.PutResourcesIDConflict:
+			graftonErr = NewErrWithMsg(merrors.ConflictError, e.Payload.Message)
+		case *resource.PutResourcesIDInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			return "", false, err
+		}
+
+		return "", false, graftonErr
+	}
+
 	var msgPtr *string
 	callback := false
 	switch {
-	case err != nil:
-		return "", false, err
 	case res != nil:
 		msgPtr = res.Payload.Message
 	case acceptedRes != nil:
@@ -79,7 +93,7 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 	}
 
 	if msgPtr == nil {
-		return "", callback, errMissingMsg
+		return "", false, ErrMissingMsg
 	}
 
 	return *msgPtr, callback, nil
@@ -114,14 +128,32 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 
 	res, accepted, err := c.api.Credential.PutCredentialsID(p)
 
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *credential.PutCredentialsIDBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *credential.PutCredentialsIDUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *credential.PutCredentialsIDConflict:
+			graftonErr = NewErrWithMsg(merrors.ConflictError, e.Payload.Message)
+		case *credential.PutCredentialsIDNotFound:
+			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
+		case *credential.PutCredentialsIDInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			return nil, "", false, err
+		}
+
+		return nil, "", false, graftonErr
+	}
+
 	var msg string
 	var creds map[string]string
 	callback := false
 	switch {
-	case err != nil:
-		return nil, "", false, err
 	case accepted != nil && accepted.Payload.Message == nil:
-		return nil, "", false, errMissingMsg
+		return nil, "", false, ErrMissingMsg
 	case res != nil:
 		if res.Payload.Message != nil {
 			msg = *res.Payload.Message
@@ -151,6 +183,23 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 	p.SetContext(ctx)
 
 	res, accepted, _, err := c.api.Resource.PatchResourcesID(p)
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *resource.PatchResourcesIDBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *resource.PatchResourcesIDNotFound:
+			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
+		case *resource.PatchResourcesIDUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *resource.PatchResourcesIDInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			return "", false, err
+		}
+
+		return "", false, graftonErr
+	}
 
 	var msg string
 	callback := accepted != nil
@@ -161,7 +210,7 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 		msg = *accepted.Payload.Message
 	}
 
-	return msg, callback, err
+	return msg, callback, nil
 }
 
 // DeprovisionCredentials deletes credentials from the remote provider.
@@ -180,6 +229,25 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 	p.SetXCallbackURL(cbURL)
 
 	accepted, _, err := c.api.Credential.DeleteCredentialsID(p)
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *credential.DeleteCredentialsIDBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *credential.DeleteCredentialsIDNotFound:
+			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
+		case *credential.DeleteCredentialsIDUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *credential.DeleteCredentialsIDInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			return "", false, err
+		}
+
+		return "", false, graftonErr
+
+	}
+
 	callback := accepted != nil
 	if callback && accepted.Payload.Message != nil {
 		msg = *accepted.Payload.Message
@@ -202,6 +270,24 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 	p.SetXCallbackURL(cbURL)
 
 	accepted, _, err := c.api.Resource.DeleteResourcesID(p)
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *resource.DeleteResourcesIDBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *resource.DeleteResourcesIDNotFound:
+			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
+		case *resource.DeleteResourcesIDUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *resource.DeleteResourcesIDInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			return "", false, err
+		}
+
+		return "", false, graftonErr
+	}
+
 	callback := accepted != nil
 	if callback && accepted.Payload.Message != nil {
 		msg = *accepted.Payload.Message

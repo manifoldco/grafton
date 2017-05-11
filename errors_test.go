@@ -5,10 +5,64 @@ import (
 	"net/http"
 	"testing"
 
+	swagerrs "github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	gm "github.com/onsi/gomega"
 
+	"github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 )
+
+func TestIsFatal(t *testing.T) {
+	t.Run("a generic error is not fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := errors.New("hi")
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
+	})
+
+	t.Run("an InternalServerError is not fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := manifold.NewError(merrors.InternalServerError, "hi")
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
+	})
+
+	t.Run("a go-openapi with code < 500 is fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := swagerrs.New(401, "hi")
+		gm.Expect(IsFatal(err)).To(gm.BeTrue())
+	})
+
+	t.Run("a go-openapi with code 5xx is not fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := swagerrs.New(503, "hi")
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
+	})
+
+	t.Run("a go-openapi with code 4xx is fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := swagerrs.New(401, "what")
+		gm.Expect(IsFatal(err)).To(gm.BeTrue())
+	})
+
+	t.Run("a runtime APIError with code 5xx is not fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := runtime.NewAPIError("unknown", nil, 500)
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
+	})
+
+	t.Run("a runtime APIError with code 4xx to be fatal", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		err := runtime.NewAPIError("unknown", nil, 400)
+		gm.Expect(IsFatal(err)).To(gm.BeTrue())
+	})
+}
 
 func TestToError(t *testing.T) {
 	t.Run("with an Error", func(t *testing.T) {

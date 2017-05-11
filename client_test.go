@@ -10,6 +10,7 @@ import (
 	gm "github.com/onsi/gomega"
 
 	"github.com/manifoldco/go-manifold"
+	"github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 	"github.com/manifoldco/go-signature"
 )
@@ -37,6 +38,41 @@ func callProvisionCredentials(rawURL string) (map[string]string, string, bool, e
 	resID := manifold.ID{}
 	credID := manifold.ID{}
 	return c.ProvisionCredentials(ctx, cbID, resID, credID)
+}
+
+func callChangePlan(rawURL string) (string, bool, error) {
+	ctx := context.Background()
+	sURL, _ := url.Parse(rawURL)
+	c := New(sURL, &url.URL{}, stubSigner{})
+
+	cbID := manifold.ID{}
+	resID := manifold.ID{}
+
+	return c.ChangePlan(ctx, cbID, resID, "new-plan")
+}
+
+func callDeprovisionCredentials(rawURL string) (string, bool, error) {
+	ctx := context.Background()
+	sURL, _ := url.Parse(rawURL)
+
+	c := New(sURL, &url.URL{}, stubSigner{})
+
+	cbID := manifold.ID{}
+	credID := manifold.ID{}
+
+	return c.DeprovisionCredentials(ctx, cbID, credID)
+}
+
+func callDeprovisionResource(rawURL string) (string, bool, error) {
+	ctx := context.Background()
+	sURL, _ := url.Parse(rawURL)
+
+	c := New(sURL, &url.URL{}, stubSigner{})
+
+	cbID := manifold.ID{}
+	resID := manifold.ID{}
+
+	return c.DeprovisionResource(ctx, cbID, resID)
 }
 
 func testCallbackURL(base string) (string, manifold.ID, error) {
@@ -71,6 +107,19 @@ func testCreateSSOURL(base, code string) (string, manifold.ID, error) {
 
 	c := New(u, &url.URL{}, stubSigner{})
 	return c.CreateSsoURL(code, ID).String(), ID, nil
+}
+
+func withCode(code int, fn func(string)) func(t *testing.T) {
+	return func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(code)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+		fn(srv.URL)
+	}
 }
 
 func TestDerivingCallbackURL(t *testing.T) {
@@ -158,7 +207,7 @@ func TestProvisionResource(t *testing.T) {
 
 		_, _, err := callProvision(srv.URL)
 
-		gm.Expect(err).To(gm.HaveOccurred())
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 	})
 
 	t.Run("202 accepted", func(t *testing.T) {
@@ -176,6 +225,75 @@ func TestProvisionResource(t *testing.T) {
 		gm.Expect(err).ToNot(gm.HaveOccurred())
 		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
 		gm.Expect(message).To(gm.Equal("please wait"))
+	})
+
+	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
+		_, _, err := callProvision(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, "i dont get ya")))
+	}))
+
+	t.Run("400 bad request with invalid content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callProvision(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
+	})
+
+	t.Run("400 bad request with missing message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callProvision(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+	})
+
+	t.Run("401 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
+		_, _, err := callProvision(url)
+		gm.Expect(err).To(gm.MatchError(NewError(errors.UnauthorizedError, "i dont get ya")))
+	}))
+
+	t.Run("409 conflict valid response", withCode(http.StatusConflict, func(url string) {
+		_, _, err := callProvision(url)
+		gm.Expect(err).To(gm.MatchError(NewError(errors.ConflictError, "i dont get ya")))
+	}))
+
+	t.Run("500 internal server error valid response", withCode(http.StatusInternalServerError, func(url string) {
+		_, _, err := callProvision(url)
+		gm.Expect(err).To(gm.MatchError(NewError(errors.InternalServerError, "i dont get ya")))
+	}))
+
+	t.Run("503 service unavailable, unrecognized status code", withCode(http.StatusServiceUnavailable, func(url string) {
+		_, _, err := callProvision(url)
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
+	}))
+
+	t.Run("503 service unavailable, unrecognized status code, bad content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusServiceUnavailable)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callProvision(srv.URL)
+
+		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 	})
 }
 
@@ -256,6 +374,358 @@ func TestProvisionCredentials(t *testing.T) {
 
 		_, _, _, err := callProvisionCredentials(srv.URL)
 
-		gm.Expect(err).To(gm.HaveOccurred())
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 	})
+
+	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
+		_, _, _, err := callProvisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, "i dont get ya")))
+	}))
+
+	t.Run("400 bad request with invalid content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, _, err := callProvisionCredentials(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
+	})
+
+	t.Run("400 bad request with missing message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		_, _, _, err := callProvisionCredentials(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+	})
+
+	t.Run("404 not found valid response", withCode(http.StatusNotFound, func(url string) {
+		_, _, _, err := callProvisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.NotFoundError, "i dont get ya")))
+	}))
+
+	t.Run("409 conflict valid response", withCode(http.StatusConflict, func(url string) {
+		_, _, _, err := callProvisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.ConflictError, "i dont get ya")))
+	}))
+
+	t.Run("500 internal server error valid response", withCode(http.StatusInternalServerError, func(url string) {
+		_, _, _, err := callProvisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.InternalServerError, "i dont get ya")))
+	}))
+}
+
+func TestChangePlan(t *testing.T) {
+	t.Run("200 no message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		message, async, err := callChangePlan(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse(), "Result on 200 should not be async")
+		gm.Expect(message).To(gm.BeEmpty(), "No message was expected")
+	})
+
+	t.Run("200 with message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`{
+				"message": "the plan has changed"
+			}`))
+
+		}))
+		defer srv.Close()
+
+		message, async, err := callChangePlan(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse(), "Result on 200 should not be async")
+		gm.Expect(message).To(gm.Equal("the plan has changed"))
+	})
+
+	t.Run("202 accepted", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{"message":"please wait"}`))
+		}))
+		defer srv.Close()
+
+		message, async, err := callChangePlan(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(message).To(gm.Equal("please wait"))
+	})
+
+	t.Run("202 no message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		msg, async, err := callChangePlan(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(msg).To(gm.Equal(""))
+	})
+
+	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
+		_, _, err := callChangePlan(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, "i dont get ya")))
+	}))
+
+	t.Run("400 bad request with invalid content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callChangePlan(srv.URL)
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
+	})
+
+	t.Run("400 bad request with missing message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callChangePlan(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+	})
+
+	t.Run("401 bad unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
+		_, _, err := callChangePlan(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.UnauthorizedError, "i dont get ya")))
+	}))
+
+	t.Run("404 not found valid response", withCode(http.StatusNotFound, func(url string) {
+		_, _, err := callChangePlan(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.NotFoundError, "i dont get ya")))
+	}))
+
+	t.Run("500 internal server error valid response", withCode(http.StatusInternalServerError, func(url string) {
+		_, _, err := callChangePlan(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.InternalServerError, "i dont get ya")))
+	}))
+}
+
+func TestDeprovisionCredentials(t *testing.T) {
+	t.Run("202 accepted", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{"message":"please wait"}`))
+		}))
+		defer srv.Close()
+
+		message, async, err := callDeprovisionCredentials(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(message).To(gm.Equal("please wait"))
+	})
+
+	t.Run("202 no message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		msg, async, err := callDeprovisionCredentials(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(msg).To(gm.Equal(""))
+	})
+
+	t.Run("400 bad request error valid response", withCode(http.StatusBadRequest, func(url string) {
+		_, _, err := callDeprovisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, "i dont get ya")))
+	}))
+
+	t.Run("400 bad request with invalid content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callDeprovisionCredentials(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
+	})
+
+	t.Run("400 bad request with missing message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callDeprovisionCredentials(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+	})
+
+	t.Run("401 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
+		_, _, err := callDeprovisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.UnauthorizedError, "i dont get ya")))
+	}))
+
+	t.Run("404 not found valid response", withCode(http.StatusNotFound, func(url string) {
+		_, _, err := callDeprovisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.NotFoundError, "i dont get ya")))
+	}))
+
+	t.Run("500 internal server error valid response", withCode(http.StatusInternalServerError, func(url string) {
+		_, _, err := callDeprovisionCredentials(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.InternalServerError, "i dont get ya")))
+	}))
+}
+
+func TestDeprovisionResource(t *testing.T) {
+	t.Run("202 accepted", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{"message":"please wait"}`))
+		}))
+		defer srv.Close()
+
+		message, async, err := callDeprovisionResource(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(message).To(gm.Equal("please wait"))
+	})
+
+	t.Run("202 no message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusAccepted)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		msg, async, err := callDeprovisionResource(srv.URL)
+
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
+		gm.Expect(msg).To(gm.Equal(""))
+	})
+
+	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
+		_, _, err := callDeprovisionResource(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, "i dont get ya")))
+	}))
+
+	t.Run("400 bad request with invalid content-type", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "text/html")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{"message":"i dont get ya"}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callDeprovisionResource(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
+	})
+
+	t.Run("400 bad request with missing message", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusBadRequest)
+			rw.Write([]byte(`{}`))
+		}))
+		defer srv.Close()
+
+		_, _, err := callDeprovisionResource(srv.URL)
+
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+	})
+
+	t.Run("400 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
+		_, _, err := callDeprovisionResource(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.UnauthorizedError, "i dont get ya")))
+	}))
+
+	t.Run("404 not found valid response", withCode(http.StatusNotFound, func(url string) {
+		_, _, err := callDeprovisionResource(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.NotFoundError, "i dont get ya")))
+	}))
+
+	t.Run("500 internal server error valid response", withCode(http.StatusInternalServerError, func(url string) {
+		_, _, err := callDeprovisionResource(url)
+
+		gm.Expect(err).To(gm.MatchError(NewError(errors.InternalServerError, "i dont get ya")))
+	}))
 }
