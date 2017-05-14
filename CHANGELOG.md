@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [0.8.0] - 2017-05-14
+
+### Improvements
+
+- The grafton client now returns `grafton.Error` if the received response
+  conforms to the responses expected in the `provider.yaml` swagger
+  specification.
+- The main `grafton` package now exports a function `IsFatal` which returns
+  whether or not an error is considered to be fatal to a provision, plan
+  change, or deprovisioning flow.
 
 ## [0.7.0] - 2017-04-28
 
