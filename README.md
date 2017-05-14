@@ -81,6 +81,22 @@ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
     http://localhost:4567
 ```
 
+## Releasing
+
+Releasing grafton is a manual process run on a developers local machine.
+
+1. Ensure all of the required code has been merged into master.
+2. Determine whether or not the `CHANGELOD.md` is up to date and correct for
+   this release, if it's not, update it!
+3. Create a tag off master (following [semver](http://semver.org/)), which
+   includes the up to date `CHANGELOG.md` (and matches the remote sha of master
+   on github).
+4. Build grafton locally from scratch (`make clean; make`)
+5. Create the build zips (`make zips`)
+6. Create a release on github for the tag which includes the changelog for this
+   release and upload the build zips.
+7. Done!
+
 ## On editing the OpenAPI spec
 
 `provider.yaml` is a manual copy of an internally generated file. It, in
