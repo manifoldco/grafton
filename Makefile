@@ -21,7 +21,7 @@ ci: $(LINTERS) cover build
 # Bootstrapping for base golang package deps
 #################################################
 
-BOOTSTRAP=\
+CMD_PKGS=\
 	github.com/golang/lint/golint \
 	honnef.co/go/simple/cmd/gosimple \
 	github.com/client9/misspell/cmd/misspell \
@@ -30,15 +30,23 @@ BOOTSTRAP=\
 	github.com/alecthomas/gometalinter \
 	github.com/go-swagger/go-swagger/cmd/swagger
 
-$(BOOTSTRAP):
-	go get -u $@
-bootstrap: $(BOOTSTRAP)
+define VENDOR_BIN_TMPL
+vnedor/bin/$(notdir $(1)): vendor
+	go build -o $$@ ./vendor/$(1)
+VENDOR_BINS += vendor/bin/$(notdir $(1))
+endef
+
+$(foreach cmd_pkg,$(CMD_PKGS),$(eval $(call VENDOR_BIN_TMPL,$(cmd_pkg))))
+$(patsubst %,%-bin,$(filter-out gofmt vet,$(LINTERS))): %-bin: vendor/bin/%
+gofmt-bin vet-bin:
+
+bootstrap:
 	glide -v || curl http://glide.sh/get | sh
 
 vendor: glide.lock
 	glide install
 
-.PHONY: bootstrap $(BOOTSTRAP)
+.PHONY: bootstrap $(CMD_PKGS)
 
 #################################################
 # Test and linting

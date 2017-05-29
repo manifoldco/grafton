@@ -1,10 +1,16 @@
-hash: b8d2dc33404956af1e6bdd720a266a9b752c7918c86324058d4a9885e561dd83
-updated: 2017-04-12T21:21:53.790348012-03:00
+hash: fd35e403c7734c4dba01a55d32d6c125ac45c3d713c33010d51c85e64a7eec9a
+updated: 2017-05-29T12:02:33.992076323-03:00
 imports:
+- name: github.com/alecthomas/gometalinter
+  version: bae2f1293d092fd8167939d5108d1b025eaef9de
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
 - name: github.com/chzyer/readline
   version: 41eea22f717c616615e1e59aa06cf831f9901f35
+- name: github.com/client9/misspell
+  version: d06ddd376b273047dca6e16eeeb2a2a8f9791978
+  subpackages:
+  - cmd/misspell
 - name: github.com/dchest/blake2b
   version: 06006a921c7d13e3fdf63c401cb0e4529a26e6e4
 - name: github.com/dgrijalva/jwt-go
@@ -33,8 +39,18 @@ imports:
   version: d5f8ebc3b1c55a4cf6489eeae7354f338cfe299e
 - name: github.com/go-openapi/validate
   version: 035dcd74f1f61e83debe1c22950dc53556e7e4b2
+- name: github.com/go-swagger/go-swagger
+  version: fbc64c262a833b40adf3d2cdba241fc4d30664b0
+  subpackages:
+  - cmd/swagger
 - name: github.com/go-zoo/bone
   version: fd0aebc74e908868b09ac140fb5a53cb363884c1
+- name: github.com/golang/lint
+  version: cb00e5669539f047b2f4c53a421a01b0c8e172c6
+  subpackages:
+  - golint
+- name: github.com/gordonklaus/ineffassign
+  version: f0c5cfc1817d6dd6011c7e8b8d272f94aeeb12cb
 - name: github.com/mailru/easyjson
   version: 2af9a745a611440bab0528e5ac19b2805a1c50eb
   subpackages:
@@ -59,7 +75,7 @@ imports:
 - name: github.com/manifoldco/go-signature
   version: b948ef70772bc297c188970439dc479230833597
 - name: github.com/manifoldco/torus-cli
-  version: fbd3a2449dd62529ec5ab07cf1e49bc85c69459a
+  version: c44a71127d9dcfcf1d03b0be5942385ca66d07f6
   subpackages:
   - promptui
 - name: github.com/mitchellh/mapstructure
@@ -82,6 +98,8 @@ imports:
   version: 0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4
 - name: github.com/PuerkitoBio/urlesc
   version: bbf7a2afc14f93e1e0a5c06df524fbd75e5031e5
+- name: github.com/tsenart/deadcode
+  version: 210d2dc333e90c7e3eedf4f2242507a8e83ed4ab
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: golang.org/x/crypto
