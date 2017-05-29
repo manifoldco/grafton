@@ -34,3 +34,6 @@ import:
 - package: github.com/go-swagger/go-swagger
   subpackages:
   - cmd/swagger
+- package: golang.org/x/tools
+  subpackages:
+  - go/gcexportdata

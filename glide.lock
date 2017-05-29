@@ -1,5 +1,5 @@
-hash: fd35e403c7734c4dba01a55d32d6c125ac45c3d713c33010d51c85e64a7eec9a
-updated: 2017-05-29T12:02:33.992076323-03:00
+hash: 5ea29991b697700e04e9c63f824d4992e5d25cdc804b0dd93516dfcc3d9af2b7
+updated: 2017-05-29T16:03:11.183765042-03:00
 imports:
 - name: github.com/alecthomas/gometalinter
   version: bae2f1293d092fd8167939d5108d1b025eaef9de
@@ -68,7 +68,7 @@ imports:
 - name: github.com/manifoldco/go-jwt
   version: f2e996517b3d7de4f17b8bbfa64d2d396f302bb1
 - name: github.com/manifoldco/go-manifold
-  version: 640d3e7b9f9e858924b1b3e6c17ced1bc256c014
+  version: 55004bd59e68290faa825ca968025d2b1d9ab2e9
   subpackages:
   - errors
   - idtype
@@ -125,6 +125,10 @@ imports:
   - unicode/bidi
   - unicode/norm
   - width
+- name: golang.org/x/tools
+  version: bc6db94186c03835daa5c1c679fba599dc1f3b79
+  subpackages:
+  - go/gcexportdata
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
