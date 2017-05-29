@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The `grafton test` command now validates the credential names it receives.
 - The main `grafton` package now exports a function `ValidCredentialName` for
   testing whether or not a given credential name is valid.
+- Dependencies for bootstrapping the build are now vendored using glide.
 
 ## [0.8.0] - 2017-05-14
 
