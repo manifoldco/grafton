@@ -31,7 +31,7 @@ CMD_PKGS=\
 	github.com/go-swagger/go-swagger/cmd/swagger
 
 define VENDOR_BIN_TMPL
-vnedor/bin/$(notdir $(1)): vendor
+vendor/bin/$(notdir $(1)): vendor
 	go build -o $$@ ./vendor/$(1)
 VENDOR_BINS += vendor/bin/$(notdir $(1))
 endef
