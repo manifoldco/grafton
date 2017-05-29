@@ -46,6 +46,11 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 			"One or more credentials should be returned during provision of a Credential set",
 		)
 
+		for name := range creds {
+			gm.Expect(grafton.ValidCredentialName(name)).To(
+				gm.BeTrue(), "Credential name must be of the form "+grafton.NameRegexpString)
+		}
+
 		credentialID = cID
 	})
 
