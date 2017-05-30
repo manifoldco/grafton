@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [x.y.z] - YYYY-MM-DD (Unreleased)
+
+### Improvements
+
+- The `grafton test` command now validates the credential names it receives.
+- The main `grafton` package now exports a function `ValidCredentialName` for
+  testing whether or not a given credential name is valid.
+- Dependencies for bootstrapping the build are now vendored using glide.
+
 ## [0.8.0] - 2017-05-14
 
 ### Improvements
