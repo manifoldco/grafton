@@ -8,11 +8,11 @@ import (
 	gm "github.com/onsi/gomega"
 
 	"github.com/manifoldco/go-manifold"
+	merrors "github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
-	"github.com/manifoldco/grafton/generated/provider/client/resource"
 )
 
 var resize = Feature("plan-change", "Change a resource's plan", func(ctx context.Context) {
@@ -68,9 +68,12 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&resource.PatchResourcesIDNotFound{}),
-			"Expected a IDNotFound error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
 	})
 
 	ErrorCase("with a non existing plan", func() {
@@ -88,9 +91,12 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&resource.PatchResourcesIDBadRequest{}),
-			"Expected a BadRequest error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
 	})
 
 	ErrorCase("with a bad signature", func() {
@@ -108,9 +114,12 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&resource.PatchResourcesIDUnauthorized{}),
-			"Expected an Unauthorized error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError))
 	})
 })
 
