@@ -8,11 +8,11 @@ import (
 	gm "github.com/onsi/gomega"
 
 	"github.com/manifoldco/go-manifold"
+	merrors "github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
-	"github.com/manifoldco/grafton/generated/provider/client/credential"
 )
 
 var credentialID manifold.ID
@@ -71,9 +71,12 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&credential.PutCredentialsIDNotFound{}),
-			"Expected an IDNotFound error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
 	})
 
 	ErrorCase("with already provisioned credentials - same content acts as created", func() {
@@ -108,9 +111,12 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&credential.PutCredentialsIDUnauthorized{}),
-			"Expected an Unauthorized error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError))
 	})
 })
 
@@ -155,9 +161,12 @@ var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 			"Expected an error, got nil",
 		)
 		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&credential.DeleteCredentialsIDNotFound{}),
-			"Expected a CredentialsIDNotFound error, got %T", err,
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
 		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
 	})
 })
 

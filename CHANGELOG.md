@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   testing whether or not a given credential name is valid.
 - Dependencies for bootstrapping the build are now vendored using glide.
 
+### Fixes
+
+- A bug has been fixed which resulted in all of the error acceptance tests
+  failing despite the response returned from the provider.
+
 ## [0.8.0] - 2017-05-14
 
 ### Improvements
