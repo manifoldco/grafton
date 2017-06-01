@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [x.y.z] - YYYY-MM-DD (Unreleased)
 
+## [0.9.0] - 2017-06-01
+
 ### Improvements
 
 - The `grafton test` command now validates the credential names it receives.
