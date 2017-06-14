@@ -63,7 +63,15 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 			}
 		}
 
-		gm.Expect(len(reqs)).To(gm.Equal(1), "Zero or more than one token request should be received")
+		gm.Expect(resp.StatusCode).To(gm.SatisfyAny(
+			gm.BeNumerically("==", 200),
+			gm.BeNumerically("==", 302),
+			gm.BeNumerically("==", 303),
+		), "Status code should be success (200) or redirect (302 or 303)")
+
+		gm.Expect(len(reqs)).To(
+			gm.Equal(1), "Zero or more than one token request should be received")
+
 		tokReq := reqs[0].(*connector.TokenRequest)
 		gm.Expect(tokReq).To(matchTokenRequest(&connector.TokenRequest{
 			ContentType:  "application/x-www-form-urlencoded",
@@ -73,12 +81,6 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 		}), "Invalid token request")
-
-		gm.Expect(resp.StatusCode).To(gm.SatisfyAny(
-			gm.BeNumerically("==", 200),
-			gm.BeNumerically("==", 302),
-			gm.BeNumerically("==", 303),
-		), "Status code should be success (200) or redirect (302 or 303)")
 	})
 
 	ErrorCase("with wrong client id", func() {
