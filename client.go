@@ -42,6 +42,9 @@ func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer) *Client {
 }
 
 // ProvisionResource makes a resource provisioning call.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan, region string) (string, bool, error) {
 
 	body := models.ResourceRequest{
@@ -77,7 +80,11 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -110,6 +117,9 @@ func deriveCallbackURL(connectorURL *nurl.URL, cbID manifold.ID) (string, error)
 }
 
 // ProvisionCredentials makes a credential provisioning call.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID manifold.ID) (map[string]string, string, bool, error) {
 	body := models.CredentialRequest{
 		ID:         credID,
@@ -145,7 +155,11 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 			return nil, "", false, err
 		}
 
-		return nil, "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			return nil, "", false, graftonErr
+		}
+
+		return nil, graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -167,6 +181,9 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 }
 
 // ChangePlan makes a patch call to change the resource's plan.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, newPlan string) (string, bool, error) {
 	body := models.ResourcePlanChangeRequest{Plan: manifold.Label(newPlan)}
 
@@ -196,7 +213,11 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -217,7 +238,8 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 
 // DeprovisionCredentials deletes credentials from the remote provider.
 //
-// A message will be presented if a callback is provided
+// A message will be presented if a callback is provided or if a message was
+// returned from the provider due to an error.
 func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID manifold.ID) (string, bool, error) {
 	msg := ""
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
@@ -246,8 +268,11 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			return "", false, graftonErr
+		}
 
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
@@ -263,6 +288,9 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 }
 
 // DeprovisionResource deletes resources from the remote provider.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manifold.ID) (string, bool, error) {
 	msg := ""
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
@@ -291,7 +319,11 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
