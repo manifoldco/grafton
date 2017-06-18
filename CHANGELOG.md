@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [x.y.z] - YYYY-MM-DD (Unreleased)
 
+### Improvements
+
+- The Grafton Client now returns an `ErrMissingMsg` on a `200`, `201`, or `202`
+  request missing a `message` property.
+
 ## [0.9.0] - 2017-06-01
 
 ### Improvements

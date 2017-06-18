@@ -314,10 +314,10 @@ func TestProvisionCredentials(t *testing.T) {
 
 		creds, message, async, err := callProvisionCredentials(srv.URL)
 
-		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(message).To(gm.Equal(""))
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		gm.Expect(creds).To(gm.BeNil())
 		gm.Expect(async).To(gm.BeFalse(), "Result on 201 should not be async")
-		gm.Expect(message).To(gm.BeEmpty(), "No message was expected")
-		gm.Expect(creds).To(gm.Equal(map[string]string{"foo": "bar"}))
 	})
 
 	t.Run("201 with message", func(t *testing.T) {
@@ -443,9 +443,9 @@ func TestChangePlan(t *testing.T) {
 
 		message, async, err := callChangePlan(srv.URL)
 
-		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(message).To(gm.BeEmpty())
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 		gm.Expect(async).To(gm.BeFalse(), "Result on 200 should not be async")
-		gm.Expect(message).To(gm.BeEmpty(), "No message was expected")
 	})
 
 	t.Run("200 with message", func(t *testing.T) {
@@ -497,9 +497,9 @@ func TestChangePlan(t *testing.T) {
 
 		msg, async, err := callChangePlan(srv.URL)
 
-		gm.Expect(err).ToNot(gm.HaveOccurred())
-		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
 		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(async).To(gm.BeFalse())
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 	})
 
 	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
@@ -584,9 +584,9 @@ func TestDeprovisionCredentials(t *testing.T) {
 
 		msg, async, err := callDeprovisionCredentials(srv.URL)
 
-		gm.Expect(err).ToNot(gm.HaveOccurred())
-		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
 		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		gm.Expect(async).To(gm.BeFalse())
 	})
 
 	t.Run("400 bad request error valid response", withCode(http.StatusBadRequest, func(url string) {
@@ -672,9 +672,9 @@ func TestDeprovisionResource(t *testing.T) {
 
 		msg, async, err := callDeprovisionResource(srv.URL)
 
-		gm.Expect(err).ToNot(gm.HaveOccurred())
-		gm.Expect(async).To(gm.BeTrue(), "Result on 202 should be async")
 		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		gm.Expect(async).To(gm.BeFalse())
 	})
 
 	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
