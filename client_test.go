@@ -22,7 +22,7 @@ func (stubSigner) Sign([]byte) (*signature.Signature, error) { return &signature
 func callProvision(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{})
+	c := New(sURL, &url.URL{}, stubSigner{}, nil)
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -32,7 +32,7 @@ func callProvision(rawURL string) (string, bool, error) {
 func callProvisionCredentials(rawURL string) (map[string]string, string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{})
+	c := New(sURL, &url.URL{}, stubSigner{}, nil)
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -43,7 +43,7 @@ func callProvisionCredentials(rawURL string) (map[string]string, string, bool, e
 func callChangePlan(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{})
+	c := New(sURL, &url.URL{}, stubSigner{}, nil)
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -55,7 +55,7 @@ func callDeprovisionCredentials(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
 
-	c := New(sURL, &url.URL{}, stubSigner{})
+	c := New(sURL, &url.URL{}, stubSigner{}, nil)
 
 	cbID := manifold.ID{}
 	credID := manifold.ID{}
@@ -67,7 +67,7 @@ func callDeprovisionResource(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
 
-	c := New(sURL, &url.URL{}, stubSigner{})
+	c := New(sURL, &url.URL{}, stubSigner{}, nil)
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -105,7 +105,7 @@ func testCreateSSOURL(base, code string) (string, manifold.ID, error) {
 		return "", ID, err
 	}
 
-	c := New(u, &url.URL{}, stubSigner{})
+	c := New(u, &url.URL{}, stubSigner{}, nil)
 	return c.CreateSsoURL(code, ID).String(), ID, nil
 }
 

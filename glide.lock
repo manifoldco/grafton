@@ -1,5 +1,5 @@
-hash: 0691276178654320a4652dedc01fc6563a10c20636ff11316aaab8c2a0939a0e
-updated: 2017-05-29T16:42:23.985162557-03:00
+hash: 43fafcb6bddc9526327502742540c363b84b34ec341bc4f2cba5f78c62f35c57
+updated: 2017-06-17T21:09:33.652043062-03:00
 imports:
 - name: github.com/alecthomas/gometalinter
   version: bae2f1293d092fd8167939d5108d1b025eaef9de
@@ -75,7 +75,7 @@ imports:
 - name: github.com/manifoldco/go-signature
   version: b948ef70772bc297c188970439dc479230833597
 - name: github.com/manifoldco/torus-cli
-  version: c44a71127d9dcfcf1d03b0be5942385ca66d07f6
+  version: 6968117466a156652a246a59301cd58310e5e965
   subpackages:
   - promptui
 - name: github.com/mitchellh/mapstructure
@@ -98,6 +98,8 @@ imports:
   version: 0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4
 - name: github.com/PuerkitoBio/urlesc
   version: bbf7a2afc14f93e1e0a5c06df524fbd75e5031e5
+- name: github.com/Sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/tsenart/deadcode
   version: 210d2dc333e90c7e3eedf4f2242507a8e83ed4ab
 - name: github.com/urfave/cli

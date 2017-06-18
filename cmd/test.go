@@ -148,13 +148,13 @@ func testCmd(ctx *cli.Context) error {
 	}
 
 	connectorURL := deriveConnectorURL(connectorPort)
-	api := grafton.New(purl, connectorURL, lkp)
+	api := grafton.New(purl, connectorURL, lkp, nil)
 
 	fkp, err := emptyKeypair()
 	if err != nil {
 		return cli.NewExitError("Could not create request empty signing keypair: "+err.Error(), -1)
 	}
-	unauthorizedAPI := grafton.New(purl, connectorURL, fkp)
+	unauthorizedAPI := grafton.New(purl, connectorURL, fkp, nil)
 	c := context.Background()
 
 	willChangePlan := false
