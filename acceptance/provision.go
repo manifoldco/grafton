@@ -24,27 +24,8 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 	Default(func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
-		var err error
-		curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, region)
-		gm.Expect(err).To(notError(), "Expected a successful provision of a resource")
 
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.Equal(0),
-				"Credentials cannot be returned on a resource provisioning callback",
-			)
-		}
-
+		curResource := attemptResourceProvision(ctx, api, product, plan, region)
 		resourceID = curResource.ID
 	})
 
@@ -182,25 +163,7 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 	Default(func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
-		callbackID, async, err := deprovisionResource(ctx, api, resourceID)
-
-		gm.Expect(err).To(notError(), "No error is expected")
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.Equal(0),
-				"Credentials cannot be returned on a resource deprovisioning callback",
-			)
-		}
+		attemptResourceDeprovision(ctx, api, resourceID)
 	})
 
 	ErrorCase("delete a non existing resource", func() {
@@ -227,6 +190,53 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 	})
 })
 var _ = provision.RequiredFlags("product", "plan", "region", "new-plan")
+
+func attemptResourceProvision(ctx context.Context, api *grafton.Client, product, plan, region string) *connector.Resource {
+	var err error
+	curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, region)
+	gm.Expect(err).To(notError(), "Expected a successful provision of a resource")
+
+	if async {
+		c := fakeConnector.GetCallback(callbackID)
+
+		gm.Expect(c.State).To(
+			gm.Equal(connector.DoneCallbackState),
+			"Expected to receive 'done' as the state",
+		)
+		gm.Expect(len(c.Message)).To(gm.SatisfyAll(
+			gm.BeNumerically(">=", 3),
+			gm.BeNumerically("<", 256),
+		), "Message must be between 3 and 256 characters long.")
+		gm.Expect(len(c.Credentials)).To(
+			gm.Equal(0),
+			"Credentials cannot be returned on a resource provisioning callback",
+		)
+	}
+
+	return curResource
+}
+
+func attemptResourceDeprovision(ctx context.Context, api *grafton.Client, resourceID manifold.ID) {
+	callbackID, async, err := deprovisionResource(ctx, api, resourceID)
+
+	gm.Expect(err).To(notError(), "No error is expected")
+	if async {
+		c := fakeConnector.GetCallback(callbackID)
+
+		gm.Expect(c.State).To(
+			gm.Equal(connector.DoneCallbackState),
+			"Expected to receive 'done' as the state",
+		)
+		gm.Expect(len(c.Message)).To(gm.SatisfyAll(
+			gm.BeNumerically(">=", 3),
+			gm.BeNumerically("<", 256),
+		), "Message must be between 3 and 256 characters long.")
+		gm.Expect(len(c.Credentials)).To(
+			gm.Equal(0),
+			"Credentials cannot be returned on a resource deprovisioning callback",
+		)
+	}
+}
 
 func waitForCallback(ID manifold.ID, max time.Duration) (*connector.Callback, error) {
 	timeout := time.After(max)
