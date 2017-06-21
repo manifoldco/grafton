@@ -148,24 +148,22 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 		return nil, "", false, graftonErr
 	}
 
-	var msg string
+	var msgPtr *string
 	var creds map[string]string
-	callback := false
+	callback := accepted != nil
 	switch {
-	case accepted != nil && accepted.Payload.Message == nil:
-		return nil, "", false, ErrMissingMsg
 	case res != nil:
-		if res.Payload.Message != nil {
-			msg = *res.Payload.Message
-		}
-
+		msgPtr = res.Payload.Message
 		creds = res.Payload.Credentials
 	case accepted != nil:
-		msg = *accepted.Payload.Message
-		callback = true
+		msgPtr = accepted.Payload.Message
 	}
 
-	return creds, msg, callback, err
+	if msgPtr == nil {
+		return nil, "", false, ErrMissingMsg
+	}
+
+	return creds, *msgPtr, callback, err
 }
 
 // ChangePlan makes a patch call to change the resource's plan.
@@ -201,16 +199,20 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 		return "", false, graftonErr
 	}
 
-	var msg string
+	var msgPtr *string
 	callback := accepted != nil
 	switch {
-	case res != nil && res.Payload.Message != nil:
-		msg = *res.Payload.Message
-	case accepted != nil && accepted.Payload.Message != nil:
-		msg = *accepted.Payload.Message
+	case res != nil:
+		msgPtr = res.Payload.Message
+	case accepted != nil:
+		msgPtr = accepted.Payload.Message
 	}
 
-	return msg, callback, nil
+	if msgPtr == nil {
+		return "", false, ErrMissingMsg
+	}
+
+	return *msgPtr, callback, nil
 }
 
 // DeprovisionCredentials deletes credentials from the remote provider.
@@ -249,7 +251,11 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 	}
 
 	callback := accepted != nil
-	if callback && accepted.Payload.Message != nil {
+	if callback {
+		if accepted.Payload.Message == nil {
+			return "", false, ErrMissingMsg
+		}
+
 		msg = *accepted.Payload.Message
 	}
 
@@ -289,7 +295,11 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 	}
 
 	callback := accepted != nil
-	if callback && accepted.Payload.Message != nil {
+	if callback {
+		if accepted.Payload.Message == nil {
+			return "", false, ErrMissingMsg
+		}
+
 		msg = *accepted.Payload.Message
 	}
 
