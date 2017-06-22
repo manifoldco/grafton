@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [x.y.z] - YYYY-MM-DD (Unreleased)
 
+## [0.10.0] - 2017-06-22
+
 ### Improvements
 
 - Introduced the cleanup acceptance test set, which tests to ensure any
