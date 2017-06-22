@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Improvements
 
-- The Grafton Client now returns an `ErrMissingMsg` on a `200`, `201`, or `202`
-  request missing a `message` property.
 - Introduced the cleanup acceptance test set, which tests to ensure any
   half-created resources can be cleaned up.
 - Added a teardown step to the resize acceptance tests, ensuring a resource can
   be resized back to it's original plan.
+- The Grafton Client now returns an `ErrMissingMsg` on a `200`, `201`, or `202`
+  request missing a `message` property.
+- The Grafton client now differentiates between an error and a message returned
+  from the provider, a message will be returned if a provider sends a valid
+  message despite whether or not it was an error response.
+- The Grafton client now takes a `logrus.Entry`, when provided Grafton will
+  push error logs to the provided logger.
 
 ## [0.9.0] - 2017-06-01
 

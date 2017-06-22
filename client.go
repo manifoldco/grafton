@@ -5,9 +5,11 @@ package grafton
 
 import (
 	"context"
+	"io/ioutil"
 	nurl "net/url"
 	"path"
 
+	"github.com/Sirupsen/logrus"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
@@ -20,28 +22,44 @@ import (
 	"github.com/manifoldco/grafton/generated/provider/models"
 )
 
+var nullLogger *logrus.Logger
+
+func init() {
+	nullLogger = logrus.New()
+	nullLogger.Out = ioutil.Discard
+}
+
 // Client is a wrapper around the generated provisioning api client, providing
 // convenience methods, and signing outgoing requests.
 type Client struct {
 	url          *nurl.URL
 	connectorURL *nurl.URL
 	api          *client.Provider
+	log          *logrus.Entry
 }
 
 // New creates a new Client
-func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer) *Client {
+func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry) *Client {
 	tp := httptransport.New(url.Host, url.Path, []string{url.Scheme})
 	tp.Transport = newSigningRoundTripper(tp.Transport, signer)
 	api := client.New(tp, strfmt.Default)
+
+	if log == nil {
+		log = logrus.NewEntry(nullLogger)
+	}
 
 	return &Client{
 		url:          url,
 		api:          api,
 		connectorURL: connectorURL,
+		log:          log,
 	}
 }
 
 // ProvisionResource makes a resource provisioning call.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan, region string) (string, bool, error) {
 
 	body := models.ResourceRequest{
@@ -53,6 +71,7 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {
+		c.log.WithError(err).Error("Could not derive callback url")
 		return "", false, err
 	}
 
@@ -74,10 +93,16 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 		case *resource.PutResourcesIDInternalServerError:
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
+			c.log.WithError(err).Info("Error unrecognized, returning directly")
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("Missing error message in response")
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -110,6 +135,9 @@ func deriveCallbackURL(connectorURL *nurl.URL, cbID manifold.ID) (string, error)
 }
 
 // ProvisionCredentials makes a credential provisioning call.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID manifold.ID) (map[string]string, string, bool, error) {
 	body := models.CredentialRequest{
 		ID:         credID,
@@ -118,6 +146,7 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {
+		c.log.WithError(err).Error("Could not derive callback url")
 		return nil, "", false, err
 	}
 
@@ -142,10 +171,16 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 		case *credential.PutCredentialsIDInternalServerError:
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
+			c.log.WithError(err).Error("Error unrecognized, returning directly")
 			return nil, "", false, err
 		}
 
-		return nil, "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("Missing error message in response")
+			return nil, "", false, graftonErr
+		}
+
+		return nil, graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -167,11 +202,15 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 }
 
 // ChangePlan makes a patch call to change the resource's plan.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, newPlan string) (string, bool, error) {
 	body := models.ResourcePlanChangeRequest{Plan: manifold.Label(newPlan)}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {
+		c.log.WithError(err).Error("Error driving callback url")
 		return "", false, err
 	}
 
@@ -193,10 +232,16 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 		case *resource.PatchResourcesIDInternalServerError:
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
+			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("No error message in response")
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	var msgPtr *string
@@ -217,11 +262,13 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 
 // DeprovisionCredentials deletes credentials from the remote provider.
 //
-// A message will be presented if a callback is provided
+// A message will be presented if a callback is provided or if a message was
+// returned from the provider due to an error.
 func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID manifold.ID) (string, bool, error) {
 	msg := ""
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {
+		c.log.WithError(err).Error("Could not derive callback url")
 		return msg, false, err
 	}
 
@@ -243,11 +290,16 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 		case *credential.DeleteCredentialsIDInternalServerError:
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
+			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("No error message in response")
+			return "", false, graftonErr
+		}
 
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
@@ -263,10 +315,14 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 }
 
 // DeprovisionResource deletes resources from the remote provider.
+//
+// A message will be returned if a callback was used *or* a provider returned
+// an error with an explanation.
 func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manifold.ID) (string, bool, error) {
 	msg := ""
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {
+		c.log.WithError(err).Error("Could not derive callback url")
 		return msg, false, err
 	}
 
@@ -288,10 +344,16 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 		case *resource.DeleteResourcesIDInternalServerError:
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
+			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
-		return "", false, graftonErr
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("No error message in response")
+			return "", false, graftonErr
+		}
+
+		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
