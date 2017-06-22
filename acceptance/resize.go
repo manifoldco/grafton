@@ -19,26 +19,8 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 	Default(func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
-		callbackID, async, err := changePlan(ctx, api, resourceID, newPlan)
 
-		gm.Expect(err).To(notError(), "Expected a successful plan change of a resource")
-
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.Equal(0),
-				"Credentials cannot be returned on a resource plan change callback",
-			)
-		}
+		attemptResize(ctx, api, resourceID, newPlan)
 	})
 
 	ErrorCase("with existing plan - returns success", func() {
@@ -126,6 +108,38 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 var _ = resize.RunsInside("provision")
 var _ = resize.RunsBefore("credentials")
 var _ = resize.RequiredFlags("new-plan")
+
+var _ = resize.TearDown("Change the resource's plan back to the original", func(ctx context.Context) {
+	Default(func() {
+		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+		defer cancel()
+
+		attemptResize(ctx, api, resourceID, plan)
+	})
+})
+
+func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string) {
+	callbackID, async, err := changePlan(ctx, api, resourceID, newPlan)
+
+	gm.Expect(err).To(notError(), "Expected a successful plan change of a resource")
+
+	if async {
+		c := fakeConnector.GetCallback(callbackID)
+
+		gm.Expect(c.State).To(
+			gm.Equal(connector.DoneCallbackState),
+			"Expected to receive 'done' as the state",
+		)
+		gm.Expect(len(c.Message)).To(gm.SatisfyAll(
+			gm.BeNumerically(">=", 3),
+			gm.BeNumerically("<", 256),
+		), "Message must be between 3 and 256 characters long.")
+		gm.Expect(len(c.Credentials)).To(
+			gm.Equal(0),
+			"Credentials cannot be returned on a resource plan change callback",
+		)
+	}
+}
 
 func changePlan(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string) (manifold.ID, bool, error) {
 	Infof("Attempting to resize resource %s to %s\n", resourceID, newPlan)

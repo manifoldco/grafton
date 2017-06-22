@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - The Grafton Client now returns an `ErrMissingMsg` on a `200`, `201`, or `202`
   request missing a `message` property.
+- Introduced the cleanup acceptance test set, which tests to ensure any
+  half-created resources can be cleaned up.
+- Added a teardown step to the resize acceptance tests, ensuring a resource can
+  be resized back to it's original plan.
 
 ## [0.9.0] - 2017-06-01
 
