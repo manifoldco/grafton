@@ -227,6 +227,20 @@ func TestProvisionResource(t *testing.T) {
 		gm.Expect(message).To(gm.Equal("please wait"))
 	})
 
+	t.Run("204", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusNoContent)
+		}))
+		defer srv.Close()
+
+		message, async, err := callProvision(srv.URL)
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse())
+		gm.Expect(message).To(gm.Equal(""))
+	})
+
 	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
 		msg, _, err := callProvision(url)
 
@@ -521,6 +535,20 @@ func TestChangePlan(t *testing.T) {
 		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 	})
 
+	t.Run("204", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusNoContent)
+		}))
+		defer srv.Close()
+
+		message, async, err := callChangePlan(srv.URL)
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse())
+		gm.Expect(message).To(gm.Equal(""))
+	})
+
 	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
 		msg, _, err := callChangePlan(url)
 
@@ -615,6 +643,20 @@ func TestDeprovisionCredentials(t *testing.T) {
 		gm.Expect(async).To(gm.BeFalse())
 	})
 
+	t.Run("204", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusNoContent)
+		}))
+		defer srv.Close()
+
+		message, async, err := callDeprovisionCredentials(srv.URL)
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse())
+		gm.Expect(message).To(gm.Equal(""))
+	})
+
 	t.Run("400 bad request error valid response", withCode(http.StatusBadRequest, func(url string) {
 		msg, _, err := callDeprovisionCredentials(url)
 
@@ -707,6 +749,20 @@ func TestDeprovisionResource(t *testing.T) {
 		gm.Expect(msg).To(gm.Equal(""))
 		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
 		gm.Expect(async).To(gm.BeFalse())
+	})
+
+	t.Run("204", func(t *testing.T) {
+		gm.RegisterTestingT(t)
+
+		srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusNoContent)
+		}))
+		defer srv.Close()
+
+		message, async, err := callDeprovisionResource(srv.URL)
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(async).To(gm.BeFalse())
+		gm.Expect(message).To(gm.Equal(""))
 	})
 
 	t.Run("400 bad request valid response", withCode(http.StatusBadRequest, func(url string) {
