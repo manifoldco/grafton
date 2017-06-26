@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [x.y.z] - YYYY-MM-DD (Unreleased)
 
+### Fixes
+
+- Grafton no longer returns an error if a 204 Response is returned from a Plan
+  Change request.
+
 ## [0.10.0] - 2017-06-22
 
 ### Improvements

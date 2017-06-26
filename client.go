@@ -219,7 +219,7 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
 
-	res, accepted, _, err := c.api.Resource.PatchResourcesID(p)
+	res, accepted, noContent, err := c.api.Resource.PatchResourcesID(p)
 	if err != nil {
 		var graftonErr error
 		switch e := err.(type) {
@@ -251,6 +251,8 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 		msgPtr = res.Payload.Message
 	case accepted != nil:
 		msgPtr = accepted.Payload.Message
+	case noContent != nil:
+		return "", false, nil
 	}
 
 	if msgPtr == nil {
