@@ -183,22 +183,27 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 		return nil, graftonErr.Error(), false, graftonErr
 	}
 
-	var msgPtr *string
+	msg := ""
 	var creds map[string]string
 	callback := accepted != nil
 	switch {
 	case res != nil:
-		msgPtr = res.Payload.Message
+		// A message is optional on a 201 Response
+		if res.Payload.Message != nil {
+			msg = *res.Payload.Message
+		}
+
 		creds = res.Payload.Credentials
 	case accepted != nil:
-		msgPtr = accepted.Payload.Message
+		// A message must be provided on a 202 Response
+		if accepted.Payload.Message == nil {
+			return nil, "", false, ErrMissingMsg
+		}
+
+		msg = *accepted.Payload.Message
 	}
 
-	if msgPtr == nil {
-		return nil, "", false, ErrMissingMsg
-	}
-
-	return creds, *msgPtr, callback, err
+	return creds, msg, callback, err
 }
 
 // ChangePlan makes a patch call to change the resource's plan.

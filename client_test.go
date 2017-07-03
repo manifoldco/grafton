@@ -356,8 +356,8 @@ func TestProvisionCredentials(t *testing.T) {
 		creds, message, async, err := callProvisionCredentials(srv.URL)
 
 		gm.Expect(message).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
-		gm.Expect(creds).To(gm.BeNil())
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+		gm.Expect(creds).To(gm.Equal(map[string]string{"foo": "bar"}))
 		gm.Expect(async).To(gm.BeFalse(), "Result on 201 should not be async")
 	})
 
