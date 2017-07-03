@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [x.y.z] - YYYY-MM-DD (Unreleased)
 
+## [0.10.2] - 2017-07-03
+
 ## Fixes
 
 - Grafton no longer errors if a `message` is not provided with a 201 Created
