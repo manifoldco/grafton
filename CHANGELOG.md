@@ -5,25 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [x.y.z] - YYYY-MM-DD (Unreleased)
+## [Unreleased]
 
 ## [0.10.2] - 2017-07-03
 
-## Fixes
+## Fixed
 
 - Grafton no longer errors if a `message` is not provided with a 201 Created
   response to a credential provisioning request.
 
 ## [0.10.1] - 2017-06-26
 
-### Fixes
+### Fixed
 
 - Grafton no longer returns an error if a 204 Response is returned from a Plan
   Change request.
 
 ## [0.10.0] - 2017-06-22
 
-### Improvements
+### Added
 
 - Introduced the cleanup acceptance test set, which tests to ensure any
   half-created resources can be cleaned up.
@@ -39,21 +39,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.9.0] - 2017-06-01
 
-### Improvements
+### Added
 
 - The `grafton test` command now validates the credential names it receives.
 - The main `grafton` package now exports a function `ValidCredentialName` for
   testing whether or not a given credential name is valid.
 - Dependencies for bootstrapping the build are now vendored using glide.
 
-### Fixes
+### Fixed
 
 - A bug has been fixed which resulted in all of the error acceptance tests
   failing despite the response returned from the provider.
 
 ## [0.8.0] - 2017-05-14
 
-### Improvements
+### Added
 
 - The grafton client now returns `grafton.Error` if the received response
   conforms to the responses expected in the `provider.yaml` swagger
@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.7.0] - 2017-04-28
 
-### Improvements
+### Added
 
 - The main `grafton` package now exports a function `CreateSsoURL` for deriving
   an SSO URL.
