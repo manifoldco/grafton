@@ -44,6 +44,11 @@ the duration of their session.
 The access token is sensitive data that grants access to a user's
 data within Manifold. It should be treated with care.
 
+**IMPORTANT**: A malicious user *could* tamper with the `resource_id`
+query parameter. To prevent this, the provider *must* validate that the
+user has access to the targeted resource by requesting information
+about it from the Connector API using the granted access token.
+
 */
 func (a *Client) GetSso(params *GetSsoParams) (*GetSsoOK, error) {
 	// TODO: Validate the params before sending
