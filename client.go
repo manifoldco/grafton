@@ -9,9 +9,9 @@ import (
 	nurl "net/url"
 	"path"
 
-	"github.com/sirupsen/logrus"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/sirupsen/logrus"
 
 	"github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"

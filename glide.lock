@@ -99,7 +99,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: bbf7a2afc14f93e1e0a5c06df524fbd75e5031e5
 - name: github.com/sirupsen/logrus
-  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/tsenart/deadcode
   version: 210d2dc333e90c7e3eedf4f2242507a8e83ed4ab
 - name: github.com/urfave/cli
