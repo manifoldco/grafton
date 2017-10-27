@@ -38,4 +38,4 @@ import:
 - package: golang.org/x/tools
   subpackages:
   - go/gcexportdata
-- package: github.com/Sirupsen/logrus
+- package: github.com/sirupsen/logrus
