@@ -23,7 +23,7 @@ ci: $(LINTERS) cover build
 
 CMD_PKGS=\
 	github.com/golang/lint/golint \
-	honnef.co/go/simple/cmd/gosimple \
+	honnef.co/go/tools/cmd/gosimple \
 	github.com/client9/misspell/cmd/misspell \
 	github.com/gordonklaus/ineffassign \
 	github.com/tsenart/deadcode \
@@ -34,6 +34,8 @@ define VENDOR_BIN_TMPL
 vendor/bin/$(notdir $(1)): vendor
 	go build -o $$@ ./vendor/$(1)
 VENDOR_BINS += vendor/bin/$(notdir $(1))
+vendor/$(1): Gopkg.lock
+	dep ensure -vendor-only
 endef
 
 $(foreach cmd_pkg,$(CMD_PKGS),$(eval $(call VENDOR_BIN_TMPL,$(cmd_pkg))))
@@ -41,10 +43,10 @@ $(patsubst %,%-bin,$(filter-out gofmt vet,$(LINTERS))): %-bin: vendor/bin/%
 gofmt-bin vet-bin:
 
 bootstrap:
-	glide -v || curl http://glide.sh/get | sh
+	which dep || go get github.com/golang/dep/cmd/dep
 
-vendor: glide.lock
-	glide install
+vendor: Gopkg.lock
+	dep ensure
 
 .PHONY: bootstrap $(CMD_PKGS)
 
@@ -53,7 +55,7 @@ vendor: glide.lock
 #################################################
 
 test: vendor generated
-	@CGO_ENABLED=0 go test -v $$(glide nv | grep -v generated)
+	@CGO_ENABLED=0 go test -v $$(go list ./... | grep -v generated)
 
 comma:= ,
 empty:=
@@ -74,8 +76,7 @@ cover: vendor generated all-cover.txt $(COVER_TEST_PKGS:=-cover)
 
 $(LINTERS): %: vendor/bin/gometalinter %-bin vendor generated
 	PATH=`pwd`/vendor/bin:$$PATH gometalinter --tests --disable-all --vendor \
-	     --deadline=5m -s data $$(glide nv | grep -v generated) --enable $@
-
+	     --deadline=5m -s data --skip generated --enable $@
 
 .PHONY: cover $(LINTERS) $(COVER_TEST_PKGS:=-cover)
 

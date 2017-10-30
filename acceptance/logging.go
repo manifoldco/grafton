@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/manifoldco/torus-cli/promptui"
+	"github.com/manifoldco/promptui"
 )
 
 var (
