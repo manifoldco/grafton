@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/manifoldco/torus-cli/promptui"
+	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
 
 	"github.com/manifoldco/grafton"
