@@ -84,14 +84,16 @@ $(LINTERS): %: vendor/bin/gometalinter %-bin vendor generated
 # Code generation
 #################################################
 
-generated/provider/client generated/provider/models: provider.yaml vendor/bin/swagger
-	swagger generate client -f $< -A provider -t generated/provider
-	touch generated/provider/client
-	touch generated/provider/models
+generated/%/client: specs/%.yaml vendor/bin/swagger
+	vendor/bin/swagger generate client -f $< -t generated/$*
+	touch generated/$*/client
+	touch generated/$*/models
 
-generated: generated/provider/client generated/provider/models
+APIS=$(patsubst specs/%.yaml,%,$(wildcard specs/*.yaml))
+API_CLIENTS=$(APIS:%=generated/%/client)
+generated-clients: $(API_CLIENTS)
 
-.PHONY: generated
+.PHONY: generated-clients
 
 #################################################
 # Building
