@@ -19,7 +19,7 @@ import (
 )
 
 const passwordMask = '●'
-const apiURL = "http://api.%s.manifold.co/v1"
+const apiURL = "https://api.%s.manifold.co/v1"
 
 func init() {
 	cmd := cli.Command{
