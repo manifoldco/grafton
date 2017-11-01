@@ -34,7 +34,7 @@ func init() {
 type Client struct {
 	url          *nurl.URL
 	connectorURL *nurl.URL
-	api          *client.Provider
+	api          *client.ManifoldProvider
 	log          *logrus.Entry
 }
 

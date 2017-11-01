@@ -14,7 +14,7 @@ import (
 	"github.com/manifoldco/grafton/generated/provider/client/single_sign_on"
 )
 
-// Default provider HTTP client.
+// Default manifold provider HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -29,14 +29,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"https"}
 
-// NewHTTPClient creates a new provider HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *Provider {
+// NewHTTPClient creates a new manifold provider HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *ManifoldProvider {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new provider HTTP client,
+// NewHTTPClientWithConfig creates a new manifold provider HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Provider {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *ManifoldProvider {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
@@ -50,9 +50,9 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Pro
 	return New(transport, formats)
 }
 
-// New creates a new provider client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Provider {
-	cli := new(Provider)
+// New creates a new manifold provider client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *ManifoldProvider {
+	cli := new(ManifoldProvider)
 	cli.Transport = transport
 
 	cli.Credential = credential.New(transport, formats)
@@ -103,8 +103,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// Provider is a client for provider
-type Provider struct {
+// ManifoldProvider is a client for manifold provider
+type ManifoldProvider struct {
 	Credential *credential.Client
 
 	Resource *resource.Client
@@ -115,7 +115,7 @@ type Provider struct {
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *Provider) SetTransport(transport runtime.ClientTransport) {
+func (c *ManifoldProvider) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
 	c.Credential.SetTransport(transport)
