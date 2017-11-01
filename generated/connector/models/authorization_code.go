@@ -4,240 +4,113 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"bytes"
 	"encoding/json"
 
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	manifold "github.com/manifoldco/go-manifold"
 )
 
 // AuthorizationCode authorization code
-// swagger:model AuthorizationCode
+// swagger:model authorization_code
 type AuthorizationCode struct {
+	clientIdField manifold.ID
 
-	// body
-	// Required: true
-	Body *AuthorizationCodeBody `json:"body"`
+	clientSecretField OAuthClientSecret
 
-	// id
+	// code
 	// Required: true
-	ID manifold.ID `json:"id"`
+	Code Code `json:"code"`
+}
 
-	// type
-	// Required: true
-	Type *string `json:"type"`
+func (m *AuthorizationCode) ClientID() manifold.ID {
+	return m.clientIdField
+}
+func (m *AuthorizationCode) SetClientID(val manifold.ID) {
+	m.clientIdField = val
+}
 
-	// version
-	// Required: true
-	Version *float64 `json:"version"`
+func (m *AuthorizationCode) ClientSecret() OAuthClientSecret {
+	return m.clientSecretField
+}
+func (m *AuthorizationCode) SetClientSecret(val OAuthClientSecret) {
+	m.clientSecretField = val
+}
+
+func (m *AuthorizationCode) GrantType() string {
+	return "authorization_code"
+}
+func (m *AuthorizationCode) SetGrantType(val string) {
+
+}
+
+// UnmarshalJSON unmarshals this polymorphic type from a JSON structure
+func (m *AuthorizationCode) UnmarshalJSON(raw []byte) error {
+	var data struct {
+		ClientID manifold.ID `json:"client_id,omitempty"`
+
+		ClientSecret OAuthClientSecret `json:"client_secret,omitempty"`
+
+		GrantType string `json:"grant_type"`
+
+		// code
+		// Required: true
+		Code Code `json:"code"`
+	}
+
+	buf := bytes.NewBuffer(raw)
+	dec := json.NewDecoder(buf)
+	dec.UseNumber()
+
+	if err := dec.Decode(&data); err != nil {
+		return err
+	}
+
+	m.clientIdField = data.ClientID
+	m.clientSecretField = data.ClientSecret
+	m.Code = data.Code
+
+	return nil
+}
+
+// MarshalJSON marshals this polymorphic type to a JSON structure
+func (m AuthorizationCode) MarshalJSON() ([]byte, error) {
+	var data struct {
+		ClientID manifold.ID `json:"client_id,omitempty"`
+
+		ClientSecret OAuthClientSecret `json:"client_secret,omitempty"`
+
+		GrantType string `json:"grant_type"`
+
+		// code
+		// Required: true
+		Code Code `json:"code"`
+	}
+
+	data.ClientID = m.clientIdField
+	data.ClientSecret = m.clientSecretField
+	data.Code = m.Code
+	data.GrantType = "authorization_code"
+	return json.Marshal(data)
 }
 
 // Validate validates this authorization code
 func (m *AuthorizationCode) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateBody(formats); err != nil {
-		// prop
+	if err := m.validateClientID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateID(formats); err != nil {
-		// prop
+	if err := m.validateClientSecret(formats); err != nil {
 		res = append(res, err)
 	}
-
-	if err := m.validateType(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateVersion(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *AuthorizationCode) validateBody(formats strfmt.Registry) error {
-
-	if err := validate.Required("body", "body", m.Body); err != nil {
-		return err
-	}
-
-	if m.Body != nil {
-
-		if err := m.Body.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("body")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCode) validateID(formats strfmt.Registry) error {
-
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-var authorizationCodeTypeTypePropEnum []interface{}
-
-func init() {
-	var res []string
-	if err := json.Unmarshal([]byte(`["authorization_code"]`), &res); err != nil {
-		panic(err)
-	}
-	for _, v := range res {
-		authorizationCodeTypeTypePropEnum = append(authorizationCodeTypeTypePropEnum, v)
-	}
-}
-
-const (
-	// AuthorizationCodeTypeAuthorizationCode captures enum value "authorization_code"
-	AuthorizationCodeTypeAuthorizationCode string = "authorization_code"
-)
-
-// prop value enum
-func (m *AuthorizationCode) validateTypeEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, authorizationCodeTypeTypePropEnum); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (m *AuthorizationCode) validateType(formats strfmt.Registry) error {
-
-	if err := validate.Required("type", "body", m.Type); err != nil {
-		return err
-	}
-
-	// value enum
-	if err := m.validateTypeEnum("type", "body", *m.Type); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-var authorizationCodeTypeVersionPropEnum []interface{}
-
-func init() {
-	var res []float64
-	if err := json.Unmarshal([]byte(`[1]`), &res); err != nil {
-		panic(err)
-	}
-	for _, v := range res {
-		authorizationCodeTypeVersionPropEnum = append(authorizationCodeTypeVersionPropEnum, v)
-	}
-}
-
-// prop value enum
-func (m *AuthorizationCode) validateVersionEnum(path, location string, value float64) error {
-	if err := validate.Enum(path, location, value, authorizationCodeTypeVersionPropEnum); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (m *AuthorizationCode) validateVersion(formats strfmt.Registry) error {
-
-	if err := validate.Required("version", "body", m.Version); err != nil {
-		return err
-	}
-
-	// value enum
-	if err := m.validateVersionEnum("version", "body", *m.Version); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// AuthorizationCodeBody authorization code body
-// swagger:model AuthorizationCodeBody
-type AuthorizationCodeBody struct {
-
-	// code
-	// Required: true
-	Code Code `json:"code"`
-
-	// created at
-	// Required: true
-	CreatedAt *strfmt.DateTime `json:"created_at"`
-
-	// expires at
-	// Required: true
-	ExpiresAt *strfmt.DateTime `json:"expires_at"`
-
-	// redirect uri
-	// Required: true
-	RedirectURI *string `json:"redirect_uri"`
-
-	// resource id
-	// Required: true
-	ResourceID manifold.ID `json:"resource_id"`
-
-	// team id
-	TeamID *manifold.ID `json:"team_id,omitempty"`
-
-	// user id
-	// Required: true
-	UserID manifold.ID `json:"user_id"`
-}
-
-// Validate validates this authorization code body
-func (m *AuthorizationCodeBody) Validate(formats strfmt.Registry) error {
-	var res []error
 
 	if err := m.validateCode(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateCreatedAt(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateExpiresAt(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateRedirectURI(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateResourceID(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateTeamID(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateUserID(formats); err != nil {
-		// prop
 		res = append(res, err)
 	}
 
@@ -247,81 +120,43 @@ func (m *AuthorizationCodeBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *AuthorizationCodeBody) validateCode(formats strfmt.Registry) error {
+func (m *AuthorizationCode) validateClientID(formats strfmt.Registry) error {
 
-	if err := m.Code.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("body" + "." + "code")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCodeBody) validateCreatedAt(formats strfmt.Registry) error {
-
-	if err := validate.Required("body"+"."+"created_at", "body", m.CreatedAt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCodeBody) validateExpiresAt(formats strfmt.Registry) error {
-
-	if err := validate.Required("body"+"."+"expires_at", "body", m.ExpiresAt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCodeBody) validateRedirectURI(formats strfmt.Registry) error {
-
-	if err := validate.Required("body"+"."+"redirect_uri", "body", m.RedirectURI); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCodeBody) validateResourceID(formats strfmt.Registry) error {
-
-	if err := m.ResourceID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("body" + "." + "resource_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *AuthorizationCodeBody) validateTeamID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TeamID) { // not required
+	if swag.IsZero(m.ClientID()) { // not required
 		return nil
 	}
 
-	if m.TeamID != nil {
-
-		if err := m.TeamID.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("body" + "." + "team_id")
-			}
-			return err
+	if err := m.ClientID().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("client_id")
 		}
+		return err
 	}
 
 	return nil
 }
 
-func (m *AuthorizationCodeBody) validateUserID(formats strfmt.Registry) error {
+func (m *AuthorizationCode) validateClientSecret(formats strfmt.Registry) error {
 
-	if err := m.UserID.Validate(formats); err != nil {
+	if swag.IsZero(m.ClientSecret()) { // not required
+		return nil
+	}
+
+	if err := m.ClientSecret().Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("body" + "." + "user_id")
+			return ve.ValidateName("client_secret")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AuthorizationCode) validateCode(formats strfmt.Registry) error {
+
+	if err := m.Code.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("code")
 		}
 		return err
 	}

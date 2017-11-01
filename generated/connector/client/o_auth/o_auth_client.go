@@ -23,6 +23,47 @@ type Client struct {
 }
 
 /*
+GetSelf currents identity
+
+A provider can call this endpoint to return the identity represented by
+the access token.
+
+Depending on the grant type used to create an access token the
+underlying identity will be different.
+
+| Grant Type | Identity Type |
+| ---------- | ------------ |
+| `authorization_code` | `user` |
+| `client_credentials` | `product` |
+
+*/
+func (a *Client) GetSelf(params *GetSelfParams, authInfo runtime.ClientAuthInfoWriter) (*GetSelfOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetSelfParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetSelf",
+		Method:             "GET",
+		PathPattern:        "/self",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetSelfReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetSelfOK), nil
+
+}
+
+/*
 PostCredentials creates an o auth credential pair
 
 Create an OAuth 2.0 credential pair for a provider's product.
@@ -57,35 +98,54 @@ func (a *Client) PostCredentials(params *PostCredentialsParams, authInfo runtime
 }
 
 /*
-PostSso creates authorization code
+PostOauthTokens creates access token
 
-Endpoint for creating an authorization code used by the user to issue
-an SSO request against a providers API from the Dashboard.
+A provider uses this endpoint to acquire a scoped access token which
+grants them authority to act on behalf of the grantor (either a
+provider or user).
+
+There are two grant types used for requesting an access token:
+
+* `authorization_code` which allows a provider to exchange a `code`
+  grant from a user for an access token giving them permission to act on
+  the user's behalf.
+* `client_credentials` which allows a provider to grant themselves an
+  access token scoped to a product.
+
+This endpoint is a part of the Single Sign-On flow invoked by users
+attempting to navigate to a resource's dashboard. A `code` is only
+valid for five minutes and cannot be used more than once to grant an
+access token.
+
+Provider authentication is supported with `client_id` and
+`client_secret` in either the request body, or via basic authentication.
+Basic authentication is the preferred method, but is not required.
+
+The granted token will expire within 24hours.
 
 */
-func (a *Client) PostSso(params *PostSsoParams, authInfo runtime.ClientAuthInfoWriter) (*PostSsoCreated, error) {
+func (a *Client) PostOauthTokens(params *PostOauthTokensParams) (*PostOauthTokensCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostSsoParams()
+		params = NewPostOauthTokensParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostSso",
+		ID:                 "PostOauthTokens",
 		Method:             "POST",
-		PathPattern:        "/sso",
+		PathPattern:        "/oauth/tokens",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
 		Schemes:            []string{"https"},
 		Params:             params,
-		Reader:             &PostSsoReader{formats: a.formats},
-		AuthInfo:           authInfo,
+		Reader:             &PostOauthTokensReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostSsoCreated), nil
+	return result.(*PostOauthTokensCreated), nil
 
 }
 

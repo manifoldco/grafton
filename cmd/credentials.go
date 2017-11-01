@@ -28,7 +28,7 @@ func init() {
 		Subcommands: []cli.Command{
 			{
 				Name:   "rotate",
-				Usage:  "Creates a new credential and set the old one to expire in 24h",
+				Usage:  "Creates a new credential and sets the old one to expire in 24h",
 				Action: createCredentialsCmd,
 				Flags: []cli.Flag{
 					cli.StringFlag{
@@ -59,6 +59,9 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 	if productLabel == "" {
 		return cli.NewExitError("--product flag missing", -1)
 	}
+
+	fmt.Println("Please use your Manifold account to login.")
+	fmt.Println("If you don't have an account yet, reach out to support@manifold.co.")
 
 	p := promptui.Prompt{
 		Label: "Email",
@@ -112,6 +115,7 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 	var product *manifold.Product
 
 	provList := client.Providers.List(ctx)
+	defer provList.Close()
 
 	for provList.Next() {
 		p, err := provList.Current()
@@ -129,7 +133,10 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("Provider %q not found", providerLabel), -1)
 	}
 
-	prodList := client.Products.List(ctx, nil)
+	opts := manifold.ProductsListOpts{ProviderID: &provider.ID}
+
+	prodList := client.Products.List(ctx, &opts)
+	defer prodList.Close()
 
 	for prodList.Next() {
 		p, err := prodList.Current()

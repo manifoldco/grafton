@@ -81,6 +81,13 @@ func unmarshalAccessTokenRequest(data []byte, consumer runtime.Consumer) (Access
 
 	// The value of grant_type is used to determine which type to create and unmarshal the data into
 	switch getType.GrantType {
+	case "authorization_code":
+		var result AuthorizationCode
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+
 	case "client_credentials":
 		var result ClientCredentials
 		if err := consumer.Consume(buf2, &result); err != nil {

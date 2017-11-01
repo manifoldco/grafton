@@ -36,12 +36,6 @@ produces:
 consumes:
 - application/json
 securityDefinitions:
-  tokenRequired:
-    x-manifold-audience: internal
-    type: apiKey
-    description: Authentication mechanism for dashboard users
-    name: Authorization
-    in: header
   oauth:
     type: oauth2
     description: Authentication mechanism for external provider services.
@@ -124,6 +118,216 @@ security:
 - oauth: []
 basePath: /v1
 paths:
+  /oauth/tokens:
+    x-manifold-audience: provider
+    post:
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      summary: Create Access Token
+      description: |
+        A provider uses this endpoint to acquire a scoped access token which
+        grants them authority to act on behalf of the grantor (either a
+        provider or user).
+
+        There are two grant types used for requesting an access token:
+
+        * `authorization_code` which allows a provider to exchange a `code`
+          grant from a user for an access token giving them permission to act on
+          the user's behalf.
+        * `client_credentials` which allows a provider to grant themselves an
+          access token scoped to a product.
+
+        This endpoint is a part of the Single Sign-On flow invoked by users
+        attempting to navigate to a resource's dashboard. A `code` is only
+        valid for five minutes and cannot be used more than once to grant an
+        access token.
+
+        Provider authentication is supported with `client_id` and
+        `client_secret` in either the request body, or via basic authentication.
+        Basic authentication is the preferred method, but is not required.
+
+        The granted token will expire within 24hours.
+      tags:
+      - OAuth
+      security: []
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+        format: basic-auth
+        pattern: ^Basic [a-zA-Z0-9+/=]{100}$
+        minLength: 106
+        maxLength: 106
+        description: |
+          Authorization header for basic access authentication containing the
+          OAuth2 `client_id` as user name, and OAuth2 `client_secret` as
+          password. The `client_id` and `client_secret` may be passed either
+          in the body of the request, or in this header.
+
+          Using this header is the **preferred** way to transmit `client_id`
+          and `client_secret`.
+      - name: body
+        in: body
+        description: OAuth Access Token Request Body
+        required: true
+        schema:
+          $ref: '#/definitions/AccessTokenRequest'
+      responses:
+        201:
+          description: An access token has been created
+          schema:
+            $ref: '#/definitions/AccessToken'
+        400:
+          $ref: '#/responses/TokenBadRequest'
+        401:
+          $ref: '#/responses/TokenUnauthorized'
+        500:
+          $ref: '#/responses/Internal'
+  /self:
+    x-manifold-audience: provider
+    get:
+      summary: Current Identity
+      description: |
+        A provider can call this endpoint to return the identity represented by
+        the access token.
+
+        Depending on the grant type used to create an access token the
+        underlying identity will be different.
+
+        | Grant Type | Identity Type |
+        | ---------- | ------------ |
+        | `authorization_code` | `user` |
+        | `client_credentials` | `product` |
+      tags:
+      - OAuth
+      responses:
+        200:
+          description: |
+            The identity of the user or product represented by the access
+            token.
+          schema:
+            $ref: '#/definitions/Identity'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        500:
+          $ref: '#/responses/Internal'
+  /resources/{id}:
+    x-manifold-audience: provider
+    get:
+      summary: Retrieve a Resource
+      description: |
+        A provider can call this endpoint to return information about a
+        specific resource.
+
+        The `product` and `plan` are the machine readable labels which map to
+        Product and Plan data inside the Manifold Catalog. The `product` is
+        globally unique while the `plan` is unique to the `product`.
+
+        The `region` is the machine readable representation of the platform and
+        location in which this resource has been provisioned.
+      parameters:
+      - $ref: '#/parameters/resource_id'
+      tags:
+      - Resource
+      responses:
+        200:
+          description: A resource.
+          schema:
+            $ref: '#/definitions/Resource'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+  /resources/{id}/users:
+    x-manifold-audience: provider
+    get:
+      summary: List All Users
+      description: |
+        A provider can call this endpoint to return a list of all users who
+        have access to a specific resource.
+
+        None of this data should be stored as it's non-unique and will change.
+        Instead, a provider is required to call this end-point to fetch the
+        latest data.
+      parameters:
+      - $ref: '#/parameters/resource_id'
+      tags:
+      - Resource
+      responses:
+        200:
+          description: A list of users who have access to the Resource.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Profile'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+  /callbacks/{id}:
+    x-manifold-audience: provider
+    put:
+      summary: Complete Request
+      description: |
+        A provider can call this endpoint to complete a request that had been
+        acknowledged but not completed during the initial request as a part of a
+        provision, plan change, or deprovision flow of a resource or
+        credential.
+
+        In the event that the Connector API can't be reached *or* an unexpected
+        response (e.g. `500 Internal Server Error`) is returned, the provider
+        should attempt to invoke the callback in the future to the best of
+        their abilities.
+
+        The behaviour of this route matches the "Repeatable Actions"
+        specification of the API implemented by providers.  If the callback has
+        already been received with the payload matching the previous request a
+        `204 No Content` response will be returned. However, if the payloads do
+        not match the route will return a `409 Conflict` error response.
+
+        If the provider is responding to a request to provision credentials,
+        then a hash of credentials must be provided. Otherwise, the credentials
+        property must not be provided.
+
+        In the case of a credential provisioning callback, multiple key-value
+        pairs that represent this set of Credentials. However, if a url form
+        exists (e.g. `postgres://user:pw@host:5432/db`), please provide the
+        credentials in that form.
+      parameters:
+      - $ref: '#/parameters/callback_id'
+      - name: body
+        in: body
+        description: Response to Callback sent by the Provider
+        required: true
+        schema:
+          $ref: '#/definitions/CallbackResponse'
+      tags:
+      - Callback
+      responses:
+        204:
+          description: |
+            The callback payload has been accepted, Manifold is no longer
+            waiting for the callback to be received to continue on with the
+            current operation.
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /credentials/:
     x-manifold-audience: provider
     post:
@@ -133,50 +337,26 @@ paths:
         `client_secret` is stored as an `scrypt` hash only; if the value is
         lost after creation, it cannot be recovered.
       security:
-        - tokenRequired: []
-      tags:
-        - OAuth
-      parameters:
-        - name: body
-          in: body
-          description: A product id and description for the credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateRequest' }
-      responses:
-        200:
-          description: The created OAuth 2.0 credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateResponse' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
-  /sso:
-    x-manifold-audience: browser
-    post:
-      summary: Create Authorization Code
-      description: |
-        Endpoint for creating an authorization code used by the user to issue
-        an SSO request against a providers API from the Dashboard.
-      security:
-      - jwtRequired: []
+      - tokenRequired: []
       tags:
       - OAuth
       parameters:
       - name: body
         in: body
-        description: Authorization Code Request Body
-        required: true
+        description: A product id and description for the credential pair.
         schema:
-          $ref: '#/definitions/AuthCodeRequest'
+          $ref: '#/definitions/OAuthCredentialCreateRequest'
       responses:
-        201:
-          description: An authorization code has been created.
+        200:
+          description: The created OAuth 2.0 credential pair.
           schema:
-            $ref: '#/definitions/AuthorizationCode'
+            $ref: '#/definitions/OAuthCredentialCreateResponse'
         400:
           $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/Internal'
 definitions:
@@ -310,9 +490,9 @@ definitions:
       id:
         $ref: '#/definitions/ID'
       version:
-        type: number
+        type: string
         enum:
-        - 1
+        - "1"
       type:
         type: string
         enum:
@@ -351,6 +531,10 @@ definitions:
     - version
     - type
     - body
+    x-go-type:
+      type: OAuthAuthorizationCode
+      import:
+        package: github.com/manifoldco/marketplace/connector/primitives
   OAuthClientID:
     description: |
       Client ID portion of the OAuth Credentials used for accessing the
@@ -394,6 +578,17 @@ definitions:
     type: object
     allOf:
     - $ref: '#/definitions/AccessTokenRequest'
+  authorization_code:
+    type: object
+    allOf:
+    - $ref: '#/definitions/AccessTokenRequest'
+    - type: object
+      properties:
+        code:
+          $ref: '#/definitions/Code'
+      additionalProperties: false
+      required:
+      - code
   AccessToken:
     description: |
       A granted access token used for performing requests on behalf o a user

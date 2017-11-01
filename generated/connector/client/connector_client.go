@@ -9,7 +9,9 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/manifoldco/grafton/generated/connector/client/callback"
 	"github.com/manifoldco/grafton/generated/connector/client/o_auth"
+	"github.com/manifoldco/grafton/generated/connector/client/resource"
 )
 
 // Default connector HTTP client.
@@ -53,7 +55,11 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Connector 
 	cli := new(Connector)
 	cli.Transport = transport
 
+	cli.Callback = callback.New(transport, formats)
+
 	cli.OAuth = o_auth.New(transport, formats)
+
+	cli.Resource = resource.New(transport, formats)
 
 	return cli
 }
@@ -99,7 +105,11 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Connector is a client for connector
 type Connector struct {
+	Callback *callback.Client
+
 	OAuth *o_auth.Client
+
+	Resource *resource.Client
 
 	Transport runtime.ClientTransport
 }
@@ -108,6 +118,10 @@ type Connector struct {
 func (c *Connector) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
+	c.Callback.SetTransport(transport)
+
 	c.OAuth.SetTransport(transport)
+
+	c.Resource.SetTransport(transport)
 
 }
