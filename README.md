@@ -107,5 +107,5 @@ Until we automate more of this, the following has to be kept in mind:
   instead ported to the internal file first.
 - If the internal source of `provider.yaml` changes, the updates must be brought
   over here.
-- Whenever `provider.yaml` changes, `make generated` should be run, and the
+- Whenever `provider.yaml` changes, `make generated-clients` should be run, and the
   changes to the generated code should be checked in.

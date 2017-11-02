@@ -28,8 +28,8 @@
 [[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
-  revision = "73945b6115bfbbcc57d89b7316e28109364124e1"
-  version = "v7"
+  revision = "7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877"
+  version = "v5"
 
 [[projects]]
   branch = "master"
@@ -243,8 +243,7 @@
 [[projects]]
   name = "github.com/manifoldco/go-manifold"
   packages = [".","errors","idtype"]
-  revision = "d7f843e17a66eb40fcdaafa36896f086cbbc214b"
-  version = "v0.7.2"
+  revision = "ca80cfb5bcc161b053f063e30a0d97c49fba1cc9"
 
 [[projects]]
   name = "github.com/manifoldco/go-signature"
@@ -357,7 +356,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ed25519","ed25519/internal/edwards25519","ssh/terminal"]
+  packages = ["ed25519","ed25519/internal/edwards25519","pbkdf2","scrypt","ssh/terminal"]
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
@@ -411,6 +410,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1855385e42f21e1ecd6793bc8c28f2ac14044cc4cd0e3178d672448034fa8a01"
+  inputs-digest = "011320a97b0a07a4294cc5dc4a3bd33594a99a65b9d2042116bd94d085e60466"
   solver-name = "gps-cdcl"
   solver-version = 1
