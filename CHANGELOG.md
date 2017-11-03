@@ -7,9 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2017-11-03
+
+### Add
+
+- `credentials rotate` cmd for providers to rotate their OAuth Credentials
+
+## [0.10.3] - 2017-10-27
+
+### Fixed
+
+- Rename dependency from `Sirupsen/logrus` to `sirupsen/logrus`
+
 ## [0.10.2] - 2017-07-03
 
-## Fixed
+### Fixed
 
 - Grafton no longer errors if a `message` is not provided with a 201 Created
   response to a credential provisioning request.
