@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
+	"text/tabwriter"
+	"time"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/strfmt"
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/promptui"
@@ -66,12 +68,12 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 
 	product, err := findProduct(ctx, cliCtx, client)
 	if err != nil {
-		return cli.NewExitError("Failed to find product "+err.Error(), -1)
+		return cli.NewExitError("Failed to find product: "+err.Error(), -1)
 	}
 
 	connector, err := NewConnector(token)
 	if err != nil {
-		return cli.NewExitError("Failed to create connector client "+err.Error(), -1)
+		return cli.NewExitError("Failed to create connector client: "+err.Error(), -1)
 	}
 
 	params := o_auth.NewPostCredentialsParamsWithContext(ctx)
@@ -85,7 +87,7 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 
 	res, err := connector.OAuth.PostCredentials(params, nil)
 	if err != nil {
-		return cli.NewExitError("Failed to rotate credentials "+err.Error(), -1)
+		return cli.NewExitError("Failed to rotate credentials: "+err.Error(), -1)
 	}
 
 	payload := res.Payload
@@ -126,7 +128,23 @@ func listCredentialsCmd(cliCtx *cli.Context) error {
 
 	payload := res.Payload
 
-	spew.Dump(payload)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 8, ' ', 0)
+
+	fmt.Fprintln(w, "ID\tCreated\tExpires")
+
+	for _, cred := range payload {
+		date := time.Time(cred.ExpiresAt)
+		expires := "-"
+
+		if !date.IsZero() {
+			expires = date.Format("2006-01-02 15:04:05 MST")
+		}
+
+		created := time.Time(*cred.CreatedAt).Format("2006-01-02 15:04:05 MST")
+		fmt.Fprintf(w, "%s\t%s\t%s\n", cred.ID, created, expires)
+	}
+
+	w.Flush()
 
 	return nil
 }
