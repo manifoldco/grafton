@@ -21,6 +21,9 @@ type OAuthCredentialGetResponse struct {
 	// Required: true
 	CreatedAt *strfmt.DateTime `json:"created_at"`
 
+	// expires at
+	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
+
 	// id
 	// Required: true
 	ID manifold.ID `json:"id"`
@@ -38,6 +41,8 @@ func (m *OAuthCredentialGetResponse) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		CreatedAt *strfmt.DateTime `json:"created_at"`
 
+		ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
+
 		ID manifold.ID `json:"id"`
 
 		UpdatedAt *strfmt.DateTime `json:"updated_at"`
@@ -47,6 +52,8 @@ func (m *OAuthCredentialGetResponse) UnmarshalJSON(raw []byte) error {
 	}
 
 	m.CreatedAt = data.CreatedAt
+
+	m.ExpiresAt = data.ExpiresAt
 
 	m.ID = data.ID
 
@@ -68,12 +75,16 @@ func (m OAuthCredentialGetResponse) MarshalJSON() ([]byte, error) {
 	var data struct {
 		CreatedAt *strfmt.DateTime `json:"created_at"`
 
+		ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
+
 		ID manifold.ID `json:"id"`
 
 		UpdatedAt *strfmt.DateTime `json:"updated_at"`
 	}
 
 	data.CreatedAt = m.CreatedAt
+
+	data.ExpiresAt = m.ExpiresAt
 
 	data.ID = m.ID
 
