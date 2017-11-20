@@ -23,6 +23,39 @@ type Client struct {
 }
 
 /*
+GetCredentials gets list of o auth credentials without secrets
+
+List all non-expired OAuth 2.0 credential pair for a provider's product.
+This does **not** return the secret.
+
+*/
+func (a *Client) GetCredentials(params *GetCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*GetCredentialsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetCredentialsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetCredentials",
+		Method:             "GET",
+		PathPattern:        "/credentials/",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetCredentialsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetCredentialsOK), nil
+
+}
+
+/*
 GetSelf currents identity
 
 A provider can call this endpoint to return the identity represented by
