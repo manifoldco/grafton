@@ -23,9 +23,41 @@ type Client struct {
 }
 
 /*
+DeleteCredentialsID deletes an o auth credential pair
+
+Delete an OAuth 2.0 credential pair for a provider's product.
+
+*/
+func (a *Client) DeleteCredentialsID(params *DeleteCredentialsIDParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteCredentialsIDNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteCredentialsIDParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "DeleteCredentialsID",
+		Method:             "DELETE",
+		PathPattern:        "/credentials/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &DeleteCredentialsIDReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*DeleteCredentialsIDNoContent), nil
+
+}
+
+/*
 GetCredentials gets list of o auth credentials without secrets
 
-List all non-expired OAuth 2.0 credential pair for a provider's product.
+List all non-expired OAuth 2.0 credential pairs for a provider's product.
 This does **not** return the secret.
 
 */
@@ -154,7 +186,7 @@ Provider authentication is supported with `client_id` and
 `client_secret` in either the request body, or via basic authentication.
 Basic authentication is the preferred method, but is not required.
 
-The granted token will expire within 24hours.
+The granted token will expire within 24 hours.
 
 */
 func (a *Client) PostOauthTokens(params *PostOauthTokensParams) (*PostOauthTokensCreated, error) {
