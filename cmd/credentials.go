@@ -52,6 +52,12 @@ func init() {
 				Flags:  credentialFlags,
 				Action: createCredentialsCmd,
 			},
+			{
+				Name:      "delete",
+				ArgsUsage: "id",
+				Usage:     "Delete a credential",
+				Action:    deleteCredentialsCmd,
+			},
 		},
 	}
 
@@ -145,6 +151,41 @@ func listCredentialsCmd(cliCtx *cli.Context) error {
 	}
 
 	w.Flush()
+
+	return nil
+}
+
+func deleteCredentialsCmd(cliCtx *cli.Context) error {
+	ctx := context.Background()
+
+	args := cliCtx.Args()
+
+	if len(args) != 1 {
+		cli.ShowCommandHelpAndExit(cliCtx, cliCtx.Command.Name, -1)
+		return nil
+	}
+
+	id := args[0]
+
+	_, token, err := login(ctx)
+	if err != nil {
+		return cli.NewExitError(err.Error(), -1)
+	}
+
+	params := o_auth.NewDeleteCredentialsIDParamsWithContext(ctx)
+	params.SetID(id)
+
+	connector, err := NewConnector(token)
+	if err != nil {
+		return cli.NewExitError("Failed to create connector client: "+err.Error(), -1)
+	}
+
+	_, err = connector.OAuth.DeleteCredentialsID(params, nil)
+	if err != nil {
+		return cli.NewExitError("Failed to delete credential "+err.Error(), -1)
+	}
+
+	fmt.Println("Credential deleted!")
 
 	return nil
 }

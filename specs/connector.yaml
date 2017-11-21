@@ -147,7 +147,7 @@ paths:
         `client_secret` in either the request body, or via basic authentication.
         Basic authentication is the preferred method, but is not required.
 
-        The granted token will expire within 24hours.
+        The granted token will expire within 24 hours.
       tags:
       - OAuth
       security: []
@@ -333,7 +333,7 @@ paths:
     get:
       summary: Get list of OAuth credentials without secrets.
       description: |
-        List all non-expired OAuth 2.0 credential pair for a provider's product.
+        List all non-expired OAuth 2.0 credential pairs for a provider's product.
         This does **not** return the secret.
       security:
       - tokenRequired: []
@@ -385,6 +385,37 @@ paths:
           description: The created OAuth 2.0 credential pair.
           schema:
             $ref: '#/definitions/OAuthCredentialCreateResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
+  /credentials/{id}:
+    x-manifold-audience: provider
+    delete:
+      summary: Delete an OAuth credential pair
+      description: |
+        Delete an OAuth 2.0 credential pair for a provider's product.
+      security:
+      - tokenRequired: []
+      tags:
+      - OAuth
+      parameters:
+      - name: id
+        in: path
+        description: |
+          ID of the credential to delete, stored as a base32 encoded 18 byte
+          identifier.
+        required: true
+        type: string
+        pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+        format: base32ID
+      responses:
+        204:
+          description: Empty response
         400:
           $ref: '#/responses/BadRequest'
         401:
