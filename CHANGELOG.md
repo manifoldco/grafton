@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `credentials list` cmd for providers to list their OAuth Credentials
+- `credentials delete` cmd for providers to delete their OAuth Credentials
+
 ## [0.11.0] - 2017-11-03
 
-### Add
+### Added
 
 - `credentials rotate` cmd for providers to rotate their OAuth Credentials
 
