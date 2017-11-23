@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2017-11-23
+
 ### Added
 
 - `credentials list` cmd for providers to list their OAuth Credentials
