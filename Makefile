@@ -146,10 +146,10 @@ $(NO_WINDOWS:%=os-build/%/bin/grafton): os-build/%/bin/grafton:
 
 build/grafton_$(VERSION)_windows_amd64.zip: build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
 	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton.exe
-$(NO_WINDOWS:%=build/grafton_$(VERSION)_%.zip): build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
-	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton
+$(NO_WINDOWS:%=build/grafton_$(VERSION)_%.tar.gz): build/grafton_$(VERSION)_%.tar.gz: os-build/%/bin/grafton
+	cd build/$*/bin; tar -czf ../../grafton_$(VERSION)_$*.tar.gz grafton
 
-zips: $(OS_ARCH:%=build/grafton_$(VERSION)_%.zip)
+zips: $(NO_WINDOWS:%=build/grafton_$(VERSION)_%.tar.gz) build/grafton_$(VERSION)_windows_amd64.zip
 
 release: zips
 	curl -LO https://releases.manifold.co/promulgate/$(PROMULGATE_VERSION)/promulgate_$(PROMULGATE_VERSION)_linux_amd64.tar.gz
