@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The Grafton mock connector API now supports a JSON message body to POST /oauth/tokens, as described in the provider documentation
+
 ## [0.12.0] - 2017-11-23
 
 ### Added
