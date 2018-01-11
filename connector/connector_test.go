@@ -11,11 +11,24 @@ import (
 )
 
 var (
-	port         uint
-	clientID     = "21jtaatqj8y5t0kctb2ejr6jev5w8"
-	clientSecret = "3yTKSiJ6f5V5Bq-kWF0hmdrEUep3m3HKPTcPX7CdBZw"
-	product      = "tester"
+	port              uint
+	clientID          = "21jtaatqj8y5t0kctb2ejr6jev5w8"
+	clientSecret      = "3yTKSiJ6f5V5Bq-kWF0hmdrEUep3m3HKPTcPX7CdBZw"
+	product           = "tester"
+	connectorInstance *FakeConnector
 )
+
+func getConnectorInstance() *FakeConnector {
+	if connectorInstance != nil {
+		return connectorInstance
+	}
+	c, err := New(port, clientID, clientSecret, product)
+	if err != nil {
+		gm.Expect(err).ToNot(gm.HaveOccurred())
+	}
+	connectorInstance = c
+	return connectorInstance
+}
 
 func makeResource(t *testing.T, plan, region string) *Resource {
 	ID, err := manifold.NewID(idtype.Resource)
@@ -37,10 +50,7 @@ func makeResource(t *testing.T, plan, region string) *Resource {
 func TestConnector(t *testing.T) {
 	gm.RegisterTestingT(t)
 
-	c, err := New(port, clientID, clientSecret, product)
-	if err != nil {
-		gm.Expect(err).ToNot(gm.HaveOccurred())
-	}
+	c := getConnectorInstance()
 
 	t.Run("a resource is available if added and not if removed", func(t *testing.T) {
 		gm.RegisterTestingT(t)

@@ -2,6 +2,7 @@ package connector
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -123,16 +124,48 @@ func getSelfHandler(c *FakeConnector, capturer *RequestCapturer) http.HandlerFun
 	}
 }
 
+func hasFormValues(req *http.Request) bool {
+	ct := req.Header.Get("Content-Type")
+	return ct == "application/x-www-form-urlencoded" || ct == "multipart/form-data"
+}
+
+type CreateAccessTokenJson struct {
+	GrantType    string `json:"grant_type"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
 func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 		id, secret, ok := req.BasicAuth()
+		var grantTypeStr string
 		if !ok {
-			id = req.FormValue("client_id")
-			secret = req.FormValue("client_secret")
+			if hasFormValues(req) {
+				id = req.FormValue("client_id")
+				secret = req.FormValue("client_secret")
+				grantTypeStr = req.FormValue("grant_type")
+			} else if req.Body != nil {
+				// Assume JSON
+				decoder := json.NewDecoder(req.Body)
+				data := &CreateAccessTokenJson{}
+				if err := decoder.Decode(data); err != nil {
+					fmt.Println("Failed to decode JSON: ", err)
+					connector.ToOAuthError(err).WriteResponse(rw, jsonProducer)
+					return
+				}
+				id = data.ClientID
+				secret = data.ClientSecret
+				grantTypeStr = data.GrantType
+			} else {
+				fmt.Println("No request parameters found")
+				connector.NewOAuthError(cerrors.InvalidRequestErrorType,
+					"No request body provided").WriteResponse(rw, jsonProducer)
+				return
+			}
 		}
 
 		var gt GrantType
-		switch req.FormValue("grant_type") {
+		switch grantTypeStr {
 		case "authorization_code":
 			gt = AuthorizationCodeGrantType
 		case "client_credentials":
@@ -144,7 +177,7 @@ func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.
 		}
 
 		tokReq := &TokenRequest{
-			ContentType:  req.Header.Get("Content-Type"),
+			ContentType:  "application/x-www-form-urlencoded",
 			Code:         req.FormValue("code"),
 			AuthHeader:   ok,
 			ClientID:     id,
