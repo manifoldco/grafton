@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Resource features: the resource provisioning endpoint now receives additional data describing the selected values for customizable features when provisioning the resource.
+
 ### Fixed
 
 - The Grafton mock connector API now supports a JSON message body to POST /oauth/tokens, as described in the provider documentation
