@@ -16,6 +16,9 @@ import (
 // swagger:model ResourceRequest
 type ResourceRequest struct {
 
+	// A map of feature labels to selected values for customizable features
+	Features map[string]interface{} `json:"features,omitempty"`
+
 	// id
 	// Required: true
 	ID manifold.ID `json:"id"`

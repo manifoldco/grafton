@@ -968,6 +968,15 @@ definitions:
         $ref: '#/definitions/Label'
       region:
         $ref: '#/definitions/RegionSlug'
+      features:
+        type: object
+        description: A map of feature labels to selected values for customizable features
+        additionalProperties:
+          type: object
+        example:
+          size: 40 GB
+          e-mails: 1000
+          read-replica: true
     additionalProperties: false
     required:
     - id

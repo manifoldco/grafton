@@ -60,13 +60,15 @@ func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry
 //
 // A message will be returned if a callback was used *or* a provider returned
 // an error with an explanation.
-func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan, region string) (string, bool, error) {
+func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan,
+	region string, features map[string]interface{}) (string, bool, error) {
 
 	body := models.ResourceRequest{
-		ID:      resID,
-		Product: manifold.Label(product),
-		Plan:    manifold.Label(plan),
-		Region:  models.RegionSlug(region),
+		ID:       resID,
+		Product:  manifold.Label(product),
+		Plan:     manifold.Label(plan),
+		Region:   models.RegionSlug(region),
+		Features: features,
 	}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)

@@ -296,7 +296,7 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		fakeConnector.RemoveResource(r.ID)
 	}()
 
-	msg, callback, err := api.ProvisionResource(ctx, c.ID, id, product, plan, region)
+	msg, callback, err := api.ProvisionResource(ctx, c.ID, id, product, plan, region, nil)
 	if err != nil {
 		return nil, c.ID, false, err
 	}
