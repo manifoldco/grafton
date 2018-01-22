@@ -277,7 +277,7 @@ func findProduct(ctx context.Context, cliCtx *cli.Context, client *manifold.Clie
 	var provider *manifold.Provider
 	var product *manifold.Product
 
-	provList := client.Providers.List(ctx)
+	provList := client.Providers.List(ctx, nil)
 
 	defer provList.Close()
 
