@@ -16,7 +16,6 @@ import (
 	"github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 
-	cmodels "github.com/manifoldco/grafton/generated/connector/models"
 	"github.com/manifoldco/grafton/generated/provider/client"
 	"github.com/manifoldco/grafton/generated/provider/client/credential"
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
@@ -62,7 +61,7 @@ func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry
 // A message will be returned if a callback was used *or* a provider returned
 // an error with an explanation.
 func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan,
-	region string, features cmodels.FeatureMap) (string, bool, error) {
+	region string, features map[string]interface{}) (string, bool, error) {
 
 	body := models.ResourceRequest{
 		ID:       resID,
@@ -214,7 +213,7 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 // A message will be returned if a callback was used *or* a provider returned
 // an error with an explanation.
 func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, newPlan string,
-	features cmodels.FeatureMap) (string, bool, error) {
+	features map[string]interface{}) (string, bool, error) {
 
 	body := models.ResourcePlanChangeRequest{
 		Plan:     manifold.Label(newPlan),
