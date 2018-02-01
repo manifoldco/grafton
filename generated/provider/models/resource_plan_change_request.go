@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 
 	manifold "github.com/manifoldco/go-manifold"
+	gconnector "github.com/manifoldco/grafton/generated/connector/models"
 )
 
 // ResourcePlanChangeRequest The information sent along to a Provider to request
@@ -16,6 +17,9 @@ import (
 //
 // swagger:model ResourcePlanChangeRequest
 type ResourcePlanChangeRequest struct {
+
+	// features
+	Features gconnector.FeatureMap `json:"features,omitempty"`
 
 	// plan
 	// Required: true

@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Resource features: the resource provisioning endpoint now receives additional data describing the selected values for customizable features when provisioning the resource.
+- Resource features: the resource provisioning endpoint now receives additional data describing the
+  selected values for customizable features when provisioning the resource.
+- The change plan endpoint also receives new feature data for resource plan changes
+- The acceptance tests have been updated to allow for feature data to be supplied as a JSON object string through
+  `plan-features/PLAN_FEATURES` and `new-plan-features/NEW_PLAN_FEATURES`
 
 ### Fixed
 

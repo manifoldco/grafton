@@ -11,6 +11,8 @@ import (
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
+
+	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var api *grafton.Client
@@ -18,8 +20,10 @@ var uapi *grafton.Client
 
 var product string
 var plan string
+var planFeatures models.FeatureMap
 var region string
 var newPlan string
+var newPlanFeatures models.FeatureMap
 
 var clientID string
 var clientSecret string
@@ -32,13 +36,18 @@ type visitorFunc func(context.Context, *FeatureImpl) bool
 
 // Configure configures all the values needed to run the acceptance tests.
 // This should be called before run.
-func Configure(apiV *grafton.Client, unautorizedAPIV *grafton.Client, productV, regionV, planV, newPlanV, clientIDV, clientSecretV string, port uint, callbackTimeout string) error {
+func Configure(apiV *grafton.Client, unautorizedAPIV *grafton.Client, productV, regionV, planV string,
+	planFeaturesV models.FeatureMap, newPlanV string, newPlanFeaturesV models.FeatureMap, clientIDV string,
+	clientSecretV string, port uint, callbackTimeout string) error {
+
 	api = apiV
 	uapi = unautorizedAPIV
 	product = productV
 	region = regionV
 	plan = planV
+	planFeatures = planFeaturesV
 	newPlan = newPlanV
+	newPlanFeatures = planFeaturesV
 
 	clientID = clientIDV
 	clientSecret = clientSecretV

@@ -212,8 +212,13 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 //
 // A message will be returned if a callback was used *or* a provider returned
 // an error with an explanation.
-func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, newPlan string) (string, bool, error) {
-	body := models.ResourcePlanChangeRequest{Plan: manifold.Label(newPlan)}
+func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, newPlan string,
+	features map[string]interface{}) (string, bool, error) {
+
+	body := models.ResourcePlanChangeRequest{
+		Plan:     manifold.Label(newPlan),
+		Features: features,
+	}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	nurl "net/url"
 	"os"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/acceptance"
+
+	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var (
@@ -39,9 +42,19 @@ func init() {
 				EnvVar: "PLAN",
 			},
 			cli.StringFlag{
+				Name:   "plan-features",
+				Usage:  "A JSON object describing the selected features for the provisioning resource",
+				EnvVar: "PLAN_FEATURES",
+			},
+			cli.StringFlag{
 				Name:   "new-plan",
 				Usage:  "The plan to resize the instance to from the original plan",
 				EnvVar: "NEW_PLAN",
+			},
+			cli.StringFlag{
+				Name:   "new-plan-features",
+				Usage:  "A JSON object describing the selected features for the resizing from the original plan",
+				EnvVar: "NEW_PLAN_FEATURES",
 			},
 			cli.StringFlag{
 				Name:   "region",
@@ -97,7 +110,9 @@ func testCmd(ctx *cli.Context) error {
 
 	url := "http://localhost:3000"
 	plan := ctx.String("plan")
+	sPlanFeatures := ctx.String("plan-features")
 	newPlan := ctx.String("new-plan")
+	sNewPlanFeatures := ctx.String("new-plan-features")
 	product := ctx.String("product")
 	region := ctx.String("region")
 	excludeFeatures := ctx.StringSlice("exclude")
@@ -121,6 +136,22 @@ func testCmd(ctx *cli.Context) error {
 		os.Setenv("DEBUG", "true")
 	default:
 		return cli.NewExitError("invalid log value "+rawLevel, -1)
+	}
+
+	planFeatures := models.FeatureMap{}
+	if sPlanFeatures != "" {
+		err := json.Unmarshal([]byte(sPlanFeatures), planFeatures)
+		if err != nil {
+			return cli.NewExitError("The supplied plan-features does not appear to be valid JSON: "+err.Error(), -1)
+		}
+	}
+
+	newPlanFeatures := models.FeatureMap{}
+	if sNewPlanFeatures != "" {
+		err := json.Unmarshal([]byte(sNewPlanFeatures), newPlanFeatures)
+		if err != nil {
+			return cli.NewExitError("The supplied new-plan-features does not appear to be valid JSON: "+err.Error(), -1)
+		}
 	}
 
 	if len(args) > 0 {
@@ -198,7 +229,8 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.Infoln(buf.String())
 
-	err = acceptance.Configure(api, unauthorizedAPI, product, region, plan, newPlan, clientID, clientSecret, connectorPort, callbackTimeout)
+	err = acceptance.Configure(api, unauthorizedAPI, product, region, plan, planFeatures,
+		newPlan, newPlanFeatures, clientID, clientSecret, connectorPort, callbackTimeout)
 	if err != nil {
 		return cli.NewExitError("Error: "+err.Error(), -1)
 	}

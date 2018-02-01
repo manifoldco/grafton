@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 
 	manifold "github.com/manifoldco/go-manifold"
+	gconnector "github.com/manifoldco/grafton/generated/connector/models"
 )
 
 // ResourceRequest The information sent along to a Provider to provision a resource.
@@ -16,8 +17,8 @@ import (
 // swagger:model ResourceRequest
 type ResourceRequest struct {
 
-	// A map of feature labels to selected values for customizable features
-	Features map[string]interface{} `json:"features,omitempty"`
+	// features
+	Features gconnector.FeatureMap `json:"features,omitempty"`
 
 	// id
 	// Required: true

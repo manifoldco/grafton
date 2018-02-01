@@ -53,7 +53,11 @@ func callChangePlan(rawURL string) (string, bool, error) {
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
 
-	return c.ChangePlan(ctx, cbID, resID, "new-plan")
+	return c.ChangePlan(ctx, cbID, resID, "new-plan", map[string]interface{}{
+		"size":         "40 GB",
+		"e-mails":      1000,
+		"read-replica": true,
+	})
 }
 
 func callDeprovisionCredentials(rawURL string) (string, bool, error) {
