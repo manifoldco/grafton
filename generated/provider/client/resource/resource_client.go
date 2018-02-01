@@ -84,6 +84,41 @@ func (a *Client) DeleteResourcesID(params *DeleteResourcesIDParams) (*DeleteReso
 }
 
 /*
+GetResourcesIDMeasures gets how much a resource has used its features
+
+Manifold will call this endpoint daily to get usage information about a
+resource and its features.
+
+The Provider should only need to hold information about the time left
+in the current month and the previous month.
+
+*/
+func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams) (*GetResourcesIDMeasuresOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetResourcesIDMeasuresParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetResourcesIDMeasures",
+		Method:             "GET",
+		PathPattern:        "/resources/{id}/measures",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetResourcesIDMeasuresReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetResourcesIDMeasuresOK), nil
+
+}
+
+/*
 PatchResourcesID changes plan
 
 Manifold will call this endpoint to request a change in plan of a
