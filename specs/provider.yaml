@@ -943,6 +943,20 @@ definitions:
     type: string
     minLength: 3
     maxLength: 256
+  FeatureMap:
+    type: object
+    description: A map of feature labels to selected values for customizable features
+    additionalProperties:
+      type: object
+    example:
+      size: 40 GB
+      e-mails: 1000
+      read-replica: true
+    x-go-type:
+      type: FeatureMap
+      import:
+        package: github.com/manifoldco/grafton/generated/connector/models
+        alias: gconnector
   ProviderError:
     type: object
     properties:
@@ -969,14 +983,7 @@ definitions:
       region:
         $ref: '#/definitions/RegionSlug'
       features:
-        type: object
-        description: A map of feature labels to selected values for customizable features
-        additionalProperties:
-          type: object
-        example:
-          size: 40 GB
-          e-mails: 1000
-          read-replica: true
+        $ref: '#/definitions/FeatureMap'
     additionalProperties: false
     required:
     - id
@@ -991,6 +998,8 @@ definitions:
     properties:
       plan:
         $ref: '#/definitions/Label'
+      features:
+        $ref: '#/definitions/FeatureMap'
     additionalProperties: false
     required:
     - plan

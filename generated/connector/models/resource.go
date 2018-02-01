@@ -23,6 +23,9 @@ type Resource struct {
 	// created at
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
+	// features
+	Features FeatureMap `json:"features,omitempty"`
+
 	// id
 	ID manifold.ID `json:"id,omitempty"`
 

@@ -14,6 +14,8 @@ import (
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
+
+	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var errTimeout = errors.New("Exceeded Callback Wait time")
@@ -25,7 +27,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		curResource := attemptResourceProvision(ctx, api, product, plan, region)
+		curResource := attemptResourceProvision(ctx, api, product, plan, planFeatures, region)
 		resourceID = curResource.ID
 	})
 
@@ -33,7 +35,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, api, "", plan, region)
+		_, _, async, err := provisionResource(ctx, api, "", plan, planFeatures, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -56,7 +58,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, api, product, "faulty-plan-name", region)
+		_, _, async, err := provisionResource(ctx, api, product, "faulty-plan-name", nil, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -79,7 +81,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, api, product, plan, "faulty-region")
+		_, _, async, err := provisionResource(ctx, api, product, plan, planFeatures, "faulty-region")
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -102,7 +104,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, uapi, product, plan, region)
+		_, _, async, err := provisionResource(ctx, uapi, product, plan, planFeatures, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -126,7 +128,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, plan, region)
+		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, plan, planFeatures, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -139,7 +141,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, newPlan, region)
+		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, newPlan, newPlanFeatures, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -191,9 +193,11 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 })
 var _ = provision.RequiredFlags("product", "plan", "region", "new-plan")
 
-func attemptResourceProvision(ctx context.Context, api *grafton.Client, product, plan, region string) *connector.Resource {
+func attemptResourceProvision(ctx context.Context, api *grafton.Client, product, plan string,
+	planFeatures models.FeatureMap, region string) *connector.Resource {
+
 	var err error
-	curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, region)
+	curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, planFeatures, region)
 	gm.Expect(err).To(notError(), "Expected a successful provision of a resource")
 
 	if async {
@@ -258,7 +262,9 @@ waitForCallback:
 	}
 }
 
-func provisionResource(ctx context.Context, api *grafton.Client, product, plan, region string) (*connector.Resource, manifold.ID, bool, error) {
+func provisionResource(ctx context.Context, api *grafton.Client, product, plan string,
+	planFeatures models.FeatureMap, region string) (*connector.Resource, manifold.ID, bool, error) {
+
 	Infoln("Attempting to provision resource")
 
 	ID, err := manifold.NewID(idtype.Resource)
@@ -266,10 +272,12 @@ func provisionResource(ctx context.Context, api *grafton.Client, product, plan, 
 		return nil, ID, false, FatalErr("Could not generate resource id:", err)
 	}
 
-	return provisionResourceID(ctx, api, ID, product, plan, region)
+	return provisionResourceID(ctx, api, ID, product, plan, planFeatures, region)
 }
 
-func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.ID, product, plan, region string) (*connector.Resource, manifold.ID, bool, error) {
+func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.ID, product, plan string,
+	planFeatures models.FeatureMap, region string) (*connector.Resource, manifold.ID, bool, error) {
+
 	c, err := fakeConnector.AddCallback(connector.ResourceProvisionCallback)
 	if err != nil {
 		return nil, c.ID, false, err
@@ -280,6 +288,7 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		Product:   product,
 		Plan:      plan,
 		Region:    region,
+		Features:  planFeatures,
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}

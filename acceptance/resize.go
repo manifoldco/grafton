@@ -13,6 +13,8 @@ import (
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
+
+	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var resize = Feature("plan-change", "Change a resource's plan", func(ctx context.Context) {
@@ -20,11 +22,11 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		attemptResize(ctx, api, resourceID, newPlan)
+		attemptResize(ctx, api, resourceID, newPlan, newPlanFeatures)
 	})
 
 	ErrorCase("with existing plan - returns success", func() {
-		_, async, err := changePlan(ctx, api, resourceID, newPlan)
+		_, async, err := changePlan(ctx, api, resourceID, newPlan, newPlanFeatures)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -39,7 +41,7 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 		defer cancel()
 
 		fakeID, _ := manifold.NewID(idtype.Resource)
-		_, async, err := changePlan(ctx, api, fakeID, newPlan)
+		_, async, err := changePlan(ctx, api, fakeID, newPlan, newPlanFeatures)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -62,7 +64,7 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		_, async, err := changePlan(ctx, api, resourceID, "non-existing")
+		_, async, err := changePlan(ctx, api, resourceID, "non-existing", nil)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -85,7 +87,7 @@ var resize = Feature("plan-change", "Change a resource's plan", func(ctx context
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		_, async, err := changePlan(ctx, uapi, resourceID, newPlan)
+		_, async, err := changePlan(ctx, uapi, resourceID, newPlan, newPlanFeatures)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -114,12 +116,14 @@ var _ = resize.TearDown("Change the resource's plan back to the original", func(
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		attemptResize(ctx, api, resourceID, plan)
+		attemptResize(ctx, api, resourceID, plan, planFeatures)
 	})
 })
 
-func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string) {
-	callbackID, async, err := changePlan(ctx, api, resourceID, newPlan)
+func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string,
+	newPlanFeatures models.FeatureMap) {
+
+	callbackID, async, err := changePlan(ctx, api, resourceID, newPlan, newPlanFeatures)
 
 	gm.Expect(err).To(notError(), "Expected a successful plan change of a resource")
 
@@ -141,15 +145,17 @@ func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold
 	}
 }
 
-func changePlan(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string) (manifold.ID, bool, error) {
-	Infof("Attempting to resize resource %s to %s\n", resourceID, newPlan)
+func changePlan(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string,
+	newPlanFeatures models.FeatureMap) (manifold.ID, bool, error) {
+
+	Infof("Attempting to resize resource %s to %s, %s\n", resourceID, newPlan, newPlanFeatures)
 
 	c, err := fakeConnector.AddCallback(connector.ResourceResizeCallback)
 	if err != nil {
 		return manifold.ID{}, false, err
 	}
 
-	msg, callback, err := api.ChangePlan(ctx, c.ID, resourceID, newPlan)
+	msg, callback, err := api.ChangePlan(ctx, c.ID, resourceID, newPlan, newPlanFeatures)
 	if err != nil {
 		return c.ID, callback, err
 	}

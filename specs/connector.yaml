@@ -486,6 +486,15 @@ definitions:
       import:
         package: github.com/manifoldco/go-manifold
         alias: manifold
+  FeatureMap:
+    type: object
+    description: A map of feature labels to selected values for customizable features
+    additionalProperties:
+      type: object
+    example:
+      size: 40 GB
+      e-mails: 1000
+      read-replica: true
   Error:
     type: object
     properties:
@@ -755,6 +764,8 @@ definitions:
         $ref: '#/definitions/Label'
       region:
         $ref: '#/definitions/RegionSlug'
+      features:
+        $ref: '#/definitions/FeatureMap'
       name:
         $ref: '#/definitions/Name'
       created_at:
