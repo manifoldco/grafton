@@ -140,7 +140,7 @@ func testCmd(ctx *cli.Context) error {
 
 	planFeatures := models.FeatureMap{}
 	if sPlanFeatures != "" {
-		err := json.NewDecoder(strings.NewReader(sPlanFeatures)).Decode(planFeatures)
+		err := json.Unmarshal([]byte(sPlanFeatures), planFeatures)
 		if err != nil {
 			return cli.NewExitError("The supplied plan-features does not appear to be valid JSON: "+err.Error(), -1)
 		}
@@ -148,7 +148,7 @@ func testCmd(ctx *cli.Context) error {
 
 	newPlanFeatures := models.FeatureMap{}
 	if sNewPlanFeatures != "" {
-		err := json.NewDecoder(strings.NewReader(sNewPlanFeatures)).Decode(newPlanFeatures)
+		err := json.Unmarshal([]byte(sNewPlanFeatures), newPlanFeatures)
 		if err != nil {
 			return cli.NewExitError("The supplied new-plan-features does not appear to be valid JSON: "+err.Error(), -1)
 		}
