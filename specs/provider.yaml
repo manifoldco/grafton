@@ -921,8 +921,11 @@ paths:
         Manifold will call this endpoint daily to get usage information about a
         resource and its features.
 
-        The Provider should only need to hold information about the time left
+        The provider should only need to hold information about the time left
         in the current month and the previous month.
+
+        Months are defined by the Manifold billing period which starts at the
+        first of each month in UTC-0 and ends at the start of the next.
       parameters:
         - $ref: '#/parameters/resource_id'
         - name: period_start
@@ -942,7 +945,8 @@ paths:
           description: |
             A response should contain a measures map in which the key represents a
             resource feature and the value is the most updated usage value of the
-            feature.
+            feature. This usage value is assumed to be the sum total of usage
+            for that feature for the billing period
           schema:
             $ref: '#/definitions/ResourceMeasures'
         400: { $ref: '#/responses/BadRequest' }
@@ -1084,18 +1088,7 @@ definitions:
   ResourceMeasures:
     type: object
     description: |
-      Wrapper object for resource measures body.
-    properties:
-      body:
-        $ref: '#/definitions/ResourceMeasuresBody'
-    additionalProperties: false
-    required:
-      - body
-
-  ResourceMeasuresBody:
-    type: object
-    description: |
-      Object used to hold information about a resource and its features usage.
+      Object describing a resource's feature usage for a billing period.
     properties:
       resource_id: { $ref: '#/definitions/ID' }
       period_start: { type: string, format: datetime }

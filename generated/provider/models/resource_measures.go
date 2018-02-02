@@ -7,24 +7,54 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	manifold "github.com/manifoldco/go-manifold"
 )
 
-// ResourceMeasures Wrapper object for resource measures body.
+// ResourceMeasures Object describing a resource's feature usage for a billing period.
 //
 // swagger:model ResourceMeasures
 type ResourceMeasures struct {
 
-	// body
+	// measures
 	// Required: true
-	Body *ResourceMeasuresBody `json:"body"`
+	Measures map[string]int64 `json:"measures"`
+
+	// period end
+	// Required: true
+	PeriodEnd *strfmt.DateTime `json:"period_end"`
+
+	// period start
+	// Required: true
+	PeriodStart *strfmt.DateTime `json:"period_start"`
+
+	// resource id
+	// Required: true
+	ResourceID manifold.ID `json:"resource_id"`
 }
 
 // Validate validates this resource measures
 func (m *ResourceMeasures) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateBody(formats); err != nil {
+	if err := m.validateMeasures(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validatePeriodEnd(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validatePeriodStart(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateResourceID(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -35,20 +65,40 @@ func (m *ResourceMeasures) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ResourceMeasures) validateBody(formats strfmt.Registry) error {
+func (m *ResourceMeasures) validateMeasures(formats strfmt.Registry) error {
 
-	if err := validate.Required("body", "body", m.Body); err != nil {
+	if swag.IsZero(m.Measures) { // not required
+		return nil
+	}
+
+	return nil
+}
+
+func (m *ResourceMeasures) validatePeriodEnd(formats strfmt.Registry) error {
+
+	if err := validate.Required("period_end", "body", m.PeriodEnd); err != nil {
 		return err
 	}
 
-	if m.Body != nil {
+	return nil
+}
 
-		if err := m.Body.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("body")
-			}
-			return err
+func (m *ResourceMeasures) validatePeriodStart(formats strfmt.Registry) error {
+
+	if err := validate.Required("period_start", "body", m.PeriodStart); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ResourceMeasures) validateResourceID(formats strfmt.Registry) error {
+
+	if err := m.ResourceID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("resource_id")
 		}
+		return err
 	}
 
 	return nil
