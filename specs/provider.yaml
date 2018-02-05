@@ -913,6 +913,47 @@ paths:
           description: |
             If the request could not be processed successfully, a useful error
             message should be displayed to the user.
+
+  /resources/{id}/measures:
+    get:
+      summary: Get how much a resource has used its features
+      description: |
+        Manifold will call this endpoint daily to get usage information about a
+        resource and its features.
+
+        The provider should only need to hold information about the time left
+        in the current month and the previous month.
+
+        Months are defined by the Manifold billing period which starts at the
+        first of each month in UTC-0 and ends at the start of the next.
+      parameters:
+        - $ref: '#/parameters/resource_id'
+        - name: period_start
+          in: query
+          required: true
+          type: string
+          format: datetime
+        - name: period_end
+          in: query
+          required: true
+          type: string
+          format: datetime
+      tags:
+        - Resource
+      responses:
+        200:
+          description: |
+            A response should contain a measures map in which the key represents a
+            resource feature and the value is the most updated usage value of the
+            feature. This usage value is assumed to be the sum total of usage
+            for that feature for the billing period
+          schema:
+            $ref: '#/definitions/ResourceMeasures'
+        400: { $ref: '#/responses/BadRequest' }
+        401: { $ref: '#/responses/Unauthorized' }
+        404: { $ref: '#/responses/NotFound' }
+        500: { $ref: '#/responses/Internal' }
+
 definitions:
   ID:
     type: string
@@ -1043,3 +1084,22 @@ definitions:
     additionalProperties: false
     required:
     - message
+
+  ResourceMeasures:
+    type: object
+    description: |
+      Object describing a resource's feature usage for a billing period.
+    properties:
+      resource_id: { $ref: '#/definitions/ID' }
+      period_start: { type: string, format: datetime }
+      period_end: { type: string, format: datetime }
+      measures:
+        type: object
+        additionalProperties:
+          type: integer
+    additionalProperties: false
+    required:
+      - resource_id
+      - period_start
+      - period_end
+      - measures

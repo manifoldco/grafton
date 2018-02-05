@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The change plan endpoint also receives new feature data for resource plan changes
 - The acceptance tests have been updated to allow for feature data to be supplied as a JSON object string through
   `plan-features/PLAN_FEATURES` and `new-plan-features/NEW_PLAN_FEATURES`
+- Resource measures spec: allows Manifold to pull information about a resource
+  features usage
 
 ### Fixed
 
