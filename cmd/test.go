@@ -63,7 +63,7 @@ func init() {
 			},
 			cli.StringSliceFlag{
 				Name:   "exclude",
-				Usage:  "Exlude running these feature tests (and those that depend on it)",
+				Usage:  "Exclude running these feature tests (and those that depend on it)",
 				EnvVar: "EXCLUDE",
 			},
 			cli.BoolFlag{
@@ -98,6 +98,11 @@ func init() {
 				Usage:  "duration to wait (max. 24hours) for a callback (default: 5m)",
 				EnvVar: "CALLBACK_TIMEOUT",
 			},
+			cli.StringFlag{
+				Name:  "resource-measures",
+				Usage: "Optional measures map to be returned by resource measures polling",
+				Value: `{"feature-a": 0, "feature-b": 1000}`,
+			},
 		},
 		Action: testCmd,
 	}
@@ -121,6 +126,8 @@ func testCmd(ctx *cli.Context) error {
 	clientSecret := ctx.String("client-secret")
 	connectorPort := ctx.Uint("connector-port")
 	callbackTimeout := ctx.String("callback-timeout")
+
+	//resourceMeasures := ctx.String("resource-measures")
 
 	var logLevel acceptance.LogLevel
 	rawLevel := ctx.String("log")
