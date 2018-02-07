@@ -127,7 +127,7 @@ func testCmd(ctx *cli.Context) error {
 	connectorPort := ctx.Uint("connector-port")
 	callbackTimeout := ctx.String("callback-timeout")
 
-	//resourceMeasures := ctx.String("resource-measures")
+	resourceMeasures := ctx.String("resource-measures")
 
 	var logLevel acceptance.LogLevel
 	rawLevel := ctx.String("log")
@@ -236,9 +236,23 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.Infoln(buf.String())
 
-	err = acceptance.Configure(api, unauthorizedAPI, product, region, plan, planFeatures,
-		newPlan, newPlanFeatures, clientID, clientSecret, connectorPort, callbackTimeout)
-	if err != nil {
+	cfg := acceptance.Configration{
+		API:              api,
+		UnauthorizedAPI:  unauthorizedAPI,
+		Product:          product,
+		Region:           region,
+		Plan:             plan,
+		PlanFeatures:     planFeatures,
+		NewPlan:          newPlan,
+		NewPlanFeatures:  newPlanFeatures,
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		Port:             connectorPort,
+		CallbackTimeout:  callbackTimeout,
+		ResourceMeasures: resourceMeasures,
+	}
+
+	if err := acceptance.Configure(cfg); err != nil {
 		return cli.NewExitError("Error: "+err.Error(), -1)
 	}
 	if ok := acceptance.Run(c, !ctx.Bool("no-error-cases"), excludeFeatures); !ok {
