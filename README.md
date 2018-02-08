@@ -22,6 +22,7 @@ Using this CLI tool, a provider can test the following:
 - Provisioning of a Resource
 - Provisioning of Credentials
 - Resizing of a Resource
+- Pulling [Resource Measures](#excluding-features) (optional)
 - Deprovisioning of Credentials
 - Deprovisioning of a Resource
 
@@ -80,6 +81,12 @@ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
     --new-plan=large \
     http://localhost:4567
 ```
+
+### Excluding Features
+
+When testing it is possible to exclude of one more features from being run. To
+disable Resource Measures and Resize, for example, you can pass:
+`--exclude resource-measures plan-change`.
 
 ## Releasing
 

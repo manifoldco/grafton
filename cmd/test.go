@@ -63,7 +63,7 @@ func init() {
 			},
 			cli.StringSliceFlag{
 				Name:   "exclude",
-				Usage:  "Exlude running these feature tests (and those that depend on it)",
+				Usage:  "Exclude running these feature tests (and those that depend on it)",
 				EnvVar: "EXCLUDE",
 			},
 			cli.BoolFlag{
@@ -98,6 +98,11 @@ func init() {
 				Usage:  "duration to wait (max. 24hours) for a callback (default: 5m)",
 				EnvVar: "CALLBACK_TIMEOUT",
 			},
+			cli.StringFlag{
+				Name:  "resource-measures",
+				Usage: "Optional measures map to be returned by resource measures",
+				Value: `{"feature-a": 0, "feature-b": 1000}`,
+			},
 		},
 		Action: testCmd,
 	}
@@ -121,6 +126,8 @@ func testCmd(ctx *cli.Context) error {
 	clientSecret := ctx.String("client-secret")
 	connectorPort := ctx.Uint("connector-port")
 	callbackTimeout := ctx.String("callback-timeout")
+
+	resourceMeasures := ctx.String("resource-measures")
 
 	var logLevel acceptance.LogLevel
 	rawLevel := ctx.String("log")
@@ -195,7 +202,7 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.SetLogLevel(logLevel)
 
-	acceptance.Infoln(bold("Configration"))
+	acceptance.Infoln(bold("Configuration"))
 	buf := bytes.NewBufferString("")
 	w := tabwriter.NewWriter(buf, 0, 0, 2, ' ', 0)
 	fmt.Fprintf(w, "\tURL:\t%s\n", faint(url))
@@ -216,6 +223,10 @@ func testCmd(ctx *cli.Context) error {
 	fmt.Fprintf(w, "\tClient Secret:\t%s\n", faint(clientSecret))
 	fmt.Fprintf(w, "\tConnector Port:\t%s\n", faint(fmt.Sprintf("%d", connectorPort)))
 
+	if !contains(excludeFeatures, "resource-measures") {
+		fmt.Fprintf(w, "\tResource Measures:\t%s\n", faint(resourceMeasures))
+	}
+
 	if errs := acceptance.Validate(c, ctx, excludeFeatures); len(errs) != 0 {
 		// format errors into a single string
 		errString := []string{}
@@ -229,9 +240,23 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.Infoln(buf.String())
 
-	err = acceptance.Configure(api, unauthorizedAPI, product, region, plan, planFeatures,
-		newPlan, newPlanFeatures, clientID, clientSecret, connectorPort, callbackTimeout)
-	if err != nil {
+	cfg := acceptance.Configuration{
+		API:              api,
+		UnauthorizedAPI:  unauthorizedAPI,
+		Product:          product,
+		Region:           region,
+		Plan:             plan,
+		PlanFeatures:     planFeatures,
+		NewPlan:          newPlan,
+		NewPlanFeatures:  newPlanFeatures,
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		Port:             connectorPort,
+		CallbackTimeout:  callbackTimeout,
+		ResourceMeasures: resourceMeasures,
+	}
+
+	if err := acceptance.Configure(cfg); err != nil {
 		return cli.NewExitError("Error: "+err.Error(), -1)
 	}
 	if ok := acceptance.Run(c, !ctx.Bool("no-error-cases"), excludeFeatures); !ok {
@@ -274,4 +299,13 @@ func yn(v bool) string {
 	}
 
 	return "no"
+}
+
+func contains(list []string, s string) bool {
+	for _, i := range list {
+		if i == s {
+			return true
+		}
+	}
+	return false
 }

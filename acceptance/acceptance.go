@@ -2,9 +2,11 @@ package acceptance
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/onsi/gomega"
 	"github.com/urfave/cli"
@@ -24,6 +26,7 @@ var planFeatures models.FeatureMap
 var region string
 var newPlan string
 var newPlanFeatures models.FeatureMap
+var resourceMeasures map[string]int64
 
 var clientID string
 var clientSecret string
@@ -34,34 +37,55 @@ var maxTimeout = 24 * time.Hour
 
 type visitorFunc func(context.Context, *FeatureImpl) bool
 
+type Configuration struct {
+	API              *grafton.Client
+	UnauthorizedAPI  *grafton.Client
+	Product          string
+	Region           string
+	Plan             string
+	PlanFeatures     models.FeatureMap
+	NewPlan          string
+	NewPlanFeatures  models.FeatureMap
+	ClientID         string
+	ClientSecret     string
+	Port             uint
+	CallbackTimeout  string
+	ResourceMeasures string
+}
+
 // Configure configures all the values needed to run the acceptance tests.
 // This should be called before run.
-func Configure(apiV *grafton.Client, unautorizedAPIV *grafton.Client, productV, regionV, planV string,
-	planFeaturesV models.FeatureMap, newPlanV string, newPlanFeaturesV models.FeatureMap, clientIDV string,
-	clientSecretV string, port uint, callbackTimeout string) error {
+func Configure(cfg Configuration) error {
 
-	api = apiV
-	uapi = unautorizedAPIV
-	product = productV
-	region = regionV
-	plan = planV
-	planFeatures = planFeaturesV
-	newPlan = newPlanV
-	newPlanFeatures = planFeaturesV
+	api = cfg.API
+	uapi = cfg.UnauthorizedAPI
+	product = cfg.Product
+	region = cfg.Region
+	plan = cfg.Plan
+	planFeatures = cfg.PlanFeatures
+	newPlan = cfg.NewPlan
+	newPlanFeatures = cfg.NewPlanFeatures
 
-	clientID = clientIDV
-	clientSecret = clientSecretV
-	connectorPort = port
+	clientID = cfg.ClientID
+	clientSecret = cfg.ClientSecret
+	connectorPort = cfg.Port
 
 	var err error
-	if callbackTimeout != "" {
-		cbTimeout, err = time.ParseDuration(callbackTimeout)
+	if cfg.CallbackTimeout != "" {
+		cbTimeout, err = time.ParseDuration(cfg.CallbackTimeout)
 		if err != nil {
 			return err
 		}
 
 		if cbTimeout > maxTimeout {
 			return errors.New("callback timeout cannot exceed 24hrs")
+		}
+	}
+
+	if cfg.ResourceMeasures != "" {
+		err := json.Unmarshal([]byte(cfg.ResourceMeasures), &resourceMeasures)
+		if err != nil {
+			return errors.Wrap(err, "failed to parse resource measures json")
 		}
 	}
 

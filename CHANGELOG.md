@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `plan-features/PLAN_FEATURES` and `new-plan-features/NEW_PLAN_FEATURES`
 - Resource measures spec: allows Manifold to pull information about a resource
   features usage
+- Resource measures acceptance test
 
 ### Fixed
 
