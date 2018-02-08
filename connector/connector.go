@@ -283,7 +283,6 @@ func ValidHandler(c *FakeConnector) *bone.Mux {
 	mux.PutFunc("/v1/callbacks/:id", processCallbackHandler(c, c.capturer("/v1/callbacks/{id}")))
 	mux.GetFunc("/v1/resources/:id", getResourceHandler(c, c.capturer("/v1/resources/{id}")))
 	mux.GetFunc("/v1/resources/:id/users", getResourceUsersHandler(c, c.capturer("/v1/resources/{id}/users")))
-	mux.GetFunc("/v1/resources/:id/measures", getResourceMeasuresHandler(c, c.capturer("/v1/resources/{id}/measures")))
 	return mux
 }
 
