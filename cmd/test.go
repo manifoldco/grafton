@@ -240,7 +240,7 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.Infoln(buf.String())
 
-	cfg := acceptance.Configration{
+	cfg := acceptance.Configuration{
 		API:              api,
 		UnauthorizedAPI:  unauthorizedAPI,
 		Product:          product,

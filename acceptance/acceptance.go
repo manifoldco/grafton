@@ -37,7 +37,7 @@ var maxTimeout = 24 * time.Hour
 
 type visitorFunc func(context.Context, *FeatureImpl) bool
 
-type Configration struct {
+type Configuration struct {
 	API              *grafton.Client
 	UnauthorizedAPI  *grafton.Client
 	Product          string
@@ -55,7 +55,7 @@ type Configration struct {
 
 // Configure configures all the values needed to run the acceptance tests.
 // This should be called before run.
-func Configure(cfg Configration) error {
+func Configure(cfg Configuration) error {
 
 	api = cfg.API
 	uapi = cfg.UnauthorizedAPI
