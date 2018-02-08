@@ -100,7 +100,7 @@ func init() {
 			},
 			cli.StringFlag{
 				Name:  "resource-measures",
-				Usage: "Optional measures map to be returned by resource measures polling",
+				Usage: "Optional measures map to be returned by resource measures",
 				Value: `{"feature-a": 0, "feature-b": 1000}`,
 			},
 		},

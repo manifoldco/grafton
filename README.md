@@ -22,7 +22,7 @@ Using this CLI tool, a provider can test the following:
 - Provisioning of a Resource
 - Provisioning of Credentials
 - Resizing of a Resource
-- Polling for [Resource Measures](#excluding-features) (optional)
+- Pulling [Resource Measures](#excluding-features) (optional)
 - Deprovisioning of Credentials
 - Deprovisioning of a Resource
 
