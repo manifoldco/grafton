@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	nurl "net/url"
 	"path"
+	"time"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -400,4 +401,42 @@ func CreateSsoURL(base *nurl.URL, code string, resourceID manifold.ID) *nurl.URL
 	url.RawQuery = q.Encode()
 
 	return &url
+}
+
+// PullResourceMeasures tries to get information about a resource usage.
+func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
+	start, end time.Time) (*models.ResourceMeasures, error) {
+
+	p := resource.NewGetResourcesIDMeasuresParamsWithContext(ctx)
+	p.SetID(rid.String())
+	p.SetPeriodStart(strfmt.DateTime(start))
+	p.SetPeriodEnd(strfmt.DateTime(end))
+
+	res, err := c.api.Resource.GetResourcesIDMeasures(p)
+
+	if err != nil {
+		var graftonErr error
+		switch e := err.(type) {
+		case *resource.GetResourcesIDMeasuresBadRequest:
+			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
+		case *resource.GetResourcesIDMeasuresUnauthorized:
+			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
+		case *resource.GetResourcesIDMeasuresNotFound:
+			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
+		case *resource.GetResourcesIDMeasuresInternalServerError:
+			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
+		default:
+			c.log.WithError(err).Info("Error unrecognized, returning directly")
+			return nil, err
+		}
+
+		if graftonErr == ErrMissingMsg {
+			c.log.WithError(err).Error("Missing error message in response")
+			return nil, graftonErr
+		}
+
+		return nil, graftonErr
+	}
+
+	return res.Payload, nil
 }

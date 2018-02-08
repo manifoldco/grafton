@@ -2,9 +2,11 @@ package acceptance
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/onsi/gomega"
 	"github.com/urfave/cli"
@@ -24,6 +26,7 @@ var planFeatures models.FeatureMap
 var region string
 var newPlan string
 var newPlanFeatures models.FeatureMap
+var resourceMeasures map[string]int64
 
 var clientID string
 var clientSecret string
@@ -77,6 +80,11 @@ func Configure(cfg Configration) error {
 		if cbTimeout > maxTimeout {
 			return errors.New("callback timeout cannot exceed 24hrs")
 		}
+	}
+
+	if cfg.ResourceMeasures != "" {
+		err := json.Unmarshal([]byte(cfg.ResourceMeasures), &resourceMeasures)
+		return errors.Wrap(err, "failed to parse resource measures json")
 	}
 
 	fakeConnector, err = connector.New(connectorPort, clientID, clientSecret, product)

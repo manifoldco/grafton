@@ -2,7 +2,6 @@ package acceptance
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/manifoldco/go-manifold"
@@ -15,13 +14,20 @@ var measures = Feature("resource-measures", "Pull usage measures from a Resource
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		err := pullResourceMeasures(ctx, api, resourceID)
-		gm.Expect(err).To(notError(), "No error is expected")
+		pullResourceMeasures(ctx, api, resourceID)
 	})
 })
 
 var _ = measures.RunsInside("provision")
 
-func pullResourceMeasures(ctx context.Context, api *grafton.Client, rid manifold.ID) error {
-	return errors.New("not implemented")
+func pullResourceMeasures(ctx context.Context, api *grafton.Client, rid manifold.ID) {
+	year, month, _ := time.Now().UTC().Date()
+	start := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(0, 1, 0).Add(-time.Second)
+
+	rm, err := api.PullResourceMeasures(ctx, rid, start, end)
+
+	gm.Expect(err).To(notError(), "No error is expected")
+
+	gm.Expect(rm.PeriodStart).ToNot(gm.BeNil())
 }
