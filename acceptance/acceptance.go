@@ -84,7 +84,9 @@ func Configure(cfg Configration) error {
 
 	if cfg.ResourceMeasures != "" {
 		err := json.Unmarshal([]byte(cfg.ResourceMeasures), &resourceMeasures)
-		return errors.Wrap(err, "failed to parse resource measures json")
+		if err != nil {
+			return errors.Wrap(err, "failed to parse resource measures json")
+		}
 	}
 
 	fakeConnector, err = connector.New(connectorPort, clientID, clientSecret, product)

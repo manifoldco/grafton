@@ -14,13 +14,15 @@ var measures = Feature("resource-measures", "Pull usage measures from a Resource
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		pullResourceMeasures(ctx, api, resourceID)
+		pullResourceMeasures(ctx, api, resourceID, resourceMeasures)
 	})
 })
 
 var _ = measures.RunsInside("provision")
 
-func pullResourceMeasures(ctx context.Context, api *grafton.Client, rid manifold.ID) {
+func pullResourceMeasures(ctx context.Context, api *grafton.Client,
+	rid manifold.ID, measures map[string]int64) {
+
 	year, month, _ := time.Now().UTC().Date()
 	start := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 	end := start.AddDate(0, 1, 0).Add(-time.Second)
@@ -29,5 +31,13 @@ func pullResourceMeasures(ctx context.Context, api *grafton.Client, rid manifold
 
 	gm.Expect(err).To(notError(), "No error is expected")
 
+	gm.Expect(rm.ResourceID).To(gm.Equal(rid))
+
 	gm.Expect(rm.PeriodStart).ToNot(gm.BeNil())
+	gm.Expect(time.Time(*rm.PeriodStart)).To(gm.Equal(start))
+
+	gm.Expect(rm.PeriodEnd).ToNot(gm.BeNil())
+	gm.Expect(time.Time(*rm.PeriodEnd)).To(gm.Equal(end))
+
+	gm.Expect(rm.Measures).To(gm.Equal(resourceMeasures))
 }
