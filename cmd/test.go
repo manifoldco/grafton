@@ -202,7 +202,7 @@ func testCmd(ctx *cli.Context) error {
 
 	acceptance.SetLogLevel(logLevel)
 
-	acceptance.Infoln(bold("Configration"))
+	acceptance.Infoln(bold("Configuration"))
 	buf := bytes.NewBufferString("")
 	w := tabwriter.NewWriter(buf, 0, 0, 2, ' ', 0)
 	fmt.Fprintf(w, "\tURL:\t%s\n", faint(url))
@@ -222,6 +222,10 @@ func testCmd(ctx *cli.Context) error {
 	fmt.Fprintf(w, "\tClient ID:\t%s\n", faint(clientID))
 	fmt.Fprintf(w, "\tClient Secret:\t%s\n", faint(clientSecret))
 	fmt.Fprintf(w, "\tConnector Port:\t%s\n", faint(fmt.Sprintf("%d", connectorPort)))
+
+	if !contains(excludeFeatures, "resource-measures") {
+		fmt.Fprintf(w, "\tResource Measures:\t%s\n", faint(resourceMeasures))
+	}
 
 	if errs := acceptance.Validate(c, ctx, excludeFeatures); len(errs) != 0 {
 		// format errors into a single string
@@ -295,4 +299,13 @@ func yn(v bool) string {
 	}
 
 	return "no"
+}
+
+func contains(list []string, s string) bool {
+	for _, i := range list {
+		if i == s {
+			return true
+		}
+	}
+	return false
 }
