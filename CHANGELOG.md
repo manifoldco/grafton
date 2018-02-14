@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Resource measures spec: allows Manifold to pull information about a resource
   features usage
 - Resource measures acceptance test
+- Add `label` field to resource
 
 ### Fixed
 
