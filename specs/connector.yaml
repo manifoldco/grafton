@@ -768,6 +768,9 @@ definitions:
         $ref: '#/definitions/FeatureMap'
       name:
         $ref: '#/definitions/Name'
+        description: "This field has been deprecated in favor of label"
+      label:
+        $ref: '#/definitions/Label'
       created_at:
         type: string
         format: datetime
