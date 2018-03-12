@@ -328,7 +328,7 @@ info:
     may be interpreted differently. These differences are documented on a
     per-route basis.
 
-    # Single-Sign On
+    # Accessing your dashboard (SSO)
     Users can sign in to a dashboard for provisioned resources managed by the
     provider. The resulting user session on the provider's side is restricted to
     the resource but allows the user to access provider-specific features.
@@ -878,7 +878,7 @@ paths:
         pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
         format: base32ID
       tags:
-      - Single Sign-On
+      - Single Sign-On (SSO)
       responses:
         200:
           description: |
