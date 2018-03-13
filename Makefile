@@ -1,6 +1,8 @@
 VERSION?=$(shell git describe --tags --dirty | sed 's/^v//')
 GO_BUILD=CGO_ENABLED=0 go build -i --ldflags="-w"
 
+PROMULGATE_VERSION=0.0.9
+
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))
 
@@ -144,12 +146,17 @@ $(NO_WINDOWS:%=os-build/%/bin/grafton): os-build/%/bin/grafton:
 
 build/grafton_$(VERSION)_windows_amd64.zip: build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
 	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton.exe
-$(NO_WINDOWS:%=build/grafton_$(VERSION)_%.zip): build/grafton_$(VERSION)_%.zip: os-build/%/bin/grafton
-	cd build/$*/bin; zip -r ../../grafton_$(VERSION)_$*.zip grafton
+$(NO_WINDOWS:%=build/grafton_$(VERSION)_%.tar.gz): build/grafton_$(VERSION)_%.tar.gz: os-build/%/bin/grafton
+	cd build/$*/bin; tar -czf ../../grafton_$(VERSION)_$*.tar.gz grafton
 
-zips: $(OS_ARCH:%=build/grafton_$(VERSION)_%.zip)
+zips: $(NO_WINDOWS:%=build/grafton_$(VERSION)_%.tar.gz) build/grafton_$(VERSION)_windows_amd64.zip
 
-.PHONY: zips $(OS_ARCH:%=os-build/%/bin/grafton)
+release: zips
+	curl -LO https://releases.manifold.co/promulgate/$(PROMULGATE_VERSION)/promulgate_$(PROMULGATE_VERSION)_linux_amd64.tar.gz
+	tar xvf promulgate_*
+	./promulgate release v$(VERSION)
+
+.PHONY: release zips $(OS_ARCH:%=os-build/%/bin/grafton)
 
 #################################################
 # Cleaning
