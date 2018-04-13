@@ -32,6 +32,13 @@ func (o *GetResourcesIDMeasuresReader) ReadResponse(response runtime.ClientRespo
 		}
 		return result, nil
 
+	case 204:
+		result := NewGetResourcesIDMeasuresNoContent()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return result, nil
+
 	case 400:
 		result := NewGetResourcesIDMeasuresBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -94,6 +101,28 @@ func (o *GetResourcesIDMeasuresOK) readResponse(response runtime.ClientResponse,
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewGetResourcesIDMeasuresNoContent creates a GetResourcesIDMeasuresNoContent with default headers values
+func NewGetResourcesIDMeasuresNoContent() *GetResourcesIDMeasuresNoContent {
+	return &GetResourcesIDMeasuresNoContent{}
+}
+
+/*GetResourcesIDMeasuresNoContent handles this case with default header values.
+
+The resource was found, but no measurable data is available yet.
+
+*/
+type GetResourcesIDMeasuresNoContent struct {
+}
+
+func (o *GetResourcesIDMeasuresNoContent) Error() string {
+	return fmt.Sprintf("[GET /resources/{id}/measures][%d] getResourcesIdMeasuresNoContent ", 204)
+}
+
+func (o *GetResourcesIDMeasuresNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
