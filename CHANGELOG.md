@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.13.0] - 2018-04-13
+
 ### Added
 
 - Resource features: the resource provisioning endpoint now receives additional data describing the
