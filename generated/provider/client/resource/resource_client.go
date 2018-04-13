@@ -96,7 +96,7 @@ Months are defined by the Manifold billing period which starts at the
 first of each month in UTC-0 and ends at the start of the next.
 
 */
-func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams) (*GetResourcesIDMeasuresOK, error) {
+func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams) (*GetResourcesIDMeasuresOK, *GetResourcesIDMeasuresNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetResourcesIDMeasuresParams()
@@ -115,9 +115,15 @@ func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams) (*
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return result.(*GetResourcesIDMeasuresOK), nil
+	switch value := result.(type) {
+	case *GetResourcesIDMeasuresOK:
+		return value, nil, nil
+	case *GetResourcesIDMeasuresNoContent:
+		return nil, value, nil
+	}
+	return nil, nil, nil
 
 }
 

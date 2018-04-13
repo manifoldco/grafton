@@ -412,7 +412,7 @@ func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 	p.SetPeriodStart(strfmt.DateTime(start))
 	p.SetPeriodEnd(strfmt.DateTime(end))
 
-	res, err := c.api.Resource.GetResourcesIDMeasures(p)
+	res, _, err := c.api.Resource.GetResourcesIDMeasures(p)
 
 	if err != nil {
 		var graftonErr error

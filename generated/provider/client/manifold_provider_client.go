@@ -11,7 +11,7 @@ import (
 
 	"github.com/manifoldco/grafton/generated/provider/client/credential"
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
-	"github.com/manifoldco/grafton/generated/provider/client/single_sign_on"
+	"github.com/manifoldco/grafton/generated/provider/client/single_sign_on_s_s_o"
 )
 
 // Default manifold provider HTTP client.
@@ -59,7 +59,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *ManifoldPr
 
 	cli.Resource = resource.New(transport, formats)
 
-	cli.SingleSignOn = single_sign_on.New(transport, formats)
+	cli.SingleSignOnSSO = single_sign_on_s_s_o.New(transport, formats)
 
 	return cli
 }
@@ -109,7 +109,7 @@ type ManifoldProvider struct {
 
 	Resource *resource.Client
 
-	SingleSignOn *single_sign_on.Client
+	SingleSignOnSSO *single_sign_on_s_s_o.Client
 
 	Transport runtime.ClientTransport
 }
@@ -122,6 +122,6 @@ func (c *ManifoldProvider) SetTransport(transport runtime.ClientTransport) {
 
 	c.Resource.SetTransport(transport)
 
-	c.SingleSignOn.SetTransport(transport)
+	c.SingleSignOnSSO.SetTransport(transport)
 
 }
