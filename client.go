@@ -407,12 +407,15 @@ func CreateSsoURL(base *nurl.URL, code string, resourceID manifold.ID) *nurl.URL
 func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 	start, end time.Time) (*models.ResourceMeasures, error) {
 
+	periodStart := strfmt.DateTime(start)
+	periodEnd := strfmt.DateTime(end)
+
 	p := resource.NewGetResourcesIDMeasuresParamsWithContext(ctx)
 	p.SetID(rid.String())
-	p.SetPeriodStart(strfmt.DateTime(start))
-	p.SetPeriodEnd(strfmt.DateTime(end))
+	p.SetPeriodStart(periodStart)
+	p.SetPeriodEnd(periodEnd)
 
-	res, _, err := c.api.Resource.GetResourcesIDMeasures(p)
+	content, empty, err := c.api.Resource.GetResourcesIDMeasures(p)
 
 	if err != nil {
 		var graftonErr error
@@ -438,5 +441,13 @@ func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 		return nil, graftonErr
 	}
 
-	return res.Payload, nil
+	if empty != nil {
+		return &models.ResourceMeasures{
+			ResourceID:  rid,
+			PeriodStart: &periodStart,
+			PeriodEnd:   &periodEnd,
+		}, nil
+	}
+
+	return content.Payload, nil
 }
