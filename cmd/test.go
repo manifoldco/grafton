@@ -64,7 +64,7 @@ func init() {
 			cli.StringFlag{
 				Name:   "import-code",
 				Usage:  "The import code to import an existing resource for that resource",
-				EnvVar: "REGION",
+				EnvVar: "IMPORT_CODE",
 			},
 			cli.StringSliceFlag{
 				Name:   "exclude",
