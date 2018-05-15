@@ -16,7 +16,6 @@ import (
 	"github.com/manifoldco/grafton/connector"
 
 	"github.com/manifoldco/grafton/generated/connector/models"
-	providers "github.com/manifoldco/grafton/generated/provider/models"
 )
 
 var errTimeout = errors.New("Exceeded Callback Wait time")
@@ -353,12 +352,12 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		fakeConnector.RemoveResource(r.ID)
 	}()
 
-	model := providers.ResourceRequest{
+	model := grafton.ResourceBody{
 		ID:         id,
-		Product:    manifold.Label(product),
-		Plan:       manifold.Label(plan),
-		Region:     providers.RegionSlug(region),
-		ImportCode: providers.ImportCode(importCode),
+		Product:    product,
+		Plan:       plan,
+		Region:     region,
+		ImportCode: importCode,
 		Features:   nil,
 	}
 
