@@ -470,6 +470,12 @@ definitions:
       Combination of the cloud platform and location to provision this
       resource within.
     pattern: ^([a-z0-9][a-z0-9\-_]{1,63})::([a-z0-9][a-z0-9\-_]{1,63})$
+  ImportCode:
+    type: string
+    minLength: 3
+    maxLength: 256
+    description: |
+      A provider specific import code for providing resources that already exists in the system rather than create new ones.
   Code:
     type: string
     minLength: 13
@@ -764,6 +770,8 @@ definitions:
         $ref: '#/definitions/Label'
       region:
         $ref: '#/definitions/RegionSlug'
+      import_code:
+        $ref: '#/definitions/ImportCode'
       features:
         $ref: '#/definitions/FeatureMap'
       name:

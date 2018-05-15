@@ -13,6 +13,7 @@ import (
 	"github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 	"github.com/manifoldco/go-signature"
+	"github.com/manifoldco/grafton/generated/provider/models"
 )
 
 type stubSigner struct{}
@@ -26,12 +27,21 @@ func callProvision(rawURL string) (string, bool, error) {
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
-	return c.ProvisionResource(ctx, cbID, resID, "my-product", "my-plan",
-		"aws::us-east-1", map[string]interface{}{
+
+	model := models.ResourceRequest{
+		ID:         resID,
+		Product:    manifold.Label("my-product"),
+		Plan:       manifold.Label("my-plan"),
+		Region:     models.RegionSlug("aws::us-east-1"),
+		ImportCode: models.ImportCode("import-code-1111"),
+		Features:   map[string]interface{}{
 			"size":         "40 GB",
 			"e-mails":      1000,
 			"read-replica": true,
-		})
+		},
+	}
+
+	return c.ProvisionResource(ctx, cbID, model)
 }
 
 func callProvisionCredentials(rawURL string) (map[string]string, string, bool, error) {

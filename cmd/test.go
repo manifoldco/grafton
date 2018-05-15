@@ -61,6 +61,11 @@ func init() {
 				Usage:  "The label of the region which the resource will be provision in",
 				EnvVar: "REGION",
 			},
+			cli.StringFlag{
+				Name:   "import-code",
+				Usage:  "The import code to import an existing resource for that resource",
+				EnvVar: "REGION",
+			},
 			cli.StringSliceFlag{
 				Name:   "exclude",
 				Usage:  "Exclude running these feature tests (and those that depend on it)",
@@ -120,6 +125,7 @@ func testCmd(ctx *cli.Context) error {
 	sNewPlanFeatures := ctx.String("new-plan-features")
 	product := ctx.String("product")
 	region := ctx.String("region")
+	importCode := ctx.String("import-code")
 	excludeFeatures := ctx.StringSlice("exclude")
 
 	clientID := ctx.String("client-id")
@@ -245,6 +251,7 @@ func testCmd(ctx *cli.Context) error {
 		UnauthorizedAPI:  unauthorizedAPI,
 		Product:          product,
 		Region:           region,
+		ImportCode:       importCode,
 		Plan:             plan,
 		PlanFeatures:     planFeatures,
 		NewPlan:          newPlan,

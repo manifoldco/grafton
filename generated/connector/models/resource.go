@@ -29,6 +29,9 @@ type Resource struct {
 	// id
 	ID manifold.ID `json:"id,omitempty"`
 
+	// import code
+	ImportCode ImportCode `json:"import_code,omitempty"`
+
 	// label
 	Label manifold.Label `json:"label,omitempty"`
 
@@ -53,6 +56,11 @@ func (m *Resource) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateID(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateImportCode(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -97,6 +105,22 @@ func (m *Resource) validateID(formats strfmt.Registry) error {
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Resource) validateImportCode(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ImportCode) { // not required
+		return nil
+	}
+
+	if err := m.ImportCode.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("import_code")
 		}
 		return err
 	}
