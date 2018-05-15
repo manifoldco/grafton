@@ -101,6 +101,29 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
 	})
 
+	ErrorCase("with no import code", func() {
+		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+		defer cancel()
+		var err error
+		_, _, async, err := provisionResource(ctx, api, product, plan, planFeatures, region, "")
+
+		gm.Expect(async).To(
+			gm.BeFalse(),
+			"Validation errors should be returned on the initial request",
+		)
+		gm.Expect(err).ShouldNot(
+			gm.BeNil(),
+			"Expected an error, got nil",
+		)
+		gm.Expect(err).Should(
+			gm.BeAssignableToTypeOf(&grafton.Error{}),
+			"Expected a grafton error, got %T", err,
+		)
+
+		e := err.(*grafton.Error)
+		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
+	})
+
 	ErrorCase("with a faulty import code", func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
