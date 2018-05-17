@@ -26,12 +26,21 @@ func callProvision(rawURL string) (string, bool, error) {
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
-	return c.ProvisionResource(ctx, cbID, resID, "my-product", "my-plan",
-		"aws::us-east-1", map[string]interface{}{
+
+	model := ResourceBody{
+		ID:         resID,
+		Product:    "my-product",
+		Plan:       "my-plan",
+		Region:     "aws::us-east-1",
+		ImportCode: "import-code-1111",
+		Features: map[string]interface{}{
 			"size":         "40 GB",
 			"e-mails":      1000,
 			"read-replica": true,
-		})
+		},
+	}
+
+	return c.ProvisionResource(ctx, cbID, model)
 }
 
 func callProvisionCredentials(rawURL string) (map[string]string, string, bool, error) {

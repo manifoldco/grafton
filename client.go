@@ -39,6 +39,17 @@ type Client struct {
 	log          *logrus.Entry
 }
 
+// ResourceBody is an exported type that enables external users to pass data
+// to the ProvisionResource function as a model.
+type ResourceBody struct {
+	ID         manifold.ID
+	Product    string
+	Plan       string
+	Region     string
+	ImportCode string
+	Features   map[string]interface{}
+}
+
 // New creates a new Client
 func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry) *Client {
 	tp := httptransport.New(url.Host, url.Path, []string{url.Scheme})
@@ -61,15 +72,16 @@ func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry
 //
 // A message will be returned if a callback was used *or* a provider returned
 // an error with an explanation.
-func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID, product, plan,
-	region string, features map[string]interface{}) (string, bool, error) {
+func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
+	model ResourceBody) (string, bool, error) {
 
 	body := models.ResourceRequest{
-		ID:       resID,
-		Product:  manifold.Label(product),
-		Plan:     manifold.Label(plan),
-		Region:   models.RegionSlug(region),
-		Features: features,
+		ID:         model.ID,
+		Product:    manifold.Label(model.Product),
+		Plan:       manifold.Label(model.Plan),
+		Region:     models.RegionSlug(model.Region),
+		ImportCode: models.ImportCode(model.ImportCode),
+		Features:   model.Features,
 	}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)
@@ -78,7 +90,7 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID, resID manifold.ID,
 		return "", false, err
 	}
 
-	p := resource.NewPutResourcesIDParams().WithBody(&body).WithID(resID.String())
+	p := resource.NewPutResourcesIDParams().WithBody(&body).WithID(model.ID.String())
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
