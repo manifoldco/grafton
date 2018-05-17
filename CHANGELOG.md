@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Resource provisioning will now accept an optional parameter called `import_code`.
+Import code allows some providers to provision resources that already exists for larger teams
+thant need to provision many resources.
+
 ## [0.13.0] - 2018-04-13
 
 ### Added
