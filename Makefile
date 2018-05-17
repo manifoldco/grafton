@@ -85,6 +85,7 @@ $(LINTERS): %: vendor/bin/gometalinter %-bin vendor generated
 #################################################
 
 generated/%/client: specs/%.yaml vendor/bin/swagger
+	rm -rf generated/$*/
 	vendor/bin/swagger generate client -f $< -t generated/$*
 	touch generated/$*/client
 	touch generated/$*/models
