@@ -10,8 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Resource provisioning will now accept an optional parameter called `import_code`.
-Import code allows some providers to provision resources that already exists for larger teams
-thant need to provision many resources.
+Import code allows providers to import existing resources into Manifold.
 
 ## [0.13.0] - 2018-04-13
 
