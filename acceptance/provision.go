@@ -174,7 +174,16 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, _, err = provisionResourceID(ctx, api, resourceID, product, plan, planFeatures, region, importCode)
+		_, callbackID, async, err := provisionResourceID(ctx, api, resourceID, product, plan, planFeatures, region, importCode)
+
+		if async {
+			c := fakeConnector.GetCallback(callbackID)
+
+			gm.Expect(c.State).To(
+				gm.Equal(connector.DoneCallbackState),
+				"Expected to receive 'done' as the state",
+			)
+		}
 
 		gm.Expect(err).To(notError(), "Create response should be returned (Repeatable Action)")
 	})
@@ -183,12 +192,17 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, newPlan, newPlanFeatures, region, importCode)
+		_, callbackID, async, err := provisionResourceID(ctx, api, resourceID, product, newPlan, newPlanFeatures, region, importCode)
 
-		gm.Expect(async).To(
-			gm.BeFalse(),
-			"Same content should be evaluated during the initial call from Manifold",
-		)
+		if async {
+			c := fakeConnector.GetCallback(callbackID)
+
+			gm.Expect(c.State).To(
+				gm.Equal(connector.ErrorCallbackState),
+				"Expected to receive 'error' as the state",
+			)
+		}
+
 		gm.Expect(err).ShouldNot(
 			gm.BeNil(),
 			"Expected an error, got nil",
