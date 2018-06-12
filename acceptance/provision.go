@@ -174,12 +174,8 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResourceID(ctx, api, resourceID, product, plan, planFeatures, region, importCode)
+		_, _, _, err = provisionResourceID(ctx, api, resourceID, product, plan, planFeatures, region, importCode)
 
-		gm.Expect(async).To(
-			gm.BeFalse(),
-			"Same content should be evaluated during the initial call from Manifold",
-		)
 		gm.Expect(err).To(notError(), "Create response should be returned (Repeatable Action)")
 	})
 
