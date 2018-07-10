@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/manifoldco/go-manifold"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 // GrantType represents a type of access token grant
@@ -49,14 +47,14 @@ type AccessToken struct {
 
 // Resource represents a resource provisioned through Grafton
 type Resource struct {
-	ID         manifold.ID       `json:"id"`
-	Plan       string            `json:"plan"`
-	Product    string            `json:"product"`
-	Region     string            `json:"region"`
-	ImportCode string            `json:"import_code"`
-	Features   models.FeatureMap `json:"features,omitempty"`
-	CreatedAt  time.Time         `json:"created_at"`
-	UpdatedAt  time.Time         `json:"updated_at"`
+	ID         manifold.ID         `json:"id"`
+	Plan       string              `json:"plan"`
+	Product    string              `json:"product"`
+	Region     string              `json:"region"`
+	ImportCode string              `json:"import_code"`
+	Features   manifold.FeatureMap `json:"features,omitempty"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
 }
 
 // UserProfile represents the data returned on GET /v1/self when the target

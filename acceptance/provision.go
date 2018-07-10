@@ -8,14 +8,12 @@ import (
 
 	gm "github.com/onsi/gomega"
 
-	"github.com/manifoldco/go-manifold"
+	manifold "github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var errTimeout = errors.New("Exceeded Callback Wait time")
@@ -250,7 +248,7 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 var _ = provision.RequiredFlags("product", "plan", "region", "new-plan")
 
 func attemptResourceProvision(ctx context.Context, api *grafton.Client, product, plan string,
-	planFeatures models.FeatureMap, region, importCode string) *connector.Resource {
+	planFeatures manifold.FeatureMap, region, importCode string) *connector.Resource {
 
 	var err error
 	curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, planFeatures, region, importCode)
@@ -319,7 +317,7 @@ waitForCallback:
 }
 
 func provisionResource(ctx context.Context, api *grafton.Client, product, plan string,
-	planFeatures models.FeatureMap, region, importCode string) (*connector.Resource, manifold.ID, bool, error) {
+	planFeatures manifold.FeatureMap, region, importCode string) (*connector.Resource, manifold.ID, bool, error) {
 
 	Infoln("Attempting to provision resource")
 
@@ -332,7 +330,7 @@ func provisionResource(ctx context.Context, api *grafton.Client, product, plan s
 }
 
 func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.ID, product, plan string,
-	planFeatures models.FeatureMap, region, importCode string) (*connector.Resource, manifold.ID, bool, error) {
+	planFeatures manifold.FeatureMap, region, importCode string) (*connector.Resource, manifold.ID, bool, error) {
 
 	c, err := fakeConnector.AddCallback(connector.ResourceProvisionCallback)
 	if err != nil {

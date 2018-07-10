@@ -6,11 +6,13 @@ package models
 import (
 	"bytes"
 	"encoding/json"
+	"strconv"
 
 	strfmt "github.com/go-openapi/strfmt"
 	manifold "github.com/manifoldco/go-manifold"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
@@ -109,9 +111,21 @@ type UserAO1Target struct {
 	// Required: true
 	Email manifold.Email `json:"email"`
 
+	// id
+	ID manifold.ID `json:"id,omitempty"`
+
 	// name
 	// Required: true
 	Name manifold.Name `json:"name"`
+
+	// projects
+	Projects []*Project `json:"projects"`
+
+	// resources
+	Resources []*Resource `json:"resources"`
+
+	// teams
+	Teams []*Team `json:"teams"`
 }
 
 // Validate validates this user a o1 target
@@ -123,7 +137,27 @@ func (m *UserAO1Target) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateID(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validateName(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateProjects(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateResources(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateTeams(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -146,6 +180,22 @@ func (m *UserAO1Target) validateEmail(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *UserAO1Target) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("target" + "." + "id")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *UserAO1Target) validateName(formats strfmt.Registry) error {
 
 	if err := m.Name.Validate(formats); err != nil {
@@ -153,6 +203,87 @@ func (m *UserAO1Target) validateName(formats strfmt.Registry) error {
 			return ve.ValidateName("target" + "." + "name")
 		}
 		return err
+	}
+
+	return nil
+}
+
+func (m *UserAO1Target) validateProjects(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Projects) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Projects); i++ {
+
+		if swag.IsZero(m.Projects[i]) { // not required
+			continue
+		}
+
+		if m.Projects[i] != nil {
+
+			if err := m.Projects[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("target" + "." + "projects" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *UserAO1Target) validateResources(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Resources) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Resources); i++ {
+
+		if swag.IsZero(m.Resources[i]) { // not required
+			continue
+		}
+
+		if m.Resources[i] != nil {
+
+			if err := m.Resources[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("target" + "." + "resources" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *UserAO1Target) validateTeams(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Teams) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Teams); i++ {
+
+		if swag.IsZero(m.Teams[i]) { // not required
+			continue
+		}
+
+		if m.Teams[i] != nil {
+
+			if err := m.Teams[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("target" + "." + "teams" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

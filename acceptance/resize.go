@@ -7,14 +7,12 @@ import (
 
 	gm "github.com/onsi/gomega"
 
-	"github.com/manifoldco/go-manifold"
+	manifold "github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var resize = Feature("plan-change", "Change a resource's plan", func(ctx context.Context) {
@@ -121,7 +119,7 @@ var _ = resize.TearDown("Change the resource's plan back to the original", func(
 })
 
 func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string,
-	newPlanFeatures models.FeatureMap) {
+	newPlanFeatures manifold.FeatureMap) {
 
 	callbackID, async, err := changePlan(ctx, api, resourceID, newPlan, newPlanFeatures)
 
@@ -146,7 +144,7 @@ func attemptResize(ctx context.Context, api *grafton.Client, resourceID manifold
 }
 
 func changePlan(ctx context.Context, api *grafton.Client, resourceID manifold.ID, newPlan string,
-	newPlanFeatures models.FeatureMap) (manifold.ID, bool, error) {
+	newPlanFeatures manifold.FeatureMap) (manifold.ID, bool, error) {
 
 	Infof("Attempting to resize resource %s to %s, %s\n", resourceID, newPlan, newPlanFeatures)
 

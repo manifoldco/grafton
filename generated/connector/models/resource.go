@@ -24,7 +24,7 @@ type Resource struct {
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// features
-	Features FeatureMap `json:"features,omitempty"`
+	Features manifold.FeatureMap `json:"features,omitempty"`
 
 	// id
 	ID manifold.ID `json:"id,omitempty"`
@@ -32,7 +32,7 @@ type Resource struct {
 	// label
 	Label manifold.Label `json:"label,omitempty"`
 
-	// This field has been deprecated in favor of label
+	// This field is deprecated in favor of label
 	Name manifold.Name `json:"name,omitempty"`
 
 	// plan

@@ -88,6 +88,39 @@ func (a *Client) GetCredentials(params *GetCredentialsParams, authInfo runtime.C
 }
 
 /*
+GetInternalCredentialsID gets an o auth credential pair
+
+Retrieve an existing OAuth 2.0 credential pair. This does **not** return
+the secret.
+
+*/
+func (a *Client) GetInternalCredentialsID(params *GetInternalCredentialsIDParams, authInfo runtime.ClientAuthInfoWriter) (*GetInternalCredentialsIDOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetInternalCredentialsIDParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetInternalCredentialsID",
+		Method:             "GET",
+		PathPattern:        "/internal/credentials/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetInternalCredentialsIDReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetInternalCredentialsIDOK), nil
+
+}
+
+/*
 GetSelf currents identity
 
 A provider can call this endpoint to return the identity represented by
@@ -163,6 +196,40 @@ func (a *Client) PostCredentials(params *PostCredentialsParams, authInfo runtime
 }
 
 /*
+PostInternalCredentials creates an o auth credential pair
+
+Create an OAuth 2.0 credential pair for a provider's product.
+`client_secret` is stored as an `scrypt` hash only; if the value is
+lost after creation, it cannot be recovered.
+
+*/
+func (a *Client) PostInternalCredentials(params *PostInternalCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*PostInternalCredentialsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostInternalCredentialsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostInternalCredentials",
+		Method:             "POST",
+		PathPattern:        "/internal/credentials",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &PostInternalCredentialsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostInternalCredentialsOK), nil
+
+}
+
+/*
 PostOauthTokens creates access token
 
 A provider uses this endpoint to acquire a scoped access token which
@@ -211,6 +278,39 @@ func (a *Client) PostOauthTokens(params *PostOauthTokensParams) (*PostOauthToken
 		return nil, err
 	}
 	return result.(*PostOauthTokensCreated), nil
+
+}
+
+/*
+PostSso creates authorization code
+
+Endpoint for creating an authorization code used by the user to issue
+an SSO request against a providers API from the Dashboard.
+
+*/
+func (a *Client) PostSso(params *PostSsoParams, authInfo runtime.ClientAuthInfoWriter) (*PostSsoCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostSsoParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostSso",
+		Method:             "POST",
+		PathPattern:        "/sso",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &PostSsoReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostSsoCreated), nil
 
 }
 

@@ -63,6 +63,72 @@ func (a *Client) GetResourcesID(params *GetResourcesIDParams, authInfo runtime.C
 }
 
 /*
+GetResourcesIDCredentials lists credentials from resource
+
+A provider can call this endpoint to return a list of all the credentials
+related to a specific resource
+
+*/
+func (a *Client) GetResourcesIDCredentials(params *GetResourcesIDCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*GetResourcesIDCredentialsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetResourcesIDCredentialsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetResourcesIDCredentials",
+		Method:             "GET",
+		PathPattern:        "/resources/{id}/credentials",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetResourcesIDCredentialsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetResourcesIDCredentialsOK), nil
+
+}
+
+/*
+GetResourcesIDMeasures retrieves measures
+
+A provider can call this endpoint to see how much Manifold has stored
+for feature usage of a resource. This is useful for testing and validation.
+
+*/
+func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams, authInfo runtime.ClientAuthInfoWriter) (*GetResourcesIDMeasuresOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetResourcesIDMeasuresParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetResourcesIDMeasures",
+		Method:             "GET",
+		PathPattern:        "/resources/{id}/measures",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &GetResourcesIDMeasuresReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetResourcesIDMeasuresOK), nil
+
+}
+
+/*
 GetResourcesIDUsers lists all users
 
 A provider can call this endpoint to return a list of all users who
@@ -96,6 +162,39 @@ func (a *Client) GetResourcesIDUsers(params *GetResourcesIDUsersParams, authInfo
 		return nil, err
 	}
 	return result.(*GetResourcesIDUsersOK), nil
+
+}
+
+/*
+PutResourcesIDMeasures bs e t a set how much a resource has used of its features
+
+**BETA** A provider can call this endpoint to set how much a resource
+has used of its features during a period of time.
+
+*/
+func (a *Client) PutResourcesIDMeasures(params *PutResourcesIDMeasuresParams, authInfo runtime.ClientAuthInfoWriter) (*PutResourcesIDMeasuresNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPutResourcesIDMeasuresParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PutResourcesIDMeasures",
+		Method:             "PUT",
+		PathPattern:        "/resources/{id}/measures",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &PutResourcesIDMeasuresReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PutResourcesIDMeasuresNoContent), nil
 
 }
 
