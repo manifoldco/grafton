@@ -11,10 +11,9 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/validate"
+	"github.com/manifoldco/grafton/marketplace/primitives"
 
 	strfmt "github.com/go-openapi/strfmt"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 // PostSsoReader is a Reader for the PostSso structure.
@@ -69,7 +68,7 @@ func NewPostSsoCreated() *PostSsoCreated {
 An authorization code has been created.
 */
 type PostSsoCreated struct {
-	Payload *models.AuthorizationCode
+	Payload *primitives.OAuthAuthorizationCode
 }
 
 func (o *PostSsoCreated) Error() string {
@@ -78,7 +77,7 @@ func (o *PostSsoCreated) Error() string {
 
 func (o *PostSsoCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.AuthorizationCode)
+	o.Payload = new(primitives.OAuthAuthorizationCode)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

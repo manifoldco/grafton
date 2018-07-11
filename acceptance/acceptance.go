@@ -11,10 +11,10 @@ import (
 	"github.com/onsi/gomega"
 	"github.com/urfave/cli"
 
+	manifold "github.com/manifoldco/go-manifold"
+
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var api *grafton.Client
@@ -22,11 +22,11 @@ var uapi *grafton.Client
 
 var product string
 var plan string
-var planFeatures models.FeatureMap
+var planFeatures manifold.FeatureMap
 var region string
 var importCode string
 var newPlan string
-var newPlanFeatures models.FeatureMap
+var newPlanFeatures manifold.FeatureMap
 var resourceMeasures map[string]int64
 
 var clientID string
@@ -45,9 +45,9 @@ type Configuration struct {
 	Region           string
 	ImportCode       string
 	Plan             string
-	PlanFeatures     models.FeatureMap
+	PlanFeatures     manifold.FeatureMap
 	NewPlan          string
-	NewPlanFeatures  models.FeatureMap
+	NewPlanFeatures  manifold.FeatureMap
 	ClientID         string
 	ClientSecret     string
 	Port             uint

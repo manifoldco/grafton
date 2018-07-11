@@ -11,13 +11,13 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
+
+	manifold "github.com/manifoldco/go-manifold"
+	"github.com/manifoldco/promptui"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/acceptance"
-
-	"github.com/manifoldco/grafton/generated/connector/models"
 )
 
 var (
@@ -151,7 +151,7 @@ func testCmd(ctx *cli.Context) error {
 		return cli.NewExitError("invalid log value "+rawLevel, -1)
 	}
 
-	planFeatures := models.FeatureMap{}
+	planFeatures := manifold.FeatureMap{}
 	if sPlanFeatures != "" {
 		err := json.Unmarshal([]byte(sPlanFeatures), planFeatures)
 		if err != nil {
@@ -159,7 +159,7 @@ func testCmd(ctx *cli.Context) error {
 		}
 	}
 
-	newPlanFeatures := models.FeatureMap{}
+	newPlanFeatures := manifold.FeatureMap{}
 	if sNewPlanFeatures != "" {
 		err := json.Unmarshal([]byte(sNewPlanFeatures), newPlanFeatures)
 		if err != nil {

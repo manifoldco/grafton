@@ -7,6 +7,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
 
 	manifold "github.com/manifoldco/go-manifold"
 )
@@ -23,9 +24,15 @@ type Profile struct {
 	// Required: true
 	Email manifold.Email `json:"email"`
 
+	// id
+	ID manifold.ID `json:"id,omitempty"`
+
 	// name
 	// Required: true
 	Name manifold.Name `json:"name"`
+
+	// role
+	Role UserRole `json:"role,omitempty"`
 }
 
 // Validate validates this profile
@@ -37,7 +44,17 @@ func (m *Profile) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateID(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validateName(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateRole(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -60,11 +77,43 @@ func (m *Profile) validateEmail(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Profile) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *Profile) validateName(formats strfmt.Registry) error {
 
 	if err := m.Name.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("name")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Profile) validateRole(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Role) { // not required
+		return nil
+	}
+
+	if err := m.Role.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("role")
 		}
 		return err
 	}

@@ -999,8 +999,8 @@ definitions:
     x-go-type:
       type: FeatureMap
       import:
-        package: github.com/manifoldco/grafton/generated/connector/models
-        alias: gconnector
+        package: github.com/manifoldco/go-manifold
+        alias: manifold
   ProviderError:
     type: object
     properties:
