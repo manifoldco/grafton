@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/DataDog/dd-trace-go"
-  packages = ["tracer","tracer/ext"]
-  revision = "18a1bd09e80d07d1ae4713f4cae5bbadb677a2f2"
-  version = "v0.2.0"
-
-[[projects]]
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
   revision = "0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4"
@@ -38,12 +32,6 @@
   version = "v5"
 
 [[projects]]
-  name = "github.com/aws/aws-sdk-go"
-  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/csm","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/sdkio","internal/sdkrand","internal/shareddefaults","private/protocol","private/protocol/json/jsonutil","private/protocol/jsonrpc","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/kms","service/sts"]
-  revision = "66e86be40287fdef6990768b65f713f4bce11deb"
-  version = "v1.14.23"
-
-[[projects]]
   branch = "master"
   name = "github.com/chzyer/readline"
   packages = ["."]
@@ -68,34 +56,10 @@
   version = "v3.1.0"
 
 [[projects]]
-  name = "github.com/elithrar/simple-scrypt"
-  packages = ["."]
-  revision = "d150773194090feb6c897805a7bcea8d49544e2c"
-  version = "v1.3.0"
-
-[[projects]]
-  name = "github.com/fatih/structs"
-  packages = ["."]
-  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
-  version = "v1.0"
-
-[[projects]]
-  name = "github.com/felixge/httpsnoop"
-  packages = ["."]
-  revision = "eadd4fad6aac69ae62379194fe0219f3dbc80fd3"
-  version = "v1.0.0"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
   version = "v1.4.2"
-
-[[projects]]
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  revision = "06f5f3d67269ccec1fe5fe4134ba6e982984f7f5"
-  version = "v1.37.0"
 
 [[projects]]
   branch = "master"
@@ -193,6 +157,12 @@
   revision = "da3d65debb9bff70fcfb6f277a8db31e8200de20"
 
 [[projects]]
+  name = "github.com/gorilla/context"
+  packages = ["."]
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
+
+[[projects]]
   name = "github.com/gorilla/handlers"
   packages = ["."]
   revision = "a4043c62cc2329bacda331d33fc908ab11ef0ec3"
@@ -205,20 +175,10 @@
   revision = "42e33e2d55a0ff1d6263f738896ea8c13571a8d0"
 
 [[projects]]
-  name = "github.com/jackc/pgx"
-  packages = [".","chunkreader","internal/sanitize","pgio","pgproto3","pgtype"]
-  revision = "b84338d7d62598f75859b2b146d830b22f1b9ec8"
-
-[[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
   revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
   version = "v1.3.0"
-
-[[projects]]
-  name = "github.com/jmespath/go-jmespath"
-  packages = ["."]
-  revision = "0b12d6b5"
 
 [[projects]]
   branch = "master"
@@ -299,22 +259,10 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/manifoldco/marketplace"
-  packages = ["boxer","boxer/primitives","connector/primitives","db","framework/logger","framework/pathpat","generated/marketplace/v1/models","marketplace/primitives","owned","patch","provisioning/primitives","ptr","rbac","tracer"]
-  revision = "746665e66a54dae9c66c628176f5b1b6c4946d7f"
-  version = "v2.12.6"
-
-[[projects]]
   branch = "master"
   name = "github.com/manifoldco/promptui"
   packages = [".","list","screenbuf"]
   revision = "ec3d3b6d896f047545120a282951f24815db552c"
-
-[[projects]]
-  branch = "rescue-nil-stringer"
-  name = "github.com/manifoldco/rollrus"
-  packages = ["."]
-  revision = "c27f2fd8858ce35db8a51c4ac657a1baccb34167"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -395,12 +343,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/stvp/roll"
-  packages = ["."]
-  revision = "3627a5cbeaeaa68023abd02bb8687925265f2f63"
-
-[[projects]]
   name = "github.com/toqueteos/webbrowser"
   packages = ["."]
   revision = "21fc9f95c83442fd164094666f7cb4f9fdd56cd6"
@@ -419,12 +361,6 @@
   version = "v1.2.15"
 
 [[projects]]
-  name = "github.com/ugorji/go"
-  packages = ["codec"]
-  revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/urfave/cli"
   packages = ["."]
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
@@ -433,7 +369,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ed25519","ed25519/internal/edwards25519","nacl/secretbox","pbkdf2","poly1305","salsa20/salsa","scrypt","ssh/terminal"]
+  packages = ["ed25519","ed25519/internal/edwards25519","pbkdf2","scrypt","ssh/terminal"]
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
@@ -487,6 +423,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "28a6c72754edb80913c89d588f6e89f268a10ea15b9a95ea73e2e60355653b55"
+  inputs-digest = "945563b65dd7a9cfd2ed76b74d4cade39c859b15dc4d691f5e444e0fd0e62d3d"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -725,7 +725,7 @@ definitions:
     x-go-type:
       type: OAuthAuthorizationCode
       import:
-        package: 'github.com/manifoldco/marketplace/connector/primitives'
+        package: 'github.com/manifoldco/grafton/marketplace/primitives'
 
   OAuthClientID:
     description: |
