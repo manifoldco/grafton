@@ -45,7 +45,7 @@ required=[
 
 [[constraint]]
   name = "github.com/manifoldco/go-manifold"
-  branch = "master"
+  branch = "events"
 
 [[constraint]]
   name = "github.com/manifoldco/go-signature"
