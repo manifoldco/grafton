@@ -32,7 +32,7 @@ func TestCreateAccessTokenHandler(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			handler.ServeHTTP(rec, req)
-			gm.Expect(rec.Code).To(gm.Equal(200))
+			gm.Expect(rec.Code).To(gm.Equal(201))
 		})
 
 	t.Run("create access token [client_credentials] responds properly to url encoded data",
@@ -48,6 +48,6 @@ func TestCreateAccessTokenHandler(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			handler.ServeHTTP(rec, req)
-			gm.Expect(rec.Code).To(gm.Equal(200))
+			gm.Expect(rec.Code).To(gm.Equal(201))
 		})
 }

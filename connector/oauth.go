@@ -228,7 +228,7 @@ func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.
 		}
 
 		c.addToken(t)
-		respondWithJSON(rw, t, 200)
+		respondWithJSON(rw, t, 201)
 	}
 }
 

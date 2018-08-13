@@ -294,7 +294,6 @@
   version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/manifoldco/go-manifold"
   packages = [
     ".",
