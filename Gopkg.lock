@@ -300,8 +300,7 @@
     "errors",
     "idtype"
   ]
-  revision = "e262a63f5361bdea8bb5a72132ac9d1022284ada"
-  version = "v0.9.3"
+  revision = "968fd67c3d09d9c49a5fb4554417b4841a866d1c"
 
 [[projects]]
   name = "github.com/manifoldco/go-signature"
