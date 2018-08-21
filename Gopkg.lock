@@ -294,13 +294,14 @@
   version = "v0.1.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/manifoldco/go-manifold"
   packages = [
     ".",
     "errors",
     "idtype"
   ]
-  revision = "968fd67c3d09d9c49a5fb4554417b4841a866d1c"
+  revision = "b689ac97b9312ca887f252291a5ae64ade6f3e87"
 
 [[projects]]
   name = "github.com/manifoldco/go-signature"
