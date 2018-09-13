@@ -108,9 +108,9 @@ func Run(ctx context.Context, runErrorCases bool, exclude []string) bool {
 	fakeConnector.Start()
 	defer fakeConnector.Stop()
 
-	ok := walkGraph(ctx, exclude, false, execute)
+	failed := walkGraph(ctx, exclude, false, execute)
 	printSummary(failures, success)
-	return ok
+	return failed
 }
 
 // Validate checks if the test run has all the required information it needs to run
