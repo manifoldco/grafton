@@ -7,7 +7,6 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/swag"
 
 	manifold "github.com/manifoldco/go-manifold"
 )
@@ -23,9 +22,6 @@ type ResourceRequest struct {
 	// id
 	// Required: true
 	ID manifold.ID `json:"id"`
-
-	// import code
-	ImportCode ImportCode `json:"import-code,omitempty"`
 
 	// plan
 	// Required: true
@@ -45,11 +41,6 @@ func (m *ResourceRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateID(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateImportCode(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -80,22 +71,6 @@ func (m *ResourceRequest) validateID(formats strfmt.Registry) error {
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ResourceRequest) validateImportCode(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.ImportCode) { // not required
-		return nil
-	}
-
-	if err := m.ImportCode.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("import-code")
 		}
 		return err
 	}

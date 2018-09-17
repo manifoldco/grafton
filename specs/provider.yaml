@@ -1028,8 +1028,6 @@ definitions:
         $ref: '#/definitions/RegionSlug'
       features:
         $ref: '#/definitions/FeatureMap'
-      import-code:
-        $ref: '#/definitions/ImportCode'
     additionalProperties: false
     required:
     - id
@@ -1108,9 +1106,3 @@ definitions:
       - period_start
       - period_end
       - measures
-  ImportCode:
-    type: string
-    minLength: 3
-    maxLength: 256
-    description: |
-      A provider specific import code for providing resources that already exists in the system rather than create new ones.

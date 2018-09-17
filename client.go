@@ -76,12 +76,11 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	model ResourceBody) (string, bool, error) {
 
 	body := models.ResourceRequest{
-		ID:         model.ID,
-		Product:    manifold.Label(model.Product),
-		Plan:       manifold.Label(model.Plan),
-		Region:     models.RegionSlug(model.Region),
-		ImportCode: models.ImportCode(model.ImportCode),
-		Features:   model.Features,
+		ID:       model.ID,
+		Product:  manifold.Label(model.Product),
+		Plan:     manifold.Label(model.Plan),
+		Region:   models.RegionSlug(model.Region),
+		Features: model.Features,
 	}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)

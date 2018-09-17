@@ -10,7 +10,7 @@ var _ = Feature("cleanup", "Remove dangling resource due to failed provision", f
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 
-		curResource := attemptResourceProvision(ctx, api, product, plan, planFeatures, region, importCode)
+		curResource := attemptResourceProvision(ctx, api, product, plan, planFeatures, region)
 		attemptResourceDeprovision(ctx, api, curResource.ID)
 	})
 })

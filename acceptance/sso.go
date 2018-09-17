@@ -17,7 +17,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 	Default(func() {
 		authCode, err := fakeConnector.CreateCode()
 		if err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		url := api.CreateSsoURL(authCode.Code, resourceID)
@@ -28,7 +28,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
@@ -47,7 +47,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		capturer, err := fakeConnector.GetCapturer("/v1/oauth/tokens")
 		if err != nil {
-			FatalErr("Could not find request capturer")
+			FatalErr("Could not find request capturer %s")
 		}
 
 		foundReqs := capturer.Get()
@@ -55,7 +55,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		for _, v := range foundReqs {
 			req, ok := v.(*connector.TokenRequest)
 			if !ok {
-				FatalErr("Could not cast request body to TokenRequest")
+				FatalErr("Could not cast request body to TokenRequest %s")
 			}
 
 			if req.GrantType == connector.AuthorizationCodeGrantType {
@@ -90,7 +90,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		}()
 		authCode, err := fakeConnector.CreateCode()
 		if err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		url := api.CreateSsoURL(authCode.Code, resourceID)
@@ -101,7 +101,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
@@ -132,7 +132,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		authCode, err := fakeConnector.CreateCode()
 		if err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		url := api.CreateSsoURL(authCode.Code, resourceID)
@@ -143,7 +143,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
@@ -170,7 +170,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		authCode, err := fakeConnector.CreateCode()
 		authCode.ExpiresAt = time.Now().Add(-1 * time.Minute)
 		if err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		url := api.CreateSsoURL(authCode.Code, resourceID)
@@ -181,7 +181,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
@@ -206,7 +206,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 	ErrorCase("with non-existing code", func() {
 		if _, err := fakeConnector.CreateCode(); err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		wrongCode := &connector.AuthorizationCode{
@@ -222,7 +222,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
@@ -253,7 +253,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		authCode, err := fakeConnector.CreateCode()
 		if err != nil {
-			FatalErr("could not create auth code", err)
+			FatalErr("could not create auth code %s", err)
 		}
 
 		url := api.CreateSsoURL(authCode.Code, resourceID)
@@ -264,7 +264,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		req, err := http.NewRequest("GET", url.String(), nil)
 		if err != nil {
-			FatalErr("got error building new request", err)
+			FatalErr("got error building new request %s", err)
 		}
 
 		client := http.Client{
