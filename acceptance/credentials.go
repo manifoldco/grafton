@@ -176,7 +176,7 @@ func provisionCredentials(ctx context.Context, api *grafton.Client, resourceID m
 	Infof("Attempting to provision credentials for resource: %s\n", resourceID)
 	ID, err := manifold.NewID(idtype.Credential)
 	if err != nil {
-		return ID, nil, ID, false, FatalErr("Could not generate credential id:", err)
+		return ID, nil, ID, false, FatalErr("Could not generate credential id: %s", err)
 	}
 
 	return provisionCredentialsID(ctx, api, ID, resourceID)

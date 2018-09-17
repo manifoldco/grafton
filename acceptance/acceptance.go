@@ -24,7 +24,6 @@ var product string
 var plan string
 var planFeatures manifold.FeatureMap
 var region string
-var importCode string
 var newPlan string
 var newPlanFeatures manifold.FeatureMap
 var resourceMeasures map[string]int64
@@ -43,7 +42,6 @@ type Configuration struct {
 	UnauthorizedAPI  *grafton.Client
 	Product          string
 	Region           string
-	ImportCode       string
 	Plan             string
 	PlanFeatures     manifold.FeatureMap
 	NewPlan          string
@@ -63,7 +61,6 @@ func Configure(cfg Configuration) error {
 	uapi = cfg.UnauthorizedAPI
 	product = cfg.Product
 	region = cfg.Region
-	importCode = cfg.ImportCode
 	plan = cfg.Plan
 	planFeatures = cfg.PlanFeatures
 	newPlan = cfg.NewPlan
