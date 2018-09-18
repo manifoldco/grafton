@@ -68,6 +68,17 @@ type FakeConnector struct {
 	Server     *http.Server
 }
 
+// StartSync starts the server or returns an error if it couldn't be started
+func (c *FakeConnector) StartSync() error {
+	h := ValidHandler(c)
+	c.Server = &http.Server{
+		Addr:    fmt.Sprintf("localhost:%d", c.Config.Port),
+		Handler: h,
+	}
+
+	return c.Server.ListenAndServe()
+}
+
 // Start the server or return an error if it couldn't be started
 func (c *FakeConnector) Start() {
 	h := ValidHandler(c)
