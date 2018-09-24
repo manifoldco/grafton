@@ -211,8 +211,9 @@ info:
     any incoming requests from Manifold:
     - [Go](https://github.com/manifoldco/go-signature)
     - [Node.js](https://github.com/manifoldco/node-signature)
-    - [Ruby](https://github.com/manifoldco/ruby-manifoldco-signature)
+    - [PHP](https://github.com/Ziggeo/manifold-php-signature)
     - [Python](https://github.com/manifoldco/python-manifoldco-signature)
+    - [Ruby](https://github.com/manifoldco/ruby-manifoldco-signature)
 
     Please reach out to [Manifold](mailto:support@manifold.co) if we're missing
     the language of your choice.
