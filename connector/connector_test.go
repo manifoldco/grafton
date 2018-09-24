@@ -8,6 +8,8 @@ import (
 
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/go-manifold/idtype"
+	"github.com/manifoldco/go-manifold/names"
+	"github.com/manifoldco/grafton/db"
 )
 
 var (
@@ -30,18 +32,32 @@ func getConnectorInstance() *FakeConnector {
 	return connectorInstance
 }
 
-func makeResource(t *testing.T, plan, region string) *Resource {
-	ID, err := manifold.NewID(idtype.Resource)
+func makeResource(t *testing.T, plan, region string) *db.Resource {
+	id, err := manifold.NewID(idtype.Resource)
 	if err != nil {
 		gm.Expect(err).ToNot(gm.HaveOccurred())
 		return nil
 	}
 
-	return &Resource{
-		ID:        ID,
-		Product:   product,
-		Plan:      plan,
+	productLabel := manifold.Label(product)
+	if err := productLabel.Validate(nil); err != nil {
+		panic(err)
+	}
+	planLabel := manifold.Label(plan)
+	if err := planLabel.Validate(nil); err != nil {
+		panic(err)
+	}
+
+	label := names.ForResource(manifold.Label(product), id)
+
+	return &db.Resource{
+		ID:        id,
+		Label:     label,
+		Name:      manifold.Name(label),
+		Product:   productLabel,
+		Plan:      planLabel,
 		Region:    region,
+		Features:  manifold.FeatureMap{},
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}

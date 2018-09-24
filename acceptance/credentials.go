@@ -2,6 +2,7 @@ package acceptance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
+	"github.com/manifoldco/grafton/db"
 )
 
 var credentialID manifold.ID
@@ -214,7 +216,15 @@ func provisionCredentialsID(ctx context.Context, api *grafton.Client, credential
 		Infoln("  ", k, "=", v)
 	}
 
-	return credentialID, creds, c.ID, callback, err
+	// Store in connector
+	fakeConnector.DB.PutCredential(db.Credential{
+		ID:         credentialID,
+		Keys:       creds,
+		CreatedOn:  time.Now(),
+		ResourceID: resourceID,
+	})
+
+	return credentialID, creds, c.ID, callback, nil
 }
 
 func deprovisionCredentials(ctx context.Context, api *grafton.Client, credentialID manifold.ID) (manifold.ID, bool, error) {
@@ -245,5 +255,11 @@ func deprovisionCredentials(ctx context.Context, api *grafton.Client, credential
 	if msg != "" {
 		Infoln("Message: ", msg)
 	}
+
+	// Delete in connector
+	if !fakeConnector.DB.DeleteCredential(credentialID) {
+		return c.ID, callback, errors.New("Credential did not exist in database")
+	}
+
 	return c.ID, callback, nil
 }

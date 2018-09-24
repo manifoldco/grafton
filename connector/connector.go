@@ -15,6 +15,7 @@ import (
 	cerrors "github.com/manifoldco/go-connector/errors"
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/go-manifold/idtype"
+	"github.com/manifoldco/grafton/db"
 )
 
 // ErrCallbackNotFound represents an error which occurs if a callback does not
@@ -59,11 +60,11 @@ type FakeConnectorConfig struct {
 // by providers to integrate with Manifold.
 type FakeConnector struct {
 	Config     *FakeConnectorConfig
+	DB         *db.DB
 	OnCallback chan *Callback
 	capturers  map[string]*RequestCapturer
 	codes      []*AuthorizationCode
 	tokens     []*AccessToken
-	resources  []*Resource
 	callbacks  []*Callback
 	Server     *http.Server
 }
@@ -112,31 +113,21 @@ func (c *FakeConnector) GetCapturer(route string) (*RequestCapturer, error) {
 }
 
 // AddResource stores a resource inside the connector
-func (c *FakeConnector) AddResource(r *Resource) {
-	c.resources = append(c.resources, r)
+func (c *FakeConnector) AddResource(r *db.Resource) {
+	c.DB.PutResource(*r)
 }
 
 // RemoveResource deletes a resource stored inside the connector
 func (c *FakeConnector) RemoveResource(ID manifold.ID) error {
-	for i, r := range c.resources {
-		if r.ID == ID {
-			c.resources = append(c.resources[:i], c.resources[i+1:]...)
-			return nil
-		}
+	if c.DB.DeleteResource(ID) {
+		return nil
 	}
-
 	return ErrResourceNotFound
 }
 
 // GetResource returns a Resource for the ID or nil
-func (c *FakeConnector) GetResource(id manifold.ID) *Resource {
-	for _, v := range c.resources {
-		if id == v.ID {
-			return v
-		}
-	}
-
-	return nil
+func (c *FakeConnector) GetResource(id manifold.ID) *db.Resource {
+	return c.DB.GetResource(id)
 }
 
 // AddCallback stores the callback inside the FakeConnector
@@ -278,6 +269,7 @@ func New(port uint, clientID string, clientSecret string, product string) (*Fake
 			ClientSecret: clientSecret,
 			SigningKey:   "hello",
 		},
+		DB:         db.New(),
 		OnCallback: make(chan *Callback, 100),
 		capturers:  make(map[string]*RequestCapturer),
 	}
@@ -293,7 +285,14 @@ func ValidHandler(c *FakeConnector) *bone.Mux {
 	mux.GetFunc("/v1/self", getSelfHandler(c, c.capturer("/v1/self")))
 	mux.PutFunc("/v1/callbacks/:id", processCallbackHandler(c, c.capturer("/v1/callbacks/{id}")))
 	mux.GetFunc("/v1/resources/:id", getResourceHandler(c, c.capturer("/v1/resources/{id}")))
-	mux.GetFunc("/v1/resources/:id/users", getResourceUsersHandler(c, c.capturer("/v1/resources/{id}/users")))
+	mux.GetFunc("/v1/resources/:id/users", getResourceUsersHandler(c,
+		c.capturer("/v1/resources/{id}/users")))
+	mux.GetFunc("/v1/resources/:id/credentials", getResourceCredentialsHandler(c,
+		c.capturer("/v1/resources/{id}/credentials")))
+	mux.GetFunc("/v1/resources/:id/measures", getResourceMeasuresHandler(c,
+		c.capturer("/v1/resources/{id}/measures")))
+	mux.PutFunc("/v1/resources/:id/measures", putResourceMeasuresHandler(c,
+		c.capturer("/v1/resources/{id}/measures")))
 	return mux
 }
 

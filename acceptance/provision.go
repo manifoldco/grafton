@@ -11,14 +11,16 @@ import (
 	manifold "github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 	"github.com/manifoldco/go-manifold/idtype"
+	"github.com/manifoldco/go-manifold/names"
 
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
+	"github.com/manifoldco/grafton/db"
 )
 
 var errTimeout = errors.New("Exceeded Callback Wait time")
 var resourceID manifold.ID
-var curResource *connector.Resource
+var curResource *db.Resource
 
 var provision = Feature("provision", "Provision a resource", func(ctx context.Context) {
 	Default(func() {
@@ -33,7 +35,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, api, "", plan, planFeatures, region)
+		_, _, async, err := provisionResource(ctx, api, "not-your-product", plan, planFeatures, region)
 
 		gm.Expect(async).To(
 			gm.BeFalse(),
@@ -202,7 +204,7 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 var _ = provision.RequiredFlags("product", "plan", "region", "new-plan")
 
 func attemptResourceProvision(ctx context.Context, api *grafton.Client, product, plan string,
-	planFeatures manifold.FeatureMap, region string) *connector.Resource {
+	planFeatures manifold.FeatureMap, region string) *db.Resource {
 
 	var err error
 	curResource, callbackID, async, err := provisionResource(ctx, api, product, plan, planFeatures, region)
@@ -271,7 +273,7 @@ waitForCallback:
 }
 
 func provisionResource(ctx context.Context, api *grafton.Client, product, plan string,
-	planFeatures manifold.FeatureMap, region string) (*connector.Resource, manifold.ID, bool, error) {
+	planFeatures manifold.FeatureMap, region string) (*db.Resource, manifold.ID, bool, error) {
 
 	Infoln("Attempting to provision resource")
 
@@ -284,17 +286,30 @@ func provisionResource(ctx context.Context, api *grafton.Client, product, plan s
 }
 
 func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.ID, product, plan string,
-	planFeatures manifold.FeatureMap, region string) (*connector.Resource, manifold.ID, bool, error) {
+	planFeatures manifold.FeatureMap, region string) (*db.Resource, manifold.ID, bool, error) {
 
 	c, err := fakeConnector.AddCallback(connector.ResourceProvisionCallback)
 	if err != nil {
 		return nil, c.ID, false, err
 	}
 
-	r := &connector.Resource{
+	productLabel := manifold.Label(product)
+	if err := productLabel.Validate(nil); err != nil {
+		return nil, c.ID, false, FatalErr("Product label is not a valid label: %s", err)
+	}
+	planLabel := manifold.Label(plan)
+	if err := planLabel.Validate(nil); err != nil {
+		return nil, c.ID, false, FatalErr("Plan label is not a valid label: %s", err)
+	}
+
+	label := names.ForResource(manifold.Label(product), id)
+
+	r := &db.Resource{
 		ID:        id,
-		Product:   product,
-		Plan:      plan,
+		Label:     label,
+		Name:      manifold.Name(label),
+		Product:   productLabel,
+		Plan:      planLabel,
 		Region:    region,
 		Features:  planFeatures,
 		CreatedAt: time.Now().UTC(),

@@ -45,18 +45,6 @@ type AccessToken struct {
 	GrantType   GrantType   `json:"-"`
 }
 
-// Resource represents a resource provisioned through Grafton
-type Resource struct {
-	ID         manifold.ID         `json:"id"`
-	Plan       string              `json:"plan"`
-	Product    string              `json:"product"`
-	Region     string              `json:"region"`
-	ImportCode string              `json:"import_code"`
-	Features   manifold.FeatureMap `json:"features,omitempty"`
-	CreatedAt  time.Time           `json:"created_at"`
-	UpdatedAt  time.Time           `json:"updated_at"`
-}
-
 // UserProfile represents the data returned on GET /v1/self when the target
 // type is a user
 type UserProfile struct {
@@ -67,9 +55,23 @@ type UserProfile struct {
 // UserTarget represents the contents of a response on GET /v1/self when the
 // target is a user
 type UserTarget struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID    manifold.ID    `json:"id"`
+	Name  string         `json:"name"`
+	Email string         `json:"email"`
+	Role  UserTargetRole `json:"role"`
 }
+
+// UserTargetRole defines an enum type of valid roles
+type UserTargetRole string
+
+const (
+	// UserTargetRoleOwner defines the "owner" role
+	UserTargetRoleOwner UserTargetRole = "owner"
+	// UserTargetRoleMember defines the "member" role
+	UserTargetRoleMember UserTargetRole = "member"
+	// UserTargetRoleAdmin defines the "admin" role
+	UserTargetRoleAdmin UserTargetRole = "admin"
+)
 
 // ProductTarget represents the data returned on GET /v1/vself when the target
 // type is product
@@ -125,4 +127,34 @@ type CallbackRequest struct {
 	State       CallbackState     `json:"state"`
 	Message     string            `json:"message"`
 	Credentials map[string]string `json:"credentials"`
+}
+
+// ResourceMeasures is a struct that provides resource measures information
+//  in addition to hoisted information about the measured features
+type ResourceMeasures struct {
+	UpdatedAt   time.Time         `json:"updated_at"`
+	PeriodStart time.Time         `json:"period_start"`
+	PeriodEnd   time.Time         `json:"period_end"`
+	Measures    []ResourceMeasure `json:"measures"`
+}
+
+// ResourceMeasure holds a specific measure and information relating to its feature
+type ResourceMeasure struct {
+	Feature      ResourceMeasureFeature      `json:"feature"`
+	FeatureValue ResourceMeasureFeatureValue `json:"feature_value"`
+	Usage        int64                       `json:"usage"`
+	Max          *int64                      `json:"max"`
+	Suffix       *string                     `json:"suffix"`
+}
+
+// ResourceMeasureFeature holds information about a measure's feature
+type ResourceMeasureFeature struct {
+	Name  manifold.Name  `json:"name"`
+	Label manifold.Label `json:"label"`
+}
+
+// ResourceMeasureFeatureValue holds information about a measure's feature value
+type ResourceMeasureFeatureValue struct {
+	Name  manifold.Name              `json:"name"`
+	Label manifold.FeatureValueLabel `json:"label"`
 }
