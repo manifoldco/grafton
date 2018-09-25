@@ -333,7 +333,7 @@ func provisionResourceID(ctx context.Context, api *grafton.Client, id manifold.I
 		Product:  product,
 		Plan:     plan,
 		Region:   region,
-		Features: nil,
+		Features: planFeatures,
 	}
 
 	msg, callback, err := api.ProvisionResource(ctx, c.ID, model)
