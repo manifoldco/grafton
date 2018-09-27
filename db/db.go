@@ -8,30 +8,30 @@ import (
 
 // DB functions as an in-memory database of marketplace entities
 type DB struct {
-	resourcesByID         map[manifold.ID]Resource
-	credentialsByResource map[manifold.ID][]Credential
-	credentialsByID       map[manifold.ID]Credential
-	measuresByResource    map[manifold.ID][]Measure
+	ResourcesByID         map[manifold.ID]Resource
+	CredentialsByResource map[manifold.ID][]Credential
+	CredentialsByID       map[manifold.ID]Credential
+	MeasuresByResource    map[manifold.ID][]Measure
 }
 
 // New creates a new DB instance in-memory
 func New() *DB {
 	return &DB{
-		resourcesByID:         make(map[manifold.ID]Resource),
-		credentialsByResource: make(map[manifold.ID][]Credential),
-		credentialsByID:       make(map[manifold.ID]Credential),
-		measuresByResource:    make(map[manifold.ID][]Measure),
+		ResourcesByID:         make(map[manifold.ID]Resource),
+		CredentialsByResource: make(map[manifold.ID][]Credential),
+		CredentialsByID:       make(map[manifold.ID]Credential),
+		MeasuresByResource:    make(map[manifold.ID][]Measure),
 	}
 }
 
 // PutResource stores the provided resource in the database
 func (db *DB) PutResource(r Resource) {
-	db.resourcesByID[r.ID] = r
+	db.ResourcesByID[r.ID] = r
 }
 
 // GetResource returns a resource based on it's id or nil, if it can't be found
 func (db *DB) GetResource(id manifold.ID) *Resource {
-	r, ok := db.resourcesByID[id]
+	r, ok := db.ResourcesByID[id]
 	if ok {
 		return &r
 	}
@@ -40,13 +40,13 @@ func (db *DB) GetResource(id manifold.ID) *Resource {
 
 // DeleteResource removes a resource and returns true, false if there was no resource
 func (db *DB) DeleteResource(id manifold.ID) bool {
-	_, ok := db.resourcesByID[id]
+	_, ok := db.ResourcesByID[id]
 	if ok {
-		cs, _ := db.credentialsByResource[id]
+		cs, _ := db.CredentialsByResource[id]
 		for _, c := range cs {
 			db.DeleteCredential(c.ID)
 		}
-		delete(db.resourcesByID, id)
+		delete(db.ResourcesByID, id)
 		return true
 	}
 	return false
@@ -57,14 +57,14 @@ func (db *DB) PutCredential(c Credential) {
 	if c.ResourceID.IsEmpty() {
 		panic("Supplied credential did not have a resource ID specified")
 	}
-	db.credentialsByID[c.ID] = c
-	db.credentialsByResource[c.ResourceID] = append(
-		db.credentialsByResource[c.ResourceID], c)
+	db.CredentialsByID[c.ID] = c
+	db.CredentialsByResource[c.ResourceID] = append(
+		db.CredentialsByResource[c.ResourceID], c)
 }
 
 // GetCredential returns a credential based on it's id or nil, if it can't be found
 func (db *DB) GetCredential(id manifold.ID) *Credential {
-	c, ok := db.credentialsByID[id]
+	c, ok := db.CredentialsByID[id]
 	if ok {
 		return &c
 	}
@@ -73,7 +73,7 @@ func (db *DB) GetCredential(id manifold.ID) *Credential {
 
 // GetCredentialsByResource returns a list of credentials or nil, for a ResourceID
 func (db *DB) GetCredentialsByResource(id manifold.ID) []Credential {
-	c, ok := db.credentialsByResource[id]
+	c, ok := db.CredentialsByResource[id]
 	if ok {
 		return c
 	}
@@ -82,11 +82,11 @@ func (db *DB) GetCredentialsByResource(id manifold.ID) []Credential {
 
 // DeleteCredential removes a credential and returns true, false if there was no credential
 func (db *DB) DeleteCredential(id manifold.ID) bool {
-	c, ok := db.credentialsByID[id]
+	c, ok := db.CredentialsByID[id]
 	if !ok {
 		return false
 	}
-	cs, ok := db.credentialsByResource[c.ResourceID]
+	cs, ok := db.CredentialsByResource[c.ResourceID]
 	if !ok {
 		panic("Credential existed, but resource credential list did not")
 	}
@@ -96,9 +96,9 @@ func (db *DB) DeleteCredential(id manifold.ID) bool {
 			cs = append(cs[:i], cs[i+1:]...)
 		}
 	}
-	db.credentialsByResource[c.ResourceID] = cs
+	db.CredentialsByResource[c.ResourceID] = cs
 	// Finally remove the key
-	delete(db.credentialsByID, id)
+	delete(db.CredentialsByID, id)
 	return true
 }
 
@@ -108,13 +108,13 @@ func (db *DB) PutMeasure(m Measure) {
 		panic("Supplied measure did not have a resource ID specified")
 	}
 	m.UpdatedAt = time.Now()
-	db.measuresByResource[m.ResourceID] = append(
-		db.measuresByResource[m.ResourceID], m)
+	db.MeasuresByResource[m.ResourceID] = append(
+		db.MeasuresByResource[m.ResourceID], m)
 }
 
 // GetMeasuresByResource returns a list of measures or nil, for a ResourceID
 func (db *DB) GetMeasuresByResource(id manifold.ID) []Measure {
-	m, ok := db.measuresByResource[id]
+	m, ok := db.MeasuresByResource[id]
 	if ok {
 		return m
 	}

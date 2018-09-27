@@ -10,6 +10,7 @@ import (
 
 	"github.com/manifoldco/go-base64"
 	"github.com/manifoldco/go-signature"
+	"github.com/urfave/cli"
 )
 
 // keypair represents a Master Public Keypair used for generating and endorsing
@@ -23,6 +24,25 @@ type keypair struct {
 type liveKeypair struct {
 	keypair
 	Endorsement *base64.Value
+}
+
+func getKeypair() (*keypair, error) {
+	keyFile, err := getKeyFilePath()
+	if err != nil {
+		return nil, cli.NewExitError("Could not determine working directory: "+err.Error(), -1)
+	}
+
+	if _, err = os.Stat(keyFile); os.IsNotExist(err) {
+		return nil, cli.NewExitError(
+			"Master key file does not exist; generate one using 'grafton generate'", -1)
+	}
+
+	k, err := loadKeypair(keyFile)
+	if err != nil {
+		return nil, cli.NewExitError("Could not load master key file: "+err.Error(), -1)
+	}
+
+	return k, err
 }
 
 // GetKeyFilePath returns the filepath to where the master key should belong
