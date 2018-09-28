@@ -65,7 +65,7 @@ func serveCmd(ctx *cli.Context) error {
 	marketplacePort := ctx.Uint("marketplace-port")
 	if providerAPI == "" {
 		fmt.Println("'provider-api' was not defined, using: http://localhost:3000")
-		providerAPI = "http://localhost:3000"
+		providerAPI = "http://localhost:3000/v1/"
 	}
 	if connectorPort == 0 {
 		fmt.Println("'connector-port' was not defined, using: 3001")
