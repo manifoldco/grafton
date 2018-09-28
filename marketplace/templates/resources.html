@@ -7,15 +7,21 @@
   </div>
 
   {{end}}
+  <div class="columns is-multiline">
   {{range .Resources}}
-    <div class="card">
-      <div class="card-content">
-        <h3 class="title is-4">{{.Name}}</h3>
+    <div class="column is-3">
+      <div class="card">
+        <div class="card-content">
+          <h3 class="title is-4">{{.Name}}</h3>
+          <a href="/deprovision/{{.ID}}" class="button is-small is-warning">Deprovision</a>
+          <a href="/sso/{{.ID}}" class="button is-small">SSO</a>
+        </div>
       </div>
     </div>
   {{else}}
     <em>No Resources :(</em>
   {{end}}
+  </div>
 
   <section class="section">
     <div class="box">
