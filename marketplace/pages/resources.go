@@ -11,6 +11,6 @@ const pageResources = `
 <h2>No Resources</h2>
 {{end}}
 <form method="post" action="/resources">
-  <input type="submit">Provision Resource</input>
+  <input type="submit" value="Provision a Resource">
 </form>
 `
