@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -13,7 +14,6 @@ import (
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/db"
-	"github.com/manifoldco/grafton/marketplace/pages"
 )
 
 func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, code int, msg string) {
@@ -25,7 +25,7 @@ func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, co
 		i++
 	}
 
-	pageValues := struct {
+	content := struct {
 		Resources []db.Resource
 		Code      int
 		Message   string
@@ -35,7 +35,7 @@ func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, co
 		Message:   msg,
 	}
 
-	respond(rw, req, pages.Resources, pageValues, code)
+	respond(rw, req, "resources", content, code)
 }
 
 // GetResourcesHandler displays a list of resources in format depending on the
@@ -57,6 +57,24 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 			return
 		}
 
+		err = req.ParseForm()
+		if err != nil {
+			respondError(rw, req, "Failed to parse form - "+err.Error(), 500)
+			return
+		}
+
+		var features manifold.FeatureMap
+
+		featuresTxt := req.Form.Get("features")
+		if featuresTxt != "" {
+			err = json.Unmarshal([]byte(featuresTxt), &features)
+
+			if err != nil {
+				respondError(rw, req, "Failed to parse features - "+err.Error(), 500)
+				return
+			}
+		}
+
 		name := names.ForResource(manifold.Label("grafton"), id)
 
 		// Store in a provisioning state
@@ -71,6 +89,7 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			State:     db.ResourceStateProvisioning,
+			Features:  features,
 		}
 		d.PutResource(*r)
 

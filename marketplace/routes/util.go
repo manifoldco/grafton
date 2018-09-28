@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
@@ -9,7 +10,6 @@ import (
 
 	manifold "github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/grafton/connector"
-	"github.com/manifoldco/grafton/marketplace/pages"
 )
 
 const callbackTimeout = time.Minute * 5
@@ -34,7 +34,7 @@ func respondWithJSON(rw http.ResponseWriter, v interface{}, code int) {
 	}
 }
 
-func respondWithHTML(rw http.ResponseWriter, t *template.Template, v interface{}, code int) {
+func respondWithHTML(rw http.ResponseWriter, name string, v interface{}, code int) {
 	rw.Header().Set("Content-Type", "text/html")
 	rw.WriteHeader(code)
 
@@ -42,24 +42,35 @@ func respondWithHTML(rw http.ResponseWriter, t *template.Template, v interface{}
 		return
 	}
 
-	err := t.Execute(rw, v)
+	tpl := template.New("layout.html")
+
+	path := fmt.Sprintf("marketplace/templates/%s.html", name)
+
+	tpl, err := tpl.ParseFiles(path, "marketplace/templates/layout.html")
 	if err != nil {
-		panic(err)
+		fmt.Fprint(rw, err.Error())
+		return
+	}
+
+	err = tpl.Execute(rw, v)
+	if err != nil {
+		fmt.Fprint(rw, err.Error())
+		return
 	}
 }
 
-func respond(rw http.ResponseWriter, req *http.Request, t *template.Template, v interface{}, code int) {
+func respond(rw http.ResponseWriter, req *http.Request, templatePath string, v interface{}, code int) {
 	// If JSON Request, respond as such
 	if isJSONRequest(req) {
 		respondWithJSON(rw, v, code)
 		return
 	}
 	// Else HTML
-	respondWithHTML(rw, t, v, code)
+	respondWithHTML(rw, templatePath, v, code)
 }
 
 func respondError(rw http.ResponseWriter, req *http.Request, message string, code int) {
-	respond(rw, req, pages.Error, struct {
+	respond(rw, req, "error", struct {
 		Message string
 		Code    int
 	}{
