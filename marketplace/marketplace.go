@@ -82,6 +82,7 @@ func Routes(m *FakeMarketplace) *bone.Mux {
 	mux.PostFunc("/resources", routes.PostResourcesHandler(m.DB, m.GC, m.Connector))
 	mux.PostFunc("/resources/:id", routes.PutResourcesHandler(m.DB))
 	mux.GetFunc("/resources/:id/delete", routes.DeleteResourcesHandler(m.DB, m.GC, m.Connector))
+	mux.GetFunc("/resources/:id/sso", routes.SSOResourcesHandler(m.DB, m.GC, m.Connector))
 
 	// TODO: Core funcs
 	// mux.GetFunc("/resources/:id/sso", getResourcesSSOHandler(c))
