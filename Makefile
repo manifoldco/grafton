@@ -28,8 +28,7 @@ CMD_PKGS=\
 	github.com/gordonklaus/ineffassign \
 	github.com/tsenart/deadcode \
 	github.com/alecthomas/gometalinter \
-	github.com/go-swagger/go-swagger/cmd/swagger \
-	github.com/gobuffalo/packr/...
+	github.com/go-swagger/go-swagger/cmd/swagger
 
 define VENDOR_BIN_TMPL
 vendor/bin/$(notdir $(1)): vendor
@@ -120,6 +119,7 @@ GRAFTON_DEPS=\
 	generated/provider/models
 
 $(PREFIX)bin/grafton$(SUFFIX): $(GRAFTON_DEPS)
+	go get github.com/gobuffalo/packr/...
 	$(GO_BUILD) -o $(PREFIX)bin/grafton$(SUFFIX) ./cmd; packr clean
 
 .PHONY: build
