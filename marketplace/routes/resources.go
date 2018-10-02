@@ -16,7 +16,7 @@ import (
 	"github.com/manifoldco/grafton/db"
 )
 
-func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, code int, msg string) {
+func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, code int, features string) {
 	// Get all resources
 	rs := make([]db.Resource, len(d.ResourcesByID))
 	i := 0
@@ -28,11 +28,11 @@ func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, co
 	content := struct {
 		Resources []db.Resource
 		Code      int
-		Message   string
+		Features  string
 	}{
 		Resources: rs,
 		Code:      code,
-		Message:   msg,
+		Features:  features,
 	}
 
 	respond(rw, req, "resources", content, code)
@@ -42,7 +42,11 @@ func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, co
 //  Accept header
 func GetResourcesHandler(d *db.DB) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
-		respondResourcePage(d, rw, req, 200, "")
+		query := req.URL.Query()
+
+		fjson := query.Get("features")
+
+		respondResourcePage(d, rw, req, 200, fjson)
 	}
 }
 
@@ -105,7 +109,8 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 			failedToProvision("Failed to register callback for resource provision - " + err.Error())
 			return
 		}
-		msg, callback, err := gc.ProvisionResource(req.Context(), cb.ID, grafton.ResourceBody{
+
+		_, callback, err := gc.ProvisionResource(req.Context(), cb.ID, grafton.ResourceBody{
 			ID:       r.ID,
 			Product:  string(r.Product),
 			Plan:     string(r.Plan),
@@ -129,7 +134,7 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 		r.State = db.ResourceStateProvisioned
 		d.PutResource(*r)
 
-		respondResourcePage(d, rw, req, 201, msg)
+		http.Redirect(rw, req, "/", http.StatusFound)
 	}
 }
 
@@ -183,7 +188,8 @@ func DeleteResourcesHandler(d *db.DB, gc *grafton.Client,
 			failedToDeprovision("Failed to register callback for resource deprovision - " + err.Error())
 			return
 		}
-		msg, callback, err := gc.DeprovisionResource(req.Context(), cb.ID, id)
+
+		_, callback, err := gc.DeprovisionResource(req.Context(), cb.ID, id)
 
 		if callback {
 			waitForCallback(fc, cb.ID)
@@ -201,7 +207,7 @@ func DeleteResourcesHandler(d *db.DB, gc *grafton.Client,
 		r.State = db.ResourceStateDeprovisioned
 		d.PutResource(*r)
 
-		respondResourcePage(d, rw, req, 200, msg)
+		http.Redirect(rw, req, "/", http.StatusFound)
 	}
 }
 
