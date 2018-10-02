@@ -1,5 +1,5 @@
 VERSION?=$(shell git describe --tags --dirty | sed 's/^v//')
-GO_BUILD=CGO_ENABLED=0 go build -i --ldflags="-w"
+GO_BUILD=CGO_ENABLED=0 packr build -i --ldflags="-w"
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))
@@ -28,7 +28,8 @@ CMD_PKGS=\
 	github.com/gordonklaus/ineffassign \
 	github.com/tsenart/deadcode \
 	github.com/alecthomas/gometalinter \
-	github.com/go-swagger/go-swagger/cmd/swagger
+	github.com/go-swagger/go-swagger/cmd/swagger \
+	github.com/gobuffalo/packr/...
 
 define VENDOR_BIN_TMPL
 vendor/bin/$(notdir $(1)): vendor
@@ -119,7 +120,7 @@ GRAFTON_DEPS=\
 	generated/provider/models
 
 $(PREFIX)bin/grafton$(SUFFIX): $(GRAFTON_DEPS)
-	$(GO_BUILD) -o $(PREFIX)bin/grafton$(SUFFIX) ./cmd
+	$(GO_BUILD) -o $(PREFIX)bin/grafton$(SUFFIX) ./cmd; packr clean
 
 .PHONY: build
 

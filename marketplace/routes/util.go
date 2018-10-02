@@ -8,11 +8,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/packr"
+
 	manifold "github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/grafton/connector"
 )
 
 const callbackTimeout = time.Minute * 5
+
+var templates packr.Box
+
+func init() {
+	templates = packr.NewBox("../templates")
+}
 
 func isJSONRequest(req *http.Request) bool {
 	ct := req.Header.Get("Content-Type")
@@ -44,9 +52,25 @@ func respondWithHTML(rw http.ResponseWriter, name string, v interface{}, code in
 
 	tpl := template.New("layout.html")
 
-	path := fmt.Sprintf("marketplace/templates/%s.html", name)
+	// Parse in Route Page
+	pageHTML, err := templates.MustString(name + ".html")
+	if err != nil {
+		fmt.Fprint(rw, err.Error())
+		return
+	}
+	tpl, err = tpl.Parse(pageHTML)
+	if err != nil {
+		fmt.Fprint(rw, err.Error())
+		return
+	}
 
-	tpl, err := tpl.ParseFiles(path, "marketplace/templates/layout.html")
+	// Parse in Layout
+	layoutHTML, err := templates.MustString("layout.html")
+	if err != nil {
+		fmt.Fprint(rw, err.Error())
+		return
+	}
+	tpl, err = tpl.Parse(layoutHTML)
 	if err != nil {
 		fmt.Fprint(rw, err.Error())
 		return
