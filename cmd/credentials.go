@@ -190,6 +190,7 @@ func deleteCredentialsCmd(cliCtx *cli.Context) error {
 	return nil
 }
 
+// NewConnector creates a new connector client with the provided 'token'
 func NewConnector(token string) (*client.Connector, error) {
 	u, err := url.Parse(fmt.Sprintf(apiURL, "connector"))
 	if err != nil {

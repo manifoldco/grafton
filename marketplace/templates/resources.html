@@ -1,0 +1,41 @@
+{{ define "content" }}
+  <h1 class="title is-1">Resources</h1>
+
+  {{if .Message }}
+  <div class="notification is-success">
+    Done: {{.Message}} - {{.Code}}
+  </div>
+
+  {{end}}
+  <div class="columns is-multiline">
+  {{range .Resources}}
+    <div class="column is-3">
+      <div class="card">
+        <div class="card-content">
+          <h3 class="title is-4">{{.Name}}</h3>
+          <a href="/deprovision/{{.ID}}" class="button is-small is-warning">Deprovision</a>
+          <a href="/sso/{{.ID}}" class="button is-small">SSO</a>
+        </div>
+      </div>
+    </div>
+  {{else}}
+    <em>No Resources :(</em>
+  {{end}}
+  </div>
+
+  <section class="section">
+    <div class="box">
+      <h3 class="title is-3">New Provision</h3>
+      <form class="form" method="post" action="/resources">
+
+        <div class="field">
+          <textarea name="features" class="textarea" placeholder="features as JSON (optional)"></textarea>
+        </div>
+
+        <div class="field">
+          <input type="submit" class="button is-primary" value="Provision a Resource">
+        </div>
+      </form>
+    </div>
+  </section>
+{{ end }}

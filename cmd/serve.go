@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"net/url"
 
 	"github.com/urfave/cli"
 
 	"github.com/manifoldco/grafton/connector"
+	"github.com/manifoldco/grafton/marketplace"
 )
 
 func init() {
@@ -30,10 +32,20 @@ func init() {
 				Usage:  "Client secret to use for SSO and local Connector API testing",
 				EnvVar: "OAUTH2_CLIENT_SECRET",
 			},
+			cli.StringFlag{
+				Name:   "provider-api",
+				Usage:  "URL for the provider API, for the Marketplace to connect with",
+				EnvVar: "PROVIDER_API",
+			},
 			cli.UintFlag{
 				Name:   "connector-port",
 				Usage:  "Local port for running the fake Connector API for SSO and Async testing",
 				EnvVar: "CONNECTOR_PORT",
+			},
+			cli.UintFlag{
+				Name:   "marketplace-port",
+				Usage:  "Local port for running the fake Marketplace Web Server for SSO and Async testing",
+				EnvVar: "MARKETPLACE_PORT",
 			},
 		},
 	}
@@ -48,10 +60,26 @@ func serveCmd(ctx *cli.Context) error {
 	}
 	clientID := ctx.String("client-id")
 	clientSecret := ctx.String("client-secret")
+	providerAPI := ctx.String("provider-api")
 	connectorPort := ctx.Uint("connector-port")
+	marketplacePort := ctx.Uint("marketplace-port")
+	if providerAPI == "" {
+		fmt.Println("'provider-api' was not defined, using: http://localhost:3000")
+		providerAPI = "http://localhost:3000/v1/"
+	}
 	if connectorPort == 0 {
 		fmt.Println("'connector-port' was not defined, using: 3001")
 		connectorPort = 3001
+	}
+	if marketplacePort == 0 {
+		fmt.Println("'marketplace-port' was not defined, using: 3002")
+		marketplacePort = 3002
+	}
+
+	pAPI, err := url.Parse(providerAPI)
+	if err != nil {
+		return cli.NewExitError("Failed to parse provider API URL '"+providerAPI+
+			"' - "+err.Error(), -1)
 	}
 
 	if clientID == "" && clientSecret == "" {
@@ -79,11 +107,23 @@ func serveCmd(ctx *cli.Context) error {
 		return cli.NewExitError("The 'client-secret' flag is required and was not provided", -1)
 	}
 
+	k, err := getKeypair()
+	if err != nil {
+		return err
+	}
+	lkp, err := k.liveKeypair()
+	if err != nil {
+		return cli.NewExitError("Could not create request signing keypair: "+err.Error(), -1)
+	}
+
 	fakeConnector, err := connector.New(connectorPort, clientID, clientSecret, product)
 	if err != nil {
 		return cli.NewExitError("Error while configuring connector service: "+err.Error(), -1)
 	}
+	fakeMarketplace := marketplace.New(fakeConnector, marketplacePort, pAPI, lkp)
 
-	fmt.Printf("Starting Connector server on localhost:%d", connectorPort)
-	return fakeConnector.StartSync()
+	fmt.Printf("Starting Connector server on http://localhost:%d\n", connectorPort)
+	fakeConnector.Start()
+	fmt.Printf("Starting Marketplace server on http://localhost:%d\n", marketplacePort)
+	return fakeMarketplace.StartSync()
 }

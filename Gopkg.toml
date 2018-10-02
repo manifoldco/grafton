@@ -70,3 +70,6 @@ required=[
 
 [[constraint]]
   name = "github.com/pkg/errors"
+
+[[constraint]]
+  name = "github.com/gobuffalo/packr"
