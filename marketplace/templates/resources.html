@@ -1,12 +1,6 @@
 {{ define "content" }}
   <h1 class="title is-1">Resources</h1>
 
-  {{if .Message }}
-  <div class="notification is-success">
-    Done: {{.Message}} - {{.Code}}
-  </div>
-
-  {{end}}
   <div class="columns is-multiline">
   {{range .Resources}}
     {{if eq .State "provisioned"}}
@@ -45,7 +39,7 @@
       <form class="form" method="post" action="/resources">
 
         <div class="field">
-          <textarea name="features" class="textarea" placeholder="features as JSON (optional)"></textarea>
+          <textarea name="features" class="textarea" placeholder="features as JSON (optional)">{{ .Features }}</textarea>
         </div>
 
         <div class="field">
