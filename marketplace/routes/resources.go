@@ -204,3 +204,38 @@ func DeleteResourcesHandler(d *db.DB, gc *grafton.Client,
 		respondResourcePage(d, rw, req, 200, msg)
 	}
 }
+
+// SSOResourcesHandler attempts to update an existing resource
+func SSOResourcesHandler(d *db.DB, gc *grafton.Client,
+	fc *connector.FakeConnector) http.HandlerFunc {
+
+	return func(rw http.ResponseWriter, req *http.Request) {
+
+		idString := bone.GetValue(req, "id")
+		if idString == "" {
+			respondError(rw, req, "No ID provided!", 400)
+			return
+		}
+
+		id, err := manifold.DecodeIDFromString(idString)
+		if err != nil {
+			respondError(rw, req, "Provided ID was not a Manifold ID", 400)
+			return
+		} else if id.Type() != idtype.Resource {
+			respondError(rw, req, "Provided ID is not for Resource", 400)
+			return
+		}
+
+		authCode, err := fc.CreateCode()
+		if err != nil {
+			respondError(rw, req, "Failed to create auth code: "+err.Error(), 500)
+			return
+		}
+
+		url := gc.CreateSsoURL(authCode.Code, id)
+
+		// Redirect to provider dashboard
+		rw.Header().Add("Location", url.String())
+		rw.WriteHeader(302)
+	}
+}
