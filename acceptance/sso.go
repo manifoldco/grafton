@@ -47,7 +47,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 
 		capturer, err := fakeConnector.GetCapturer("/v1/oauth/tokens")
 		if err != nil {
-			FatalErr("Could not find request capturer %s")
+			FatalErr("Could not find request capturer %s", err)
 		}
 
 		foundReqs := capturer.Get()
@@ -55,7 +55,7 @@ var sso = Feature("sso", "Single Sign-On Flow", func(ctx context.Context) {
 		for _, v := range foundReqs {
 			req, ok := v.(*connector.TokenRequest)
 			if !ok {
-				FatalErr("Could not cast request body to TokenRequest %s")
+				FatalErr("Could not cast request body to TokenRequest %s", err)
 			}
 
 			if req.GrantType == connector.AuthorizationCodeGrantType {
