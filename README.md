@@ -93,7 +93,7 @@ disable Resource Measures and Resize, for example, you can pass:
 Releasing grafton is a manual process run on a developers local machine.
 
 1. Ensure all of the required code has been merged into master.
-2. Determine whether or not the `CHANGELOD.md` is up to date and correct for
+2. Determine whether or not the `CHANGELOG.md` is up to date and correct for
    this release, if it's not, update it!
 3. Create a tag off master (following [semver](http://semver.org/)), which
    includes the up to date `CHANGELOG.md` (and matches the remote sha of master
