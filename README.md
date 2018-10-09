@@ -82,6 +82,14 @@ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
     http://localhost:4567
 ```
 
+3. **Mini-Marketplace Connector API**
+
+Grafton provides a simple version of Manifold Marketplace that allows to test provision, deprovision and SSO manually.
+
+```
+grafton serve --product=bonnets --provider-api=http://yourlocalserver/
+```
+
 ### Excluding Features
 
 When testing it is possible to exclude of one more features from being run. To
