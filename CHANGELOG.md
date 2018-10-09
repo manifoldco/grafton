@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2018-10-09
+
 ### Added
 
-- Resource provisioning will now accept an optional parameter called `import_code`.
-Import code allows providers to import existing resources into Manifold.
+- `grafton serve` runs a local version of the Connector API
+- Plan features can be passed during provision with `--features` flag as JSON
+- Update go-manifold
+- Add mini-marketplace to Grafton as a new command, with provision, deprovision and SSO
+- Support latest go versions
 
 ### Fixed
 
