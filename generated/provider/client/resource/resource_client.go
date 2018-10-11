@@ -48,7 +48,7 @@ provider to complete the deprovision flow by calling the callback url
 within 24 hours. If the callback is not invoked, Manifold will retry
 the request again.
 
-If the deprovision was successful, then a `404 Not Found` response
+If the deprovision was otherwise successful, then a `204 No Content` response
 should be returned to Manifold.
 
 */

@@ -37,6 +37,7 @@ var maxTimeout = 24 * time.Hour
 
 type visitorFunc func(context.Context, *FeatureImpl) bool
 
+// Configuration defines the config options for the acceptance tests
 type Configuration struct {
 	API              *grafton.Client
 	UnauthorizedAPI  *grafton.Client

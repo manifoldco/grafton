@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var _ = Feature("cleanup", "Remove dangling resource due to failed provision", func(ctx context.Context) {
+var _ = Feature("cleanup", "Can provision and deprovision a resource", func(ctx context.Context) {
 	Default(func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
