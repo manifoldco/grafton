@@ -90,7 +90,7 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	}
 
 	p := resource.NewPutResourcesIDParams().WithBody(&body).WithID(model.ID.String())
-	p.SetDate(strfmt.DateTime(time.Now()))
+	// No need to set the Date, this is done in roundtripper.go
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
@@ -166,7 +166,7 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 	}
 
 	p := credential.NewPutCredentialsIDParams().WithBody(&body).WithID(credID.String())
-	p.SetDate(strfmt.DateTime(time.Now()))
+	// No need to set the Date, this is done in roundtripper.go
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
@@ -241,7 +241,7 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 	}
 
 	p := resource.NewPatchResourcesIDParams().WithBody(&body).WithID(resourceID.String())
-	p.SetDate(strfmt.DateTime(time.Now()))
+	// No need to set the Date, this is done in roundtripper.go
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
@@ -302,7 +302,7 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 	}
 
 	p := credential.NewDeleteCredentialsIDParams().WithID(credentialID.String())
-	p.SetDate(strfmt.DateTime(time.Now()))
+	// No need to set the Date, this is done in roundtripper.go
 	p.SetContext(ctx)
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
@@ -357,7 +357,7 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 	}
 
 	p := resource.NewDeleteResourcesIDParams().WithID(resourceID.String())
-	p.SetDate(strfmt.DateTime(time.Now()))
+	// No need to set the Date, this is done in roundtripper.go
 	p.SetContext(ctx)
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
