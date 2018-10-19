@@ -17,6 +17,8 @@ import (
 	"github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 
+	"os"
+
 	"github.com/manifoldco/grafton/generated/provider/client"
 	"github.com/manifoldco/grafton/generated/provider/client/credential"
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
@@ -53,7 +55,16 @@ type ResourceBody struct {
 // New creates a new Client
 func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry) *Client {
 	tp := httptransport.New(url.Host, url.Path, []string{url.Scheme})
-	tp.Transport = newSigningRoundTripper(tp.Transport, signer)
+
+	if os.Getenv("GRAFTON_DEBUG") == "true" {
+		debug := newDebugRoundTripper(tp.Transport)
+		signing := newSigningRoundTripper(debug, signer)
+		tp.Transport = signing
+	} else {
+		signing := newSigningRoundTripper(tp.Transport, signer)
+		tp.Transport = signing
+	}
+
 	api := client.New(tp, strfmt.Default)
 
 	if log == nil {

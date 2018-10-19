@@ -143,9 +143,8 @@ func testCmd(ctx *cli.Context) error {
 		logLevel = acceptance.LogInfo
 	case acceptance.LogVerbose:
 		logLevel = acceptance.LogVerbose
-		// we need to set it so the openapi runtime gets triggered to run in
-		// verbose mode and actually prints http request and response data.
-		os.Setenv("DEBUG", "true")
+		// we need to set it so grafton client dumps http request and response data.
+		os.Setenv("GRAFTON_DEBUG", "true")
 	default:
 		return cli.NewExitError("invalid log value "+rawLevel, -1)
 	}
