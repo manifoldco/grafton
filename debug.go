@@ -31,6 +31,9 @@ func (rt *debugRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 	rt.logger.Println(string(dreq))
 
 	res, err := rt.rt.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
 
 	dres, err := httputil.DumpResponse(res, true)
 	if err != nil {
