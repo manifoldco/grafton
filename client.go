@@ -17,8 +17,6 @@ import (
 	"github.com/manifoldco/go-manifold"
 	merrors "github.com/manifoldco/go-manifold/errors"
 
-	"os"
-
 	"github.com/manifoldco/grafton/generated/provider/client"
 	"github.com/manifoldco/grafton/generated/provider/client/credential"
 	"github.com/manifoldco/grafton/generated/provider/client/resource"
@@ -52,30 +50,52 @@ type ResourceBody struct {
 	Features   map[string]interface{}
 }
 
-// New creates a new Client
+// New creates a new Client for Grafton.
+// Deprecated in favor of NewClient.
 func New(url *nurl.URL, connectorURL *nurl.URL, signer Signer, log *logrus.Entry) *Client {
-	tp := httptransport.New(url.Host, url.Path, []string{url.Scheme})
+	opt := ClientOptions{
+		URL:          url,
+		ConnectorURL: connectorURL,
+		Signer:       signer,
+		Log:          log,
+	}
 
-	if os.Getenv("GRAFTON_DEBUG") == "true" {
+	return NewClient(opt)
+}
+
+// ClientOptions is the options to configure Grafton client.
+type ClientOptions struct {
+	URL          *nurl.URL
+	ConnectorURL *nurl.URL
+	Debug        bool
+	Signer       Signer
+	Log          *logrus.Entry
+}
+
+// NewClient creates a new Client for Grafton.
+func NewClient(opt ClientOptions) *Client {
+	tp := httptransport.New(opt.URL.Host, opt.URL.Path, []string{opt.URL.Scheme})
+
+	if opt.Debug {
 		debug := newDebugRoundTripper(tp.Transport)
-		signing := newSigningRoundTripper(debug, signer)
+		signing := newSigningRoundTripper(debug, opt.Signer)
 		tp.Transport = signing
 	} else {
-		signing := newSigningRoundTripper(tp.Transport, signer)
+		signing := newSigningRoundTripper(tp.Transport, opt.Signer)
 		tp.Transport = signing
 	}
 
 	api := client.New(tp, strfmt.Default)
 
-	if log == nil {
-		log = logrus.NewEntry(nullLogger)
+	if opt.Log == nil {
+		opt.Log = logrus.NewEntry(nullLogger)
 	}
 
 	return &Client{
-		url:          url,
+		url:          opt.URL,
 		api:          api,
-		connectorURL: connectorURL,
-		log:          log,
+		connectorURL: opt.ConnectorURL,
+		log:          opt.Log,
 	}
 }
 

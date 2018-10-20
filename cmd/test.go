@@ -143,8 +143,6 @@ func testCmd(ctx *cli.Context) error {
 		logLevel = acceptance.LogInfo
 	case acceptance.LogVerbose:
 		logLevel = acceptance.LogVerbose
-		// we need to set it so grafton client dumps http request and response data.
-		os.Setenv("GRAFTON_DEBUG", "true")
 	default:
 		return cli.NewExitError("invalid log value "+rawLevel, -1)
 	}
@@ -189,14 +187,23 @@ func testCmd(ctx *cli.Context) error {
 		return cli.NewExitError("Could not create request signing keypair: "+err.Error(), -1)
 	}
 
-	connectorURL := deriveConnectorURL(connectorPort)
-	api := grafton.New(purl, connectorURL, lkp, nil)
+	opt := grafton.ClientOptions{
+		URL:          purl,
+		ConnectorURL: deriveConnectorURL(connectorPort),
+		Signer:       lkp,
+		Debug:        logLevel == acceptance.LogVerbose,
+	}
+
+	api := grafton.NewClient(opt)
 
 	fkp, err := emptyKeypair()
 	if err != nil {
 		return cli.NewExitError("Could not create request empty signing keypair: "+err.Error(), -1)
 	}
-	unauthorizedAPI := grafton.New(purl, connectorURL, fkp, nil)
+
+	opt.Signer = fkp
+
+	unauthorizedAPI := grafton.NewClient(opt)
 	c := context.Background()
 
 	willChangePlan := false
