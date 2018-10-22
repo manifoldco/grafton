@@ -16,6 +16,7 @@ import (
 	"github.com/urfave/cli"
 
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/manifoldco/grafton/config"
 	"github.com/manifoldco/grafton/generated/connector/client"
 	"github.com/manifoldco/grafton/generated/connector/client/o_auth"
 	"github.com/manifoldco/grafton/generated/connector/models"
@@ -249,7 +250,7 @@ func login(ctx context.Context) (*manifold.Client, string, error) {
 	cfgs := []manifold.ConfigFunc{}
 
 	cfgs = append(cfgs, manifold.ForURLPattern(apiURL))
-	cfgs = append(cfgs, manifold.WithUserAgent("grafton-"+version))
+	cfgs = append(cfgs, manifold.WithUserAgent("grafton-"+config.Version))
 
 	client := manifold.New(cfgs...)
 
