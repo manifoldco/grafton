@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.1] - 2018-10-25
+
+### Added
+
+- `verbose` mode now correctly shows all HTTP header fields and body
+
 ## [0.14.0] - 2018-10-09
 
 ### Added
