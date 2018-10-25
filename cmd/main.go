@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/manifoldco/grafton/config"
 	"github.com/urfave/cli"
 )
 
@@ -17,7 +18,7 @@ func main() {
 	app.Name = "grafton"
 	app.HelpName = "grafton"
 	app.Usage = "Tool for testing integrations with Manifold"
-	app.Version = version
+	app.Version = config.Version
 	app.Commands = cmds
 
 	app.Run(os.Args)

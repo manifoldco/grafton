@@ -1,5 +1,9 @@
 VERSION?=$(shell git describe --tags --dirty | sed 's/^v//')
-GO_BUILD=CGO_ENABLED=0 packr build -i --ldflags="-w"
+PKG=github.com/manifoldco/grafton
+
+LD_FLAGS=-w -X $(PKG)/config.Version=$(VERSION)
+
+GO_BUILD=CGO_ENABLED=0 packr build -i --ldflags="$(LD_FLAGS)"
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))

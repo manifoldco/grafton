@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/manifoldco/grafton/config"
 	"github.com/urfave/cli"
 )
-
-var version = "dev"
 
 func init() {
 	versionCmd := cli.Command{
@@ -19,7 +18,7 @@ func init() {
 }
 
 func versionLookup(ctx *cli.Context) error {
-	fmt.Printf("%s\n", version)
+	fmt.Printf("%s\n", config.Version)
 
 	return nil
 }
