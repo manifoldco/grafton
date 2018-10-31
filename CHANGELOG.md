@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.2] - 2018-10-31
+
+### Added
+
+- releases are handled by [promulgate](https://www.github.com/manifoldco/promulgate)
+
+### Added
+
 ## [0.14.1] - 2018-10-25
 
 ### Added
