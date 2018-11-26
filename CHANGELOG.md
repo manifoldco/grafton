@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.4] - 2018-11-26
+
+### Added
+
+- Build with go modules on go1.11
+
+
 ## [0.14.2] - 2018-10-31
 
 ### Added
