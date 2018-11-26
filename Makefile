@@ -11,13 +11,10 @@ PROMULGATE_VERSION=0.0.9
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))
 
-LINTERS=\
+HAS_GO_MOD=$(shell go help mod; echo $$?)
+LINTERS=$(shell grep "// lint" tools.go | awk '{gsub(/\"/, "", $$1); print $$1}' | awk -F / '{print $$NF}') \
 	gofmt \
-	golint \
-	vet \
-	misspell \
-	ineffassign \
-	deadcode
+	vet
 
 all: ci
 ci: $(LINTERS) cover build
@@ -25,37 +22,46 @@ ci: $(LINTERS) cover build
 .PHONY: all ci
 
 #################################################
-# Bootstrapping for base golang package deps
+# Bootstrapping for base golang package and tool deps
 #################################################
 
-CMD_PKGS=\
-	github.com/golang/lint/golint \
-	honnef.co/go/tools/cmd/gosimple \
-	github.com/client9/misspell/cmd/misspell \
-	github.com/gordonklaus/ineffassign \
-	github.com/tsenart/deadcode \
-	github.com/alecthomas/gometalinter \
-	github.com/go-swagger/go-swagger/cmd/swagger
+CMD_PKGS=$(shell grep '	"' tools.go | awk -F '"' '{print $$2}')
 
 define VENDOR_BIN_TMPL
-vendor/bin/$(notdir $(1)): vendor
-	go build -o $$@ ./vendor/$(1)
+vendor/bin/$(notdir $(1)): vendor/$(1) | vendor
+	go build -a -o $$@ ./vendor/$(1)
 VENDOR_BINS += vendor/bin/$(notdir $(1))
-vendor/$(1): Gopkg.lock
-	dep ensure -vendor-only
+vendor/$(1): vendor
 endef
 
 $(foreach cmd_pkg,$(CMD_PKGS),$(eval $(call VENDOR_BIN_TMPL,$(cmd_pkg))))
+
 $(patsubst %,%-bin,$(filter-out gofmt vet,$(LINTERS))): %-bin: vendor/bin/%
 gofmt-bin vet-bin:
 
+ifeq ($(HAS_GO_MOD),0)
 bootstrap:
-	which dep || go get github.com/golang/dep/cmd/dep
+
+vendor: go.sum
+	GO111MODULE=on go mod vendor
+else
+bootstrap:
+	which dep || go get -u github.com/golang/dep/cmd/dep
 
 vendor: Gopkg.lock
-	dep ensure
+	dep ensure -vendor-only
+endif
 
-.PHONY: bootstrap $(CMD_PKGS)
+mod-update:
+	GO111MODULE=on go get -u -m
+	GO111MODULE=on go mod tidy
+	dep ensure -update
+
+mod-tidy:
+	GO111MODULE=on go mod tidy
+
+.PHONY: $(CMD_PKGS)
+.PHONY: mod-update mod-tidy
 
 #################################################
 # Test and linting
