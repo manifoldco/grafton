@@ -14,6 +14,7 @@ import (
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/db"
+	"github.com/manifoldco/grafton/marketplace/primitives"
 )
 
 func respondResourcePage(d *db.DB, rw http.ResponseWriter, req *http.Request, code int, features string) {
@@ -52,7 +53,7 @@ func GetResourcesHandler(d *db.DB) http.HandlerFunc {
 
 // PostResourcesHandler attempts to provision a new resource
 func PostResourcesHandler(d *db.DB, gc *grafton.Client,
-	fc *connector.FakeConnector) http.HandlerFunc {
+	fc *connector.FakeConnector, data *primitives.FakeProductData) http.HandlerFunc {
 
 	return func(rw http.ResponseWriter, req *http.Request) {
 		id, err := manifold.NewID(idtype.Resource)
@@ -83,13 +84,12 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 
 		// Store in a provisioning state
 		r := &db.Resource{
-			ID:    id,
-			Name:  manifold.Name(name),
-			Label: manifold.Label(name),
-			// TODO: use real values from config
-			Plan:      "ursa-minor",
-			Product:   "bear",
-			Region:    "all::global",
+			ID:        id,
+			Name:      manifold.Name(name),
+			Label:     manifold.Label(name),
+			Plan:      manifold.Label(data.Plan),
+			Product:   manifold.Label(data.Product),
+			Region:    data.Region,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			State:     db.ResourceStateProvisioning,

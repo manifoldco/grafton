@@ -12,6 +12,7 @@ import (
 	"github.com/manifoldco/grafton"
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/db"
+	"github.com/manifoldco/grafton/marketplace/primitives"
 	"github.com/manifoldco/grafton/marketplace/routes"
 )
 
@@ -19,6 +20,7 @@ import (
 //  to allow provider to test a full integration experience without integrating
 type FakeMarketplace struct {
 	Port      uint
+	Product   *primitives.FakeProductData
 	DB        *db.DB
 	Connector *connector.FakeConnector
 	GC        *grafton.Client
@@ -27,10 +29,11 @@ type FakeMarketplace struct {
 
 // New creates a new FakeMarketplace based on the passed parameters
 func New(connector *connector.FakeConnector, port uint, pAPI *url.URL,
-	signer grafton.Signer) *FakeMarketplace {
+	signer grafton.Signer, data *primitives.FakeProductData) *FakeMarketplace {
 
 	fm := &FakeMarketplace{
 		Port:      port,
+		Product:   data,
 		DB:        connector.DB,
 		Connector: connector,
 	}
@@ -79,7 +82,7 @@ func Routes(m *FakeMarketplace) *bone.Mux {
 	mux.GetFunc("/", routes.GetResourcesHandler(m.DB))
 
 	mux.GetFunc("/resources", routes.GetResourcesHandler(m.DB))
-	mux.PostFunc("/resources", routes.PostResourcesHandler(m.DB, m.GC, m.Connector))
+	mux.PostFunc("/resources", routes.PostResourcesHandler(m.DB, m.GC, m.Connector, m.Product))
 	mux.PostFunc("/resources/:id", routes.PutResourcesHandler(m.DB))
 	mux.GetFunc("/resources/:id/delete", routes.DeleteResourcesHandler(m.DB, m.GC, m.Connector))
 	mux.GetFunc("/resources/:id/sso", routes.SSOResourcesHandler(m.DB, m.GC, m.Connector))

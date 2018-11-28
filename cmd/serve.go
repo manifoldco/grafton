@@ -10,6 +10,7 @@ import (
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/marketplace"
+	"github.com/manifoldco/grafton/marketplace/primitives"
 )
 
 var pathRegex = regexp.MustCompile(`^(?:.*\/)?v1\/?$`)
@@ -24,6 +25,16 @@ func init() {
 				Name:   "product",
 				Usage:  "The label of the product being provisioned",
 				EnvVar: "PRODUCT",
+			},
+			cli.StringFlag{
+				Name:   "plan",
+				Usage:  "The label of the plan being provisioned",
+				EnvVar: "PLAN",
+			},
+			cli.StringFlag{
+				Name:   "region",
+				Usage:  "The label of the region being provisioned",
+				EnvVar: "REGION",
 			},
 			cli.StringFlag{
 				Name:   "client-id",
@@ -60,6 +71,14 @@ func serveCmd(ctx *cli.Context) error {
 	product := ctx.String("product")
 	if product == "" {
 		return cli.NewExitError("The 'product' flag is required and was not provided", -1)
+	}
+	plan := ctx.String("plan")
+	if plan == "" {
+		return cli.NewExitError("The 'plan' flag is required and was not provided", -1)
+	}
+	region := ctx.String("region")
+	if region == "" {
+		return cli.NewExitError("The 'region' flag is required and was not provided", -1)
 	}
 	clientID := ctx.String("client-id")
 	clientSecret := ctx.String("client-secret")
@@ -132,7 +151,12 @@ func serveCmd(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("Error while configuring connector service: "+err.Error(), -1)
 	}
-	fakeMarketplace := marketplace.New(fakeConnector, marketplacePort, pAPI, lkp)
+	fakeMarketplace := marketplace.New(fakeConnector, marketplacePort, pAPI, lkp,
+		&primitives.FakeProductData{
+			Product: product,
+			Plan:    plan,
+			Region:  region,
+		})
 
 	fmt.Printf("Starting Connector server on http://localhost:%d\n", connectorPort)
 	fakeConnector.Start()
