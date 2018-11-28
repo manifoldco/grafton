@@ -4,12 +4,16 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/urfave/cli"
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/marketplace"
+	"github.com/manifoldco/grafton/marketplace/primitives"
 )
+
+var pathRegex = regexp.MustCompile(`^(?:.*\/)?v1\/?$`)
 
 func init() {
 	cmd := cli.Command{
@@ -21,6 +25,16 @@ func init() {
 				Name:   "product",
 				Usage:  "The label of the product being provisioned",
 				EnvVar: "PRODUCT",
+			},
+			cli.StringFlag{
+				Name:   "plan",
+				Usage:  "The label of the plan being provisioned",
+				EnvVar: "PLAN",
+			},
+			cli.StringFlag{
+				Name:   "region",
+				Usage:  "The label of the region being provisioned",
+				EnvVar: "REGION",
 			},
 			cli.StringFlag{
 				Name:   "client-id",
@@ -58,6 +72,14 @@ func serveCmd(ctx *cli.Context) error {
 	if product == "" {
 		return cli.NewExitError("The 'product' flag is required and was not provided", -1)
 	}
+	plan := ctx.String("plan")
+	if plan == "" {
+		return cli.NewExitError("The 'plan' flag is required and was not provided", -1)
+	}
+	region := ctx.String("region")
+	if region == "" {
+		return cli.NewExitError("The 'region' flag is required and was not provided", -1)
+	}
 	clientID := ctx.String("client-id")
 	clientSecret := ctx.String("client-secret")
 	providerAPI := ctx.String("provider-api")
@@ -80,6 +102,15 @@ func serveCmd(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("Failed to parse provider API URL '"+providerAPI+
 			"' - "+err.Error(), -1)
+	}
+	if !pathRegex.Match([]byte(pAPI.Path)) {
+		path := pAPI.Path
+		if len(path) > 0 && pAPI.Path[len(path)-1] == '/' {
+			pAPI.Path += "v1/"
+		} else {
+			pAPI.Path += "/v1/"
+		}
+		fmt.Printf("'provider-api' was missing the trailing '/v1/' specifier in the path, using: %s\n", pAPI)
 	}
 
 	if clientID == "" && clientSecret == "" {
@@ -120,7 +151,12 @@ func serveCmd(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("Error while configuring connector service: "+err.Error(), -1)
 	}
-	fakeMarketplace := marketplace.New(fakeConnector, marketplacePort, pAPI, lkp)
+	fakeMarketplace := marketplace.New(fakeConnector, marketplacePort, pAPI, lkp,
+		&primitives.FakeProductData{
+			Product: product,
+			Plan:    plan,
+			Region:  region,
+		})
 
 	fmt.Printf("Starting Connector server on http://localhost:%d\n", connectorPort)
 	fakeConnector.Start()
