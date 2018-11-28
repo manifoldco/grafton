@@ -4,12 +4,15 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/urfave/cli"
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/marketplace"
 )
+
+var pathRegex = regexp.MustCompile(`^(?:.*\/)?v1\/?$`)
 
 func init() {
 	cmd := cli.Command{
@@ -80,6 +83,15 @@ func serveCmd(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("Failed to parse provider API URL '"+providerAPI+
 			"' - "+err.Error(), -1)
+	}
+	if !pathRegex.Match([]byte(pAPI.Path)) {
+		path := pAPI.Path
+		if len(path) > 0 && pAPI.Path[len(path)-1] == '/' {
+			pAPI.Path += "v1/"
+		} else {
+			pAPI.Path += "/v1/"
+		}
+		fmt.Printf("'provider-api' was missing the trailing '/v1/' specifier in the path, using: %s\n", pAPI)
 	}
 
 	if clientID == "" && clientSecret == "" {
