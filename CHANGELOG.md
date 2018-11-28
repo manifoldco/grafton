@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.5] - 2018-11-28
+
+### Added
+
+- Added a fix for the /v1/ being omitted from the path
+- Added support for setting plan, region on serve and using them
+
 ## [0.14.4] - 2018-11-26
 
 ### Added
