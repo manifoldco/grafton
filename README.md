@@ -87,7 +87,7 @@ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
 Grafton provides a simple version of Manifold Marketplace that allows to test provision, deprovision and SSO manually.
 
 ```
-grafton serve --product=bonnets --provider-api=http://yourlocalserver/
+grafton serve --product=bonnets --plan=simple-hood --region=east-coast --provider-api=http://yourlocalserver/v1
 ```
 
 ### Excluding Features
