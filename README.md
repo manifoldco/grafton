@@ -94,7 +94,17 @@ grafton serve --product=bonnets --plan=simple-hood --region=east-coast --provide
 
 When testing it is possible to exclude of one more features from being run. To
 disable Resource Measures and Resize, for example, you can pass:
-`--exclude resource-measures plan-change`.
+`--exclude resource-measures --exclude plan-change`.
+
+A full list of available tests you can exclude (which is all of them):
+- `cleanup`
+- `credentials`
+- `resource-measures`
+- `provision`
+- `plan-change`
+- `sso`
+
+_Note_ : resource-measures is a test you are ONLY required to pass if you are using metered pricing.  If you are not, you can exclude it.
 
 ## Releasing
 
