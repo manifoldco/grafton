@@ -273,7 +273,7 @@ func testCmd(ctx *cli.Context) error {
 
 	failed := acceptance.Run(c, !ctx.Bool("no-error-cases"), excludeFeatures)
 	if failed {
-		os.Exit(-1)
+		os.Exit(1)
 	}
 
 	return nil
