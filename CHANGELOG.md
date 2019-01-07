@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.6] - 2019-01-07
+
+### Fixed
+
+-  Exit code when tests pass/fail
+
 ## [0.14.5] - 2018-11-28
 
 ### Added
