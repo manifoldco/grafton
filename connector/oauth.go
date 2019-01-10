@@ -133,35 +133,44 @@ type CreateAccessTokenJson struct {
 	GrantType    string `json:"grant_type"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
+	Code         string `json:"code"`
 }
 
 func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 		id, secret, ok := req.BasicAuth()
-		var grantTypeStr string
-		if !ok {
-			if hasFormValues(req) {
+		var grantTypeStr, code string
+		if hasFormValues(req) {
+			if req.FormValue("client_id") != "" && req.FormValue("client_secret") != "" {
 				id = req.FormValue("client_id")
 				secret = req.FormValue("client_secret")
-				grantTypeStr = req.FormValue("grant_type")
-			} else if req.Body != nil {
-				// Assume JSON
-				decoder := json.NewDecoder(req.Body)
-				data := &CreateAccessTokenJson{}
-				if err := decoder.Decode(data); err != nil {
-					fmt.Println("Failed to decode JSON: ", err)
-					connector.ToOAuthError(err).WriteResponse(rw, jsonProducer)
-					return
-				}
-				id = data.ClientID
-				secret = data.ClientSecret
-				grantTypeStr = data.GrantType
-			} else {
-				fmt.Println("No request parameters found")
-				connector.NewOAuthError(cerrors.InvalidRequestErrorType,
-					"No request body provided").WriteResponse(rw, jsonProducer)
+			}
+			if req.FormValue("code") != "" {
+				code = req.FormValue("code")
+			}
+			grantTypeStr = req.FormValue("grant_type")
+		} else if req.Body != nil {
+			// Assume JSON
+			decoder := json.NewDecoder(req.Body)
+			data := &CreateAccessTokenJson{}
+			if err := decoder.Decode(data); err != nil {
+				fmt.Println("Failed to decode JSON: ", err)
+				connector.ToOAuthError(err).WriteResponse(rw, jsonProducer)
 				return
 			}
+			if data.ClientID != "" && data.ClientSecret != "" {
+				id = data.ClientID
+				secret = data.ClientSecret
+			}
+			if data.Code != "" {
+				code = data.Code
+			}
+			grantTypeStr = data.GrantType
+		} else {
+			fmt.Println("No request parameters found")
+			connector.NewOAuthError(cerrors.InvalidRequestErrorType,
+				"No request body provided").WriteResponse(rw, jsonProducer)
+			return
 		}
 
 		var gt GrantType
@@ -178,7 +187,7 @@ func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.
 
 		tokReq := &TokenRequest{
 			ContentType:  "application/x-www-form-urlencoded",
-			Code:         req.FormValue("code"),
+			Code:         code,
 			AuthHeader:   ok,
 			ClientID:     id,
 			ClientSecret: secret,
