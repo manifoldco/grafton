@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.14.6] - 2019-01-07
+## [0.14.6] - 2019-01-010
 
 ### Fixed
 
 -  Exit code when tests pass/fail
+-  Fixed the fake connector expecting `application/x-www-form-urlencoded` for authorization codes even when using json
+-  Fixed the fake connector overwriting the Authorization header when providing a body
 
 ## [0.14.5] - 2018-11-28
 
