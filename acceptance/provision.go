@@ -81,7 +81,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()
 		var err error
-		_, _, async, err := provisionResource(ctx, api, product, plan, planFeatures, "faulty-region")
+		_, _, async, err := provisionResource(ctx, api, product, plan, planFeatures, "faulty::region")
 
 		gm.Expect(async).To(
 			gm.BeFalse(),

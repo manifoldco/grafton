@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Faulty region name on acceptance test didn't follow format defined on spec
+
 ## [0.14.6] - 2019-01-10
 
 ### Fixed
