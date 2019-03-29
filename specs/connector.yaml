@@ -370,6 +370,52 @@ paths:
         404: { $ref: '#/responses/NotFound' }
         500: { $ref: '#/responses/Internal' }
 
+  /credential-rotations/{rotation_id}:
+    x-manifold-audience: provider
+    put:
+      summary: Start a credential rotation
+      description: |
+        **ALPHA**
+        A provider can call this endpoint to trigger a credential rotation for
+        a specific credential. This route supports being called multiple times
+        with the same payload.
+
+        In the case of network or other unexpected errors (such as a `500 Internal
+        Server Error`), the provider may issue a request more than once with the same
+        payload and `rotation_id` to be guaranteed that the operation will run exactly once.
+
+        **Building a `rotation_id`**
+
+        Different rotations must have a different `rotation_id`. A good way to achieve
+        uniqueness would be to make these ids a uuid (Universally unique identifier).
+        Also make sure to reuse the `rotation_id` when retrying the same rotation to not
+        trigger duplicate rotations.
+      parameters:
+        - name: rotation_id
+          in: path
+          description: |
+            ID of a the credential-rotations, stored as a base32 encoded 18 byte identifier.
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Resource Provisioning Request
+          required: true
+          schema:
+            $ref: '#/definitions/CredentialRotationRequest'
+      tags:
+        - CredentialRotation
+      responses:
+        202:
+          description: |
+            Acknowledgement of the credential rotation request.
+
+            Manifold will start proccessing the request asynchronously.
+        400: { $ref: '#/responses/BadRequest' }
+        401: { $ref: '#/responses/Unauthorized' }
+        404: { $ref: '#/responses/NotFound' }
+        500: { $ref: '#/responses/Internal' }
+
   /callbacks/{id}:
     x-manifold-audience: provider
     put:
@@ -994,6 +1040,19 @@ definitions:
       - usage
       - feature
       - feature_value
+
+  CredentialRotationRequest:
+    description: |
+      The information on the credential rotation to perform.
+    type: object
+    properties:
+      resource_id: { $ref: '#/definitions/ID' }
+      credential_id: { $ref: '#/definitions/ID' }
+      reason: { type: string, minLength: 3, maxLength: 256 }
+    required:
+      - resource_id
+      - credential_id
+      - reason
 
   CallbackResponse:
     type: object
