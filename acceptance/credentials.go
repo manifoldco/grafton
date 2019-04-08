@@ -21,37 +21,7 @@ var credentialID manifold.ID
 
 var creds = Feature("credentials", "Create a credential set", func(ctx context.Context) {
 	Default(func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-
-		cID, creds, callbackID, async, err := provisionCredentials(ctx, api, resourceID)
-		gm.Expect(err).To(notError(), "Expected a successful provision of Credentials")
-
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.BeNumerically(">", 0),
-				"One or more credential should be returned during provision of a Credential set",
-			)
-		}
-
-		gm.Expect(len(creds)).To(
-			gm.BeNumerically(">", 0),
-			"One or more credentials should be returned during provision of a Credential set",
-		)
-
-		for name := range creds {
-			gm.Expect(grafton.ValidCredentialName(name)).To(
-				gm.BeTrue(), "Credential name must be of the form "+grafton.NameRegexpString)
-		}
+		cID, _ := mustProvisionCredentials(ctx, api, resourceID)
 
 		credentialID = cID
 	})
@@ -124,27 +94,7 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 
 var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 	Default(func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-		callbackID, async, err := deprovisionCredentials(ctx, api, credentialID)
-		gm.Expect(err).To(notError(), "No error is expected")
-
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.Equal(0),
-				"Credentials cannot be returned on a deprovisioning callback",
-			)
-		}
+		mustDeprovisionCredentials(ctx, api, credentialID)
 	})
 
 	ErrorCase("delete credentials that do not exist", func() {
@@ -173,6 +123,42 @@ var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 })
 
 var _ = creds.RunsInside("provision")
+
+func mustProvisionCredentials(ctx context.Context, api *grafton.Client, resourceID manifold.ID) (manifold.ID, map[string]string) {
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	cID, creds, callbackID, async, err := provisionCredentials(ctx, api, resourceID)
+	gm.Expect(err).To(notError(), "Expected a successful provision of a new set of Credentials")
+
+	if async {
+		c := fakeConnector.GetCallback(callbackID)
+		gm.Expect(c.State).To(
+			gm.Equal(connector.DoneCallbackState),
+			"Expected to receive 'done' as the state",
+		)
+		gm.Expect(len(c.Message)).To(gm.SatisfyAll(
+			gm.BeNumerically(">=", 3),
+			gm.BeNumerically("<", 256),
+		), "Message must be between 3 and 256 characters long.")
+		gm.Expect(len(c.Credentials)).To(
+			gm.BeNumerically(">", 0),
+			"One or more credential should be returned during provision of a new Credential set",
+		)
+	}
+
+	gm.Expect(len(creds)).To(
+		gm.BeNumerically(">", 0),
+		"One or more credentials should be returned during provision of a new Credential set",
+	)
+
+	for name := range creds {
+		gm.Expect(grafton.ValidCredentialName(name)).To(
+			gm.BeTrue(), "Credential name must be of the form "+grafton.NameRegexpString)
+	}
+
+	return cID, creds
+}
 
 func provisionCredentials(ctx context.Context, api *grafton.Client, resourceID manifold.ID) (manifold.ID, map[string]string, manifold.ID, bool, error) {
 	Infof("Attempting to provision credentials for resource: %s\n", resourceID)
@@ -225,6 +211,31 @@ func provisionCredentialsID(ctx context.Context, api *grafton.Client, credential
 	})
 
 	return credentialID, creds, c.ID, callback, nil
+}
+
+func mustDeprovisionCredentials(ctx context.Context, api *grafton.Client, credentialID manifold.ID) {
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	callbackID, async, err := deprovisionCredentials(ctx, api, credentialID)
+	gm.Expect(err).To(notError(), "No error is expected")
+
+	if async {
+		c := fakeConnector.GetCallback(callbackID)
+
+		gm.Expect(c.State).To(
+			gm.Equal(connector.DoneCallbackState),
+			"Expected to receive 'done' as the state",
+		)
+		gm.Expect(len(c.Message)).To(gm.SatisfyAll(
+			gm.BeNumerically(">=", 3),
+			gm.BeNumerically("<", 256),
+		), "Message must be between 3 and 256 characters long.")
+		gm.Expect(len(c.Credentials)).To(
+			gm.Equal(0),
+			"Credentials cannot be returned on a deprovisioning callback",
+		)
+	}
 }
 
 func deprovisionCredentials(ctx context.Context, api *grafton.Client, credentialID manifold.ID) (manifold.ID, bool, error) {

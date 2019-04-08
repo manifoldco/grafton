@@ -2,125 +2,100 @@ package acceptance
 
 import (
 	"context"
-	"time"
 
-	"github.com/manifoldco/go-manifold"
-	merrors "github.com/manifoldco/go-manifold/errors"
-	"github.com/manifoldco/go-manifold/idtype"
 	gm "github.com/onsi/gomega"
 
-	"github.com/manifoldco/grafton"
-	"github.com/manifoldco/grafton/connector"
+	"github.com/manifoldco/go-manifold"
 )
 
-var rotatedCredentialID manifold.ID
+var rotationTearDown func(context.Context)
 
-var rotateCreds = Feature("credentials_rotation", "Credential rotation", func(ctx context.Context) {
-	// TODO: Change this to a bunch of ifs using the rotation type flag
-	rotateCredsMultipleManual(ctx)
+var rotateCreds = Feature("credentials-rotation", "Credential rotation", func(ctx context.Context) {
+	switch credentialRotationType {
+	case "manual":
+		switch credentialType {
+		case "single":
+			featureRotateCredsSingleManual(ctx)
+		case "multiple":
+			featureRotateCredsMultipleManual(ctx)
+		default:
+			Default(func() {
+				FatalErr("unknown credentialType %s", credentialType)
+			})
+		}
+	case "automatic":
+		switch credentialType {
+		case "single":
+			Default(func() {
+				FatalErr("automatic single credential rotation test not implemented")
+			})
+		case "multiple":
+			Default(func() {
+				FatalErr("automatic multiple credential rotation test not implemented")
+			})
+		default:
+			Default(func() {
+				FatalErr("unknown credentialType %s", credentialType)
+			})
+		}
+	case "none":
+		// No tests
+		Default(func() {})
+	default:
+		Default(func() {
+			FatalErr("unknown credentialRotationType %s", credentialRotationType)
+		})
+	}
 })
 
-func rotateCredsMultipleManual(ctx context.Context) {
+var _ = rotateCreds.TearDown("credentials-rotation", func(ctx context.Context) {
+	rotationTearDown(ctx)
+})
+
+func featureRotateCredsSingleManual(ctx context.Context) {
+	var rotatedCredentialID manifold.ID
 	Default(func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
+		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 
-		cID, creds, callbackID, async, err := provisionCredentials(ctx, api, resourceID)
-		gm.Expect(err).To(notError(), "Expected a successful provision of a new set of Credentials")
+		// delete initial credential before creating new one
+		mustDeprovisionCredentials(ctx, api, initialCredID)
 
-		if async {
-			c := fakeConnector.GetCallback(callbackID)
-			gm.Expect(c.State).To(
-				gm.Equal(connector.DoneCallbackState),
-				"Expected to receive 'done' as the state",
-			)
-			gm.Expect(len(c.Message)).To(gm.SatisfyAll(
-				gm.BeNumerically(">=", 3),
-				gm.BeNumerically("<", 256),
-			), "Message must be between 3 and 256 characters long.")
-			gm.Expect(len(c.Credentials)).To(
-				gm.BeNumerically(">", 0),
-				"One or more credential should be returned during provision of a new Credential set",
-			)
-		}
+		rID, rotatedValues := mustProvisionCredentials(ctx, api, resourceID)
+		rotatedCredentialID = rID
 
-		gm.Expect(len(creds)).To(
-			gm.BeNumerically(">", 0),
-			"One or more credentials should be returned during provision of a new Credential set",
-		)
+		// assert initial and rotated are not the same
+		gm.Expect(rotatedValues).ToNot(
+			gm.Equal(initialValues), "Different credentials expected for new Credential Set")
 
-		for name := range creds {
-			gm.Expect(grafton.ValidCredentialName(name)).To(
-				gm.BeTrue(), "Credential name must be of the form "+grafton.NameRegexpString)
-		}
-
-		rotatedCredentialID = cID
 	})
 
-	ErrorCase("with an invalid resource ID", func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-		var err error
+	rotationTearDown = func(ctx context.Context) {
+		Default(func() {
+			mustDeprovisionCredentials(ctx, api, rotatedCredentialID)
+		})
+	}
+}
 
-		fakeResourceID, _ := manifold.NewID(idtype.Resource)
-		_, _, _, async, err := provisionCredentials(ctx, api, fakeResourceID)
+func featureRotateCredsMultipleManual(ctx context.Context) {
+	var rotatedCredentialID manifold.ID
+	Default(func() {
+		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
+		rID, rotatedValues := mustProvisionCredentials(ctx, api, resourceID)
+		rotatedCredentialID = rID
 
-		gm.Expect(async).To(
-			gm.BeFalse(),
-			"Validation errors should be returned on the initial request",
-		)
-		gm.Expect(err).ShouldNot(
-			gm.BeNil(),
-			"Expected an error, got nil",
-		)
-		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&grafton.Error{}),
-			"Expected a grafton error, got %T", err,
-		)
+		// assert initial and rotated are not the same
+		gm.Expect(rotatedValues).ToNot(
+			gm.Equal(initialValues), "Different credentials expected for new Credential Set")
 
-		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
+		// delete initial credential
+		mustDeprovisionCredentials(ctx, api, initialCredID)
 	})
 
-	ErrorCase("with already provisioned credentials - same content acts as created", func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-		var err error
-
-		_, _, _, async, err := provisionCredentialsID(ctx, api, rotatedCredentialID, resourceID)
-
-		gm.Expect(async).To(
-			gm.BeFalse(),
-			"Same content should be evaluated during the initial call from Manifold",
-		)
-		gm.Expect(err).To(
-			notError(),
-			"Create response should be returned (Repeatable Action)",
-		)
-	})
-
-	ErrorCase("with a bad signature", func() {
-		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-
-		_, _, _, async, err := provisionCredentials(ctx, uapi, resourceID)
-
-		gm.Expect(async).To(
-			gm.BeFalse(),
-			"Validation errors should be returned on the initial request",
-		)
-		gm.Expect(err).ShouldNot(
-			gm.BeNil(),
-			"Expected an error, got nil",
-		)
-		gm.Expect(err).Should(
-			gm.BeAssignableToTypeOf(&grafton.Error{}),
-			"Expected a grafton error, got %T", err,
-		)
-
-		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError))
-	})
+	rotationTearDown = func(ctx context.Context) {
+		Default(func() {
+			mustDeprovisionCredentials(ctx, api, rotatedCredentialID)
+		})
+	}
 }
 
 var _ = rotateCreds.RunsInside("provision")
