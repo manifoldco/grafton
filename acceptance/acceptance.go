@@ -27,6 +27,8 @@ var region string
 var newPlan string
 var newPlanFeatures manifold.FeatureMap
 var resourceMeasures map[string]int64
+var credentialType string
+var credentialRotationType string
 
 var clientID string
 var clientSecret string
@@ -66,6 +68,8 @@ func Configure(cfg Configuration) error {
 	planFeatures = cfg.PlanFeatures
 	newPlan = cfg.NewPlan
 	newPlanFeatures = cfg.NewPlanFeatures
+	credentialType = "single"
+	credentialRotationType = "none"
 
 	clientID = cfg.ClientID
 	clientSecret = cfg.ClientSecret
