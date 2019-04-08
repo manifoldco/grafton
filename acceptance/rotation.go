@@ -48,13 +48,16 @@ var rotateCreds = Feature("credentials-rotation", "Credential rotation", func(ct
 	}
 })
 
-var _ = rotateCreds.TearDown("credentials-rotation", func(ctx context.Context) {
+var _ = rotateCreds.TearDown("Remove created Credentials", func(ctx context.Context) {
+	if rotationTearDown == nil {
+		return
+	}
 	rotationTearDown(ctx)
 })
 
 func featureRotateCredsSingleManual(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	Default(func() {
+	block("Default case: manual rotation with single credentials", func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 
 		// delete initial credential before creating new one
@@ -78,7 +81,7 @@ func featureRotateCredsSingleManual(ctx context.Context) {
 
 func featureRotateCredsMultipleManual(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	Default(func() {
+	block("Default case: manual rotation with multiple credentials", func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 		rID, rotatedValues := mustProvisionCredentials(ctx, api, resourceID)
 		rotatedCredentialID = rID
