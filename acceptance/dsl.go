@@ -103,6 +103,11 @@ func Default(fn func()) {
 	block("Default case", fn)
 }
 
+// Case represents a test case of a feature.
+func Case(name string, fn func()) {
+	block(name, fn)
+}
+
 // ErrorCase represents an error case for a feature. These are optionally tested
 // based on command line flags.
 //
