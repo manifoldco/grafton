@@ -32,27 +32,31 @@ required=[
 
 [[constraint]]
   name = "github.com/manifoldco/go-base32"
+  version = "1.0.3"
 
 [[constraint]]
   name = "github.com/manifoldco/go-base64"
-  version = "1.0.0"
+  version = "1.0.2"
 
 [[constraint]]
   name = "github.com/manifoldco/go-connector"
+  version = "0.0.3"
 
 [[constraint]]
   name = "github.com/manifoldco/go-jwt"
+  version = "0.1.2"
 
 [[constraint]]
   name = "github.com/manifoldco/go-manifold"
-  branch = "master"
+  version = "0.10.11"
 
 [[constraint]]
   name = "github.com/manifoldco/go-signature"
-  version = "1.0.0"
+  version = "1.0.2"
 
 [[constraint]]
   name = "github.com/manifoldco/promptui"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/onsi/gomega"
