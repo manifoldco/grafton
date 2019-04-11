@@ -3,7 +3,7 @@ module github.com/manifoldco/grafton
 require (
 	github.com/PuerkitoBio/purell v1.1.0 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/alecthomas/gometalinter v2.0.11+incompatible
+	github.com/alecthomas/gometalinter v3.0.0+incompatible
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/client9/misspell v0.3.4
 	github.com/go-openapi/analysis v0.0.0-20170813233457-8ed83f2ea9f0 // indirect
@@ -45,8 +45,8 @@ require (
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
 	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli v1.20.0
-	golang.org/x/crypto v0.0.0-20181126144156-c05539cddb59
-	golang.org/x/net v0.0.0-20181114220301-adae6a3d119a
+	golang.org/x/crypto v0.0.0-20190411141940-e7b772b7007a
+	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
