@@ -727,7 +727,6 @@
     "github.com/go-swagger/go-swagger/cmd/swagger",
     "github.com/go-zoo/bone",
     "github.com/gobuffalo/packr",
-    "github.com/golang/lint/golint",
     "github.com/gordonklaus/ineffassign",
     "github.com/manifoldco/go-base32",
     "github.com/manifoldco/go-base64",
