@@ -18,12 +18,12 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  digest = "1:9865e581594e813752f032bca754a8d2bf650a50d0bf6a341e2478fc12738a15"
+  digest = "1:80afadfd05cefd407063c0809d333005408a97fbc9e36d54ae737be45278b0cd"
   name = "github.com/alecthomas/gometalinter"
   packages = ["."]
   pruneopts = ""
-  revision = "bae2f1293d092fd8167939d5108d1b025eaef9de"
-  version = "v1.2.1"
+  revision = "df395bfa67c5d0630d936c0044cf07ff05086655"
+  version = "v3.0.0"
 
 [[projects]]
   branch = "master"
@@ -215,17 +215,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f4cce2f25cba2320e395024199e522bec501a6bac16fba684071213581bad0f4"
-  name = "github.com/golang/lint"
-  packages = [
-    ".",
-    "golint",
-  ]
-  pruneopts = ""
-  revision = "6aaf7c34af0f4c36a57e0c429bace4d706d8e931"
-
-[[projects]]
-  branch = "master"
   digest = "1:3769ba35c72b455e88feb7d67b62ce983f7bc6abc0de04daa1d8b61e1112845e"
   name = "github.com/google/shlex"
   packages = ["."]
@@ -349,43 +338,42 @@
   revision = "3fd5e860b68f3cc81671ece2e226c78a6bbf54d3"
 
 [[projects]]
-  digest = "1:50213f22569eeddff2b6880935f742aa52afa61a6baad35c3d460f80d1dccc0b"
+  digest = "1:9bc2e4e47a13c022c29b9bf1d9a118f6487fb34485d63b24c1e1c76f0d3da52e"
   name = "github.com/manifoldco/go-base32"
   packages = ["."]
   pruneopts = ""
-  revision = "b6687e64fc5e75d8bb58badb858d79c46b0eee96"
-  version = "v1.0.0"
+  revision = "47b2838451516c36d06986c7b85bf1355522ecbb"
+  version = "v1.0.3"
 
 [[projects]]
-  digest = "1:86b2b7746c42a4cb645c3dc1d8a38b94f383f4c33470a1f3be36219e06ff1a85"
+  digest = "1:fdf20a392670c38428ab949d052282336672befe674da875f098c46e401981ca"
   name = "github.com/manifoldco/go-base64"
   packages = ["."]
   pruneopts = ""
-  revision = "bb5e620cf51d2bbe78e624a2c27117655ce73acc"
-  version = "v1.0.0"
+  revision = "d8a3bc878677ec951dce1a0065759d2e3a0f4142"
+  version = "v1.0.2"
 
 [[projects]]
-  digest = "1:b88a79f67d66dc09d1c4293e69fe335bb61ba933b809a6a01348e8babaf19f2c"
+  digest = "1:de877e6af958c53832a8c2dd1681a0b64549c9329eda00f2144fea307e757b62"
   name = "github.com/manifoldco/go-connector"
   packages = [
     ".",
     "errors",
   ]
   pruneopts = ""
-  revision = "cddc02c8c32b7a7d82d481c9b7c4ba2f0eaee65f"
-  version = "v0.0.1"
+  revision = "d4834402847d103ca5db5edaf31b8eb49def0451"
+  version = "v0.0.3"
 
 [[projects]]
-  digest = "1:c83c53302f033784d8dcdc2f5e6fdd3cc4d771c6a1982cc010f7e0e7c67de981"
+  digest = "1:5f9611d12e2d6b76903d474c68ca6faa5922810412358aab56a6e8db2efc6f03"
   name = "github.com/manifoldco/go-jwt"
   packages = ["."]
   pruneopts = ""
-  revision = "f2e996517b3d7de4f17b8bbfa64d2d396f302bb1"
-  version = "v0.1.0"
+  revision = "3523b09ac66324023c0ce662e835570098168118"
+  version = "v0.1.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:87bdcee06945ea19578b563fa84bfa9c1742c3a6c65a5923bd8336bc60b323eb"
+  digest = "1:18a1573138b3798a7a3d1d09b730c9652397bd16189c4a16ae2110598abb2598"
   name = "github.com/manifoldco/go-manifold"
   packages = [
     ".",
@@ -393,21 +381,23 @@
     "idtype",
     "names",
     "names/data",
+    "number",
   ]
   pruneopts = ""
-  revision = "b689ac97b9312ca887f252291a5ae64ade6f3e87"
+  revision = "8458bf091a9e8b6242d12d26f08571ca3acc483d"
+  version = "v0.10.11"
 
 [[projects]]
-  digest = "1:5d5b8f6ea19a6f507e881790bc0ea2316c487c7ef674630b1ee7bffa5fc2b1a9"
+  digest = "1:5a6feb5b2776c613e844c260f6555002d52ea849b5b920674ced9d820f7a499d"
   name = "github.com/manifoldco/go-signature"
   packages = ["."]
   pruneopts = ""
-  revision = "b948ef70772bc297c188970439dc479230833597"
-  version = "v1.0.0"
+  revision = "f2123e23704000c075444396fbe23cdfa0732ddc"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
-  digest = "1:087b3dbb479e22abc4aa96c435a48ccf138cc33d81377bb1064f61398a1c3aa2"
+  digest = "1:74082d8597bf7652ef27a523afcfc9f08be370e2586477c30b63c83a26f23803"
   name = "github.com/manifoldco/promptui"
   packages = [
     ".",
@@ -415,7 +405,7 @@
     "screenbuf",
   ]
   pruneopts = ""
-  revision = "ec3d3b6d896f047545120a282951f24815db552c"
+  revision = "35bab80e16a4de256e470efb31775342cec6f3cc"
 
 [[projects]]
   digest = "1:9ea83adf8e96d6304f394d40436f2eb44c1dc3250d223b74088cc253a6cd0a1c"
@@ -590,6 +580,17 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:99dc4c94284ccd0d515bc11c906edcc33da407af228c6cf75b6f20e2cd3e6ab6"
+  name = "golang.org/x/lint"
+  packages = [
+    ".",
+    "golint",
+  ]
+  pruneopts = ""
+  revision = "959b441ac422379a43da2230f62be024250818b0"
+
+[[projects]]
+  branch = "master"
   digest = "1:1418c6b5c10b5e07fb4c90a24227f6493e19ad4d31177d66458115fc47669fb5"
   name = "golang.org/x/net"
   packages = [
@@ -746,6 +747,7 @@
     "github.com/tsenart/deadcode",
     "github.com/urfave/cli",
     "golang.org/x/crypto/ed25519",
+    "golang.org/x/lint/golint",
     "golang.org/x/net/context",
     "honnef.co/go/tools/cmd/gosimple",
   ]
