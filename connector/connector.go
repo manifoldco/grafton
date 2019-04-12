@@ -209,7 +209,7 @@ func callbackEqual(cb *Callback, s CallbackState, msg string, creds map[string]s
 func (c *FakeConnector) capturer(route string) *RequestCapturer {
 	r := &RequestCapturer{
 		Route:    route,
-		requests: make([]interface{}, 0, 0),
+		requests: make([]interface{}, 0),
 	}
 
 	c.capturers[route] = r

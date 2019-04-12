@@ -2,11 +2,12 @@ package connector
 
 import (
 	"encoding/base64"
-	gm "github.com/onsi/gomega"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	gm "github.com/onsi/gomega"
 )
 
 func TestCreateAccessTokenHandler(t *testing.T) {

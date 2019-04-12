@@ -8,9 +8,10 @@ import (
 
 	"golang.org/x/crypto/ed25519"
 
+	"github.com/urfave/cli"
+
 	"github.com/manifoldco/go-base64"
 	"github.com/manifoldco/go-signature"
-	"github.com/urfave/cli"
 )
 
 // keypair represents a Master Public Keypair used for generating and endorsing
@@ -105,7 +106,7 @@ func (k *keypair) liveKeypair() (*liveKeypair, error) {
 			PublicKey:  pubKey,
 			PrivateKey: privKey,
 		},
-		Endorsement: base64.New([]byte(sig)),
+		Endorsement: base64.New(sig),
 	}
 
 	return c, nil

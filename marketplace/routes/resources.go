@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-zoo/bone"
+
 	"github.com/manifoldco/go-manifold/idtype"
 	"github.com/manifoldco/grafton"
 
@@ -86,7 +87,7 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 		r := &db.Resource{
 			ID:        id,
 			Name:      manifold.Name(name),
-			Label:     manifold.Label(name),
+			Label:     name,
 			Plan:      manifold.Label(data.Plan),
 			Product:   manifold.Label(data.Product),
 			Region:    data.Region,
@@ -114,7 +115,7 @@ func PostResourcesHandler(d *db.DB, gc *grafton.Client,
 			ID:       r.ID,
 			Product:  string(r.Product),
 			Plan:     string(r.Plan),
-			Region:   string(r.Region),
+			Region:   r.Region,
 			Features: r.Features,
 		})
 

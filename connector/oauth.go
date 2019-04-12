@@ -129,7 +129,8 @@ func hasFormValues(req *http.Request) bool {
 	return ct == "application/x-www-form-urlencoded" || ct == "multipart/form-data"
 }
 
-type CreateAccessTokenJson struct {
+// CreateAccessTokenJSON creates an access token as json
+type CreateAccessTokenJSON struct {
 	GrantType    string `json:"grant_type"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
@@ -152,7 +153,7 @@ func createAccessTokenHandler(c *FakeConnector, capturer *RequestCapturer) http.
 		} else if req.Body != nil {
 			// Assume JSON
 			decoder := json.NewDecoder(req.Body)
-			data := &CreateAccessTokenJson{}
+			data := &CreateAccessTokenJSON{}
 			if err := decoder.Decode(data); err != nil {
 				fmt.Println("Failed to decode JSON: ", err)
 				connector.ToOAuthError(err).WriteResponse(rw, jsonProducer)

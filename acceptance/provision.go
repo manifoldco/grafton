@@ -20,7 +20,6 @@ import (
 
 var errTimeout = errors.New("Exceeded Callback Wait time")
 var resourceID manifold.ID
-var curResource *db.Resource
 
 var provision = Feature("provision", "Provision a resource", func(ctx context.Context) {
 	Default(func() {
