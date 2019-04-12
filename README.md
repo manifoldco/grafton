@@ -108,7 +108,7 @@ _Note_ : resource-measures is a test you are ONLY required to pass if you are us
 
 ## Releasing
 
-Releasing grafton is a manual process run on a developers local machine.
+Releasing grafton uses [promulgate](https://github.com/manifoldco/promulgate).
 
 1. Ensure all of the required code has been merged into master.
 2. Determine whether or not the `CHANGELOG.md` is up to date and correct for
@@ -116,11 +116,8 @@ Releasing grafton is a manual process run on a developers local machine.
 3. Create a tag off master (following [semver](http://semver.org/)), which
    includes the up to date `CHANGELOG.md` (and matches the remote sha of master
    on github).
-4. Build grafton locally from scratch (`make clean; make`)
-5. Create the build zips (`make zips`)
-6. Create a release on github for the tag which includes the changelog for this
-   release and upload the build zips.
-7. Done!
+4. Done! Promulgate via Travis will take care of creating the binaries and
+   uploading the zip files.
 
 ## On editing the OpenAPI spec
 
