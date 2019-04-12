@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.14.7] - 2019-04-12
+
+### Added
+
+- Travis build on go 1.12
+- Golangci lint in favour of gometalinter which is deprecated
+- Code coverage to travis
+
+### Removed
+
+- Travis build for go 1.9 and 1.10
+- go dep support
+
 ### Fixed
 
 - Faulty region name on acceptance test didn't follow format defined on spec
