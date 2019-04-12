@@ -1,8 +1,7 @@
 language: go
 go:
-- 1.9.x
-- 1.10.x
 - 1.11.x
+- 1.12.x
 branches:
   only:
   - master
@@ -15,10 +14,9 @@ before_install:
 - mkdir -p $HOME/gopath/bin
 install:
 - export PATH=$PATH:$TRAVIS_BUILD_DIR/vendor/bin:$GOPATH/bin
-- make bootstrap
 after_success:
-  # only report coverage for go-version 1.11
-  - if [[ $TRAVIS_GO_VERSION =~ ^1\.11 ]] ; then bash <(curl -s https://codecov.io/bash) -f all-cover.txt; fi
+  # only report coverage for go-version 1.12
+  - if [[ $TRAVIS_GO_VERSION =~ ^1\.12 ]] ; then bash <(curl -s https://codecov.io/bash) -f all-cover.txt; fi
 notifications:
   slack:
     secure: QogbolWEjUXgs4g33wCZIpK6LYqmTnujgsTIkJSr0IbkdF3LZXMa8frxldksv8p7njIjnFanNd5D47TlJ6caqT6K52QP6Puf0rVKkYpIjpuk1nObphHjC/mvZEBjsjLQzR9vNYqJwkUrbc4dLTQKV2NrS8hOSS5kDHmsNJfsv4WfGVohZp/pCWDkLhOHZflrHZkNlvqp6gfVY6P5GJw8Q4U0sA0z/9Y0xNoCaWYJpHu3Y/DBG7DuCZCrJt6zF0a7Bpzy5Fd01kfF8F6GwZGpm3FQ4X6HuheJVfQON5hJ+M9/uDPHvl4TM5gNE7kvEbLyUDlmhMj04rwgfBpm1Svg7h1cMr1MQUPURJClxkIDJGY+8eNVYKGibhaSUYUYTo3h/nE8dMmLKdAwdJZRrq6WmEtbWodQq++jeAGqkWk0+RK88GSEKN2xcl2ygOlOCkIo4SP+7CE9bAqzWjx+1Ssw5NHhgjGd4JKuXkOf099czgLwbScxr1jTW/LCFS060KoNoYdDy01kHy3+ysTlAmeTjKSEXaMuyBjg3MVVrBoQEK+4j2EnRWrYHRWW8R1MOVkAMAKRk/UgXNzFl9GhMrveBxiqKnYv+2ZqhQuxYR46ktW/xdm0c+dJlorFlgmRV1CsSNAYxvNPP8ZYVGquv0fqH2Aa/PEVfgxoX1SnZQ86bKs=
