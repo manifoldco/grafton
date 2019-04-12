@@ -42,7 +42,7 @@ func (db *DB) GetResource(id manifold.ID) *Resource {
 func (db *DB) DeleteResource(id manifold.ID) bool {
 	_, ok := db.ResourcesByID[id]
 	if ok {
-		cs, _ := db.CredentialsByResource[id]
+		cs := db.CredentialsByResource[id]
 		for _, c := range cs {
 			db.DeleteCredential(c.ID)
 		}

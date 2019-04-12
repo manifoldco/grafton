@@ -11,12 +11,8 @@ PROMULGATE_VERSION=0.0.9
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))
 
-LINTERS=$(shell grep "// lint" tools.go | awk '{gsub(/\"/, "", $$1); print $$1}' | awk -F / '{print $$NF}') \
-	gofmt \
-	vet
-
 all: ci
-ci: $(LINTERS) cover build
+ci: lint cover build
 
 .PHONY: all ci
 
@@ -75,11 +71,21 @@ all-cover.txt:
 
 cover: vendor generated all-cover.txt $(COVER_TEST_PKGS:=-cover)
 
-$(LINTERS): %: vendor/bin/gometalinter %-bin vendor generated
-	PATH=`pwd`/vendor/bin:$$PATH gometalinter --tests --disable-all --vendor \
-	     --deadline=5m -s data --skip generated --enable $@
+.golangci.gen.yml: .golangci.yml
+	$(shell awk '/enable:/{y=1;next} y == 0 {print}' $< > $@)
 
-.PHONY: cover $(LINTERS) $(COVER_TEST_PKGS:=-cover)
+LINTERS=$(filter-out megacheck,$(shell awk '/enable:/{y=1;next} y != 0 {print $$2}' .golangci.yml))
+
+lint: vendor/bin/golangci-lint vendor .golangci.gen.yml 
+	$< run -c .golangci.gen.yml $(LINTERS:%=-E %) ./...
+	$< run -c .golangci.gen.yml -E megacheck ./...
+#  Run imports separately because it can cause golangci to hang when it encounters build issues
+#  holding up all other tests, it is also quite long, so the separation allows us to get speedier
+#  validation through earlier completion of the lighter weight tests when running manually.
+#  As of writing this I don't believe it is taking long enough to justify a separate travis job
+	$< run -c .golangci.gen.yml -E goimports ./...
+
+.PHONY: lint cover $(COVER_TEST_PKGS:=-cover)
 
 #################################################
 # Code generation
