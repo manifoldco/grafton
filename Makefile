@@ -131,6 +131,18 @@ $(PREFIX)bin/grafton$(SUFFIX): $(GRAFTON_DEPS)
 
 .PHONY: build
 
+#################################################
+# Test against sample provider
+#################################################
+
+sample-provider:
+	GO111MODULE=on go get -u github.com/manifoldco/go-sample-provider/cmd/server
+	GO111MODULE=on go build -i -o bin/sample-provider github.com/manifoldco/go-sample-provider/cmd/server
+	./bin/grafton generate
+	./bin/sample-provider --test --grafton-path="./bin/grafton"
+	GO111MODULE=on go mod tidy
+
+.PHONY: sample-provider
 
 #################################################
 # Releasing

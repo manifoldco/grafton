@@ -46,3 +46,5 @@ require (
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1
 	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 )
+
+replace sourcegraph.com/sourcegraph/go-diff v0.5.1 => github.com/sourcegraph/go-diff v0.5.1
