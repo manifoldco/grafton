@@ -53,6 +53,7 @@ type Configuration struct {
 	Port             uint
 	CallbackTimeout  string
 	ResourceMeasures string
+	Credential       string
 }
 
 // Configure configures all the values needed to run the acceptance tests.
@@ -67,7 +68,7 @@ func Configure(cfg Configuration) error {
 	planFeatures = cfg.PlanFeatures
 	newPlan = cfg.NewPlan
 	newPlanFeatures = cfg.NewPlanFeatures
-	credentialType = "unknown"
+	credentialType = cfg.Credential
 
 	clientID = cfg.ClientID
 	clientSecret = cfg.ClientSecret

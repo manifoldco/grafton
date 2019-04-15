@@ -108,6 +108,11 @@ func init() {
 				Usage: "Optional measures map to be returned by resource measures",
 				Value: `{"feature-a": 0, "feature-b": 1000}`,
 			},
+			cli.StringFlag{
+				Name:  "credential",
+				Usage: "Describes the credential type that is supported by this product. One of (single, multiple)",
+				Value: "multiple",
+			},
 		},
 		Action: testCmd,
 	}
@@ -133,6 +138,8 @@ func testCmd(ctx *cli.Context) error {
 	callbackTimeout := ctx.String("callback-timeout")
 
 	resourceMeasures := ctx.String("resource-measures")
+
+	credential := ctx.String("credential")
 
 	var logLevel acceptance.LogLevel
 	rawLevel := ctx.String("log")
@@ -265,6 +272,7 @@ func testCmd(ctx *cli.Context) error {
 		Port:             connectorPort,
 		CallbackTimeout:  callbackTimeout,
 		ResourceMeasures: resourceMeasures,
+		Credential:       credential,
 	}
 
 	if err := acceptance.Configure(cfg); err != nil {
