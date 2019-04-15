@@ -106,7 +106,33 @@ A full list of available tests you can exclude (which is all of them):
 
 _Note_ : resource-measures is a test you are ONLY required to pass if you are using metered pricing.  If you are not, you can exclude it.
 
-## Releasing
+## Developing
+
+### Backward compatibility
+
+We strongly enforce Grafton changes to be backward compatible, which means changes 
+to the API should not break existing clients. If a breaking change is necessary, it
+should be done either as a new endpoint or a new spec version, eg: v2.
+
+In order to guarantee compatibility, we expect any API change to also be implemented
+for our [go example client](https://github.com/manifoldco/go-sample-provider) first,
+before the change can be approved in Grafton. Our CI takes cares of getting the latest
+version of the client and test against the new changes.
+
+### OpenAPI spec
+
+`provider.yaml` is a manual copy of an internally generated file. It, in
+turn, is used to generate the client code under `generated`.
+
+Until we automate more of this, the following has to be kept in mind:
+- Any changes to `provider.yaml` should not be merged here directly, but
+  instead ported to the internal file first.
+- If the internal source of `provider.yaml` changes, the updates must be brought
+  over here.
+- Whenever `provider.yaml` changes, `make generated-clients` should be run, and the
+  changes to the generated code should be checked in.
+
+### Releasing
 
 Releasing grafton uses [promulgate](https://github.com/manifoldco/promulgate).
 
@@ -119,15 +145,3 @@ Releasing grafton uses [promulgate](https://github.com/manifoldco/promulgate).
 4. Done! Promulgate via Travis will take care of creating the binaries and
    uploading the zip files.
 
-## On editing the OpenAPI spec
-
-`provider.yaml` is a manual copy of an internally generated file. It, in
-turn, is used to generate the client code under `generated`.
-
-Until we automate more of this, the following has to be kept in mind:
-- Any changes to `provider.yaml` should not be merged here directly, but
-  instead ported to the internal file first.
-- If the internal source of `provider.yaml` changes, the updates must be brought
-  over here.
-- Whenever `provider.yaml` changes, `make generated-clients` should be run, and the
-  changes to the generated code should be checked in.
