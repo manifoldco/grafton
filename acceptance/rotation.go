@@ -16,9 +16,6 @@ var rotateCreds = Feature("credentials-rotation", "Rotate a credential set", fun
 		featureReplaceRotation(ctx)
 	case "multiple":
 		featureSwapRotation(ctx)
-	case "unknown":
-		// No rotation
-		Default(func() {})
 	default:
 		Default(func() {
 			FatalErr("unknown credentialType %s", credentialType)
@@ -37,7 +34,7 @@ var _ = rotateCreds.RunsInside("provision")
 
 func featureReplaceRotation(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	Default(func() {
+	Case("single credential replace", func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 
 		// delete initial credential before creating new one
@@ -61,7 +58,7 @@ func featureReplaceRotation(ctx context.Context) {
 
 func featureSwapRotation(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	Default(func() {
+	Case("multiple credentials swap", func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 		rID, rotatedValues := mustProvisionCredentials(ctx, api, resourceID)
 		rotatedCredentialID = rID
