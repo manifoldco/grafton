@@ -10,54 +10,34 @@ import (
 
 var rotationTearDown func(context.Context)
 
-var rotateCreds = Feature("credentials-rotation", "Credential rotation", func(ctx context.Context) {
-	switch credentialRotationType {
-	case "manual":
-		switch credentialType {
-		case "single":
-			featureRotateCredsSingleManual(ctx)
-		case "multiple":
-			featureRotateCredsMultipleManual(ctx)
-		default:
-			Default(func() {
-				FatalErr("unknown credentialType %s", credentialType)
-			})
-		}
-	case "automatic":
-		switch credentialType {
-		case "single":
-			Default(func() {
-				FatalErr("automatic single credential rotation test not implemented")
-			})
-		case "multiple":
-			Default(func() {
-				FatalErr("automatic multiple credential rotation test not implemented")
-			})
-		default:
-			Default(func() {
-				FatalErr("unknown credentialType %s", credentialType)
-			})
-		}
-	case "none":
-		// No tests
+var rotateCreds = Feature("credentials-rotation", "Rotate a credential set", func(ctx context.Context) {
+	switch credentialType {
+	case "single":
+		featureReplaceRotation(ctx)
+	case "multiple":
+		featureSwapRotation(ctx)
+	case "unknown":
+		// No rotation
 		Default(func() {})
 	default:
 		Default(func() {
-			FatalErr("unknown credentialRotationType %s", credentialRotationType)
+			FatalErr("unknown credentialType %s", credentialType)
 		})
 	}
 })
 
-var _ = rotateCreds.TearDown("Remove created Credentials", func(ctx context.Context) {
+var _ = rotateCreds.TearDown("Remove rotated credential sets", func(ctx context.Context) {
 	if rotationTearDown == nil {
 		return
 	}
 	rotationTearDown(ctx)
 })
 
-func featureRotateCredsSingleManual(ctx context.Context) {
+var _ = rotateCreds.RunsInside("provision")
+
+func featureReplaceRotation(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	block("Default case: manual rotation with single credentials", func() {
+	Default(func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 
 		// delete initial credential before creating new one
@@ -79,9 +59,9 @@ func featureRotateCredsSingleManual(ctx context.Context) {
 	}
 }
 
-func featureRotateCredsMultipleManual(ctx context.Context) {
+func featureSwapRotation(ctx context.Context) {
 	var rotatedCredentialID manifold.ID
-	block("Default case: manual rotation with multiple credentials", func() {
+	Default(func() {
 		initialCredID, initialValues := mustProvisionCredentials(ctx, api, resourceID)
 		rID, rotatedValues := mustProvisionCredentials(ctx, api, resourceID)
 		rotatedCredentialID = rID
@@ -100,5 +80,3 @@ func featureRotateCredsMultipleManual(ctx context.Context) {
 		})
 	}
 }
-
-var _ = rotateCreds.RunsInside("provision")

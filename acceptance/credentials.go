@@ -26,6 +26,20 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 		credentialID = cID
 	})
 
+	if credentialType == "multiple" {
+		Case("Case: Multiple credential sets", func() {
+			cID1, val1 := mustProvisionCredentials(ctx, api, resourceID)
+			cID2, val2 := mustProvisionCredentials(ctx, api, resourceID)
+
+			// assert credentials have different values
+			gm.Expect(val1).ToNot(
+				gm.Equal(val2), "Different credentials expected for new Credential Set")
+
+			mustDeprovisionCredentials(ctx, api, cID1)
+			mustDeprovisionCredentials(ctx, api, cID2)
+		})
+	}
+
 	ErrorCase("with an invalid resource ID", func() {
 		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 		defer cancel()

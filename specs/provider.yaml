@@ -835,100 +835,6 @@ paths:
         500:
           $ref: '#/responses/Internal'
 
-  /credentials/{id}/rotations/{rotation_id}:
-    parameters:
-    - $ref: '#/parameters/credential_id'
-    - name: rotation_id
-      in: path
-      description: |
-        ID of a the credential-rotations, stored as a base32 encoded 18 byte identifier.
-      required: true
-      type: string
-    - $ref: '#/parameters/date'
-    - $ref: '#/parameters/signed_headers'
-    - $ref: '#/parameters/signature'
-    - $ref: '#/parameters/x_callback_id'
-    - $ref: '#/parameters/x_callback_url'
-    put:
-      summary: Rotate
-      description: |
-        Manifold calls this endpoint to request the rotation of a specified set of
-        Credentials. This route must support being called more than once with
-        the same payload.
-
-        The `rotation_id` property is the unique identifier Manifold uses for this
-        rotation. Use this value for making this route idempotent.
-
-        The `credential_id` property is the unique identifier Manifold will map to
-        the returned set of Credentials. Use this value for mapping Manifold
-        Credentials to data inside your system.
-
-        The `resource_id` property is the unique identifier for the
-        Resource the requested set of Credentials grant access to.
-
-        The provider can return multiple key-value pairs that represent this
-        set of Credentials. However, if a url form exists (e.g.
-        `postgres://user:pw@host:5432/db`), please provide the credentials in
-        that form.
-
-        **Request Timeout**
-
-        If the request takes longer than 60 seconds, then it is assumed to have
-        failed. Manifold will retry the request again in the future.
-
-        **Callback Timeout**
-
-        If a `202 Accepted` response is returned, Manifold will expect the
-        provider to complete the rotation flow by calling the callback url
-        within 24 hours. If the callback is not invoked, Manifold will retry
-        the request again.
-
-        If the credentials have been rotation successfully with properties
-        that match the request, then the provider should return a `201 Created`
-        response. However, if rotation failed, a corresponding error should
-        be returned.
-      tags:
-      - Credential
-      parameters:
-      - name: body
-        in: body
-        description: |
-          Credential rotation request, containing the target Resource
-          identifier.
-        required: true
-        schema:
-          $ref: '#/definitions/CredentialRotationRequest'
-      responses:
-        201:
-          description: |
-            Successful credential rotation request with associated secrets.
-          schema:
-            $ref: '#/definitions/CredentialRotationResponse'
-          examples:
-            application/json:
-              credentials:
-                mysql_url: mysql://user:pass@host.com:3211/mydatabase
-        202:
-          description: |
-            Acknowledgement of the credential rotation request with a corresponding
-            message to be displayed to the user. The provider will call the
-            callback url once credentials have been rotated successfully or
-            a failure has occurred.
-          schema:
-            $ref: '#/definitions/SuccessMessage'
-          examples:
-            application/json:
-              message: We're walking over to the rack now to type in your new password!
-        400:
-          $ref: '#/responses/BadRequest'
-        401:
-          $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
-        409:
-          $ref: '#/responses/Conflict'
-        500:
-          $ref: '#/responses/Internal'
   /sso/:
     get:
       summary: Single Sign-On
@@ -1162,38 +1068,6 @@ definitions:
     description: |
       The response expected back from a Provider to provision a set of
       Credentials for a resource.
-    properties:
-      message:
-        $ref: '#/definitions/Message'
-      credentials:
-        type: object
-        additionalProperties:
-          type: string
-    additionalProperties: false
-    required:
-    - credentials
-  CredentialRotationRequest:
-    type: object
-    description: |
-      The information sent along to a Provider to perform a rotation of
-      a set of Credentials for a resource.
-    properties:
-      rotation_id:
-        $ref: '#/definitions/ID'
-      resource_id:
-        $ref: '#/definitions/ID'
-      credential_id:
-        $ref: '#/definitions/ID'
-    additionalProperties: false
-    required:
-    - rotation_id
-    - resource_id
-    - credential_id
-  CredentialRotationResponse:
-    type: object
-    description: |
-      The response expected back from a Provider when performing a rotation of
-      a set of Credentials for a resource.
     properties:
       message:
         $ref: '#/definitions/Message'
