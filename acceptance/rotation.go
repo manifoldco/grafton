@@ -10,7 +10,7 @@ import (
 
 var rotationTearDown func(context.Context)
 
-var rotateCreds = Feature("credentials-rotation", "Rotate a credential set", func(ctx context.Context) {
+var rotateCreds = Feature("credential-rotation", "Rotate a credential set", func(ctx context.Context) {
 	switch credentialType {
 	case "single":
 		featureReplaceRotation(ctx)
