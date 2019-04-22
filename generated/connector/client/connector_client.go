@@ -10,6 +10,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/manifoldco/grafton/generated/connector/client/callback"
+	"github.com/manifoldco/grafton/generated/connector/client/credential_rotation"
 	"github.com/manifoldco/grafton/generated/connector/client/o_auth"
 	"github.com/manifoldco/grafton/generated/connector/client/resource"
 )
@@ -56,6 +57,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Connector 
 	cli.Transport = transport
 
 	cli.Callback = callback.New(transport, formats)
+
+	cli.CredentialRotation = credential_rotation.New(transport, formats)
 
 	cli.OAuth = o_auth.New(transport, formats)
 
@@ -107,6 +110,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type Connector struct {
 	Callback *callback.Client
 
+	CredentialRotation *credential_rotation.Client
+
 	OAuth *o_auth.Client
 
 	Resource *resource.Client
@@ -119,6 +124,8 @@ func (c *Connector) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
 	c.Callback.SetTransport(transport)
+
+	c.CredentialRotation.SetTransport(transport)
 
 	c.OAuth.SetTransport(transport)
 
