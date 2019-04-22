@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2019-04-22
+
+Grafton ❤️  Credential rotations! 🎉🎉
+
+### Added
+
+- Add `--credential` options to configure the type of credentials supported. Defaults to multiple.
+- Add credential rotation tests based on the type of credentials supported.
+
 ### Fixed
 
 - `--plan` and `--new-plan` must be have different values in order for resize operation to work

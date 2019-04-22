@@ -89,6 +89,8 @@ info:
     must be a first class citizen of our platform which are addressable so they
     can added, removed, and updated independent of the Resource lifecycle.
 
+    Grafton takes advantages of this in its credential rotation tests.
+
     **What's the difference between the `id` in the path and body of a PUT request?**
 
     They are the same, the `id` is provided in the body for completeness *and*
@@ -108,6 +110,35 @@ info:
     For simplicity, a Resource will always have a region property. Products
     which do not support a region will receive the `all::global` region in the
     Provision request payload.
+
+    **What are the single and multiple credential types?**
+
+    The credential types allow Grafton to determine if your product supports
+    multiple live credential simultaneously or not. Supporting `multiple`
+    credentials means that your product can be accessed using different live
+    credentials. Supporting `single` credentials means that your product only
+    supports one live credential at a time.
+
+    Grafton defaults to `multiple` since it offers the best experience to
+    developers especially when performing a credential rotation.
+
+    **What are the credential rotation tests?**
+
+    The Grafton credential rotation tests ensure that the Credentials
+    endpoints can be used to perform a rotation. Credential rotation is a
+    process managed my Manifold that results in a new credential being used
+    instead of the initial one.
+
+    Grafton will choose the best rotation algorithm based on the type of
+    credentials supported: `single` or `multiple`.
+
+    For `single` credentials, the initial credential is deleted first, and then
+    a new one is created in its place.
+
+    For `multiple` credentials, a new credential is created first, and then the
+    old one gets deleted.
+
+    Grafton also ensures that the initial and new credentials are different.
 
     # Authentication
     In order to provision, deprovision, or resize resources and credentials
