@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `--plan` and `--new-plan` must be have different values in order for resize operation to work
+
 ## [0.14.7] - 2019-04-12
 
 ### Added
