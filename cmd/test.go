@@ -141,6 +141,10 @@ func testCmd(ctx *cli.Context) error {
 
 	credential := ctx.String("credential")
 
+	if plan != "" && plan == newPlan {
+		return cli.NewExitError("--new-plan value must be different than --plan", -1)
+	}
+
 	var logLevel acceptance.LogLevel
 	rawLevel := ctx.String("log")
 	switch acceptance.LogLevel(rawLevel) {
