@@ -100,6 +100,7 @@ generated/%/client: specs/%.yaml vendor/bin/swagger
 APIS=$(patsubst specs/%.yaml,%,$(wildcard specs/*.yaml))
 API_CLIENTS=$(APIS:%=generated/%/client)
 generated-clients: $(API_CLIENTS)
+generated: generated-clients
 
 .PHONY: generated-clients
 

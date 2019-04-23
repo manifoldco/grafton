@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 
 	strfmt "github.com/go-openapi/strfmt"
-	manifold "github.com/manifoldco/go-manifold"
+	"github.com/manifoldco/go-manifold"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/validate"
