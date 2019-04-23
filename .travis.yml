@@ -30,6 +30,7 @@ deploy:
   on:
     tags: true
     repo: manifoldco/grafton
+    condition: $TRAVIS_GO_VERSION =~ ^1\.12
 env:
   global:
   - AWS_REGION=us-east-1
