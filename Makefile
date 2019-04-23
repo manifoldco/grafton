@@ -12,7 +12,7 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) \
 	$(filter $(subst *,%,$2),$d))
 
 all: ci
-ci: lint cover build
+ci: generated-clients lint cover build
 
 .PHONY: all ci
 
@@ -51,7 +51,7 @@ mod-tidy:
 # Test and linting
 #################################################
 
-test: vendor generated
+test: vendor
 	@CGO_ENABLED=0 go test -v $$(go list ./... | grep -v generated)
 
 comma:= ,
@@ -69,7 +69,7 @@ $(COVER_TEST_PKGS:=-cover): %-cover: all-cover.txt
 all-cover.txt:
 	echo "mode: atomic" > all-cover.txt
 
-cover: vendor generated all-cover.txt $(COVER_TEST_PKGS:=-cover)
+cover: vendor all-cover.txt $(COVER_TEST_PKGS:=-cover)
 
 .golangci.gen.yml: .golangci.yml
 	$(shell awk '/enable:/{y=1;next} y == 0 {print}' $< > $@)
@@ -100,7 +100,6 @@ generated/%/client: specs/%.yaml vendor/bin/swagger
 APIS=$(patsubst specs/%.yaml,%,$(wildcard specs/*.yaml))
 API_CLIENTS=$(APIS:%=generated/%/client)
 generated-clients: $(API_CLIENTS)
-generated: generated-clients
 
 .PHONY: generated-clients
 
@@ -123,8 +122,7 @@ GRAFTON_DEPS=\
 	$(call rwildcard,acceptance,*.go) \
 	$(call rwildcard,cmd,*.go) \
 	$(call rwildcard,connector,*.go) \
-	generated/provider/client \
-	generated/provider/models
+	generated-clients
 
 $(PREFIX)bin/grafton$(SUFFIX): $(GRAFTON_DEPS)
 	go get github.com/gobuffalo/packr/...
@@ -186,4 +184,6 @@ release: zips
 
 clean:
 	rm -rf bin/grafton
+	rm -rf bin/grafton.exe
 	rm -rf build
+	rm -rf generated
