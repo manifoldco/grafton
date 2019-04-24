@@ -2,7 +2,6 @@ swagger: "2.0"
 info:
   title: Manifold Provider API
   description: |
-    # Introduction
     The Manifold Provider API is a set of HTTP endpoints a developer services
     provider implements as a part of their application stack in order to
     integrate with Manifold's identity, billing, and provisioning
@@ -13,17 +12,34 @@ info:
     experience for developers to buy and integrate their products using a
     Manifold account, without having to implement billing or identity.
 
-    The Connector API allows Providers to query Manifold for data related to
-    provisioned resources and users of those resources. For more information,
-    please read the Connector documentation.
+    The separate [Connector API](https://docs.manifold.co/docs/connector-api-1N1dFeeucoggYqeKOwCo8Q)
+    allows Providers to query Manifold for data related to provisioned
+    resources and users of those resources.
 
     # Getting Started
-    Manifold provides a CLI tool called Grafton for locally testing a
+    The [Provider documentation](https://docs.manifold.co/docs/introduction-29Q4oH7UReWEaKCYuoK0IK)
+    is the best way to get familiar with the different concepts and terms
+    required to integrate. It also contains the
+    [Guide to launching your Service](https://docs.manifold.co/docs/integration_phases-oKYp5R7fOKK6wYgKSMi6K)
+    which goes through all the different phases developer services providers
+    have to go through.
+
+    Manifold also has a list of example Providers that can be used as inspiration:
+    - [Go](https://github.com/manifoldco/go-sample-provider)
+    - [Node.js](https://github.com/manifoldco/node-restify-sample-provider)
+    - [Ruby](https://github.com/manifoldco/ruby-sinatra-sample-provider)
+
+    Please reach out to [Manifold](mailto:support@manifold.co) for any questions.
+
+    ## Testing locally
+
+    Manifold makes it easy for providers to validate their integration
+    with a CLI tool called Grafton. Grafton is used for testing locally a
     Provider's implementation of resource and credential provisioning,
     resizing, deprovision, and sign in.
 
-    While the tests are running through grafton test, a local version of
-    Manifold's Connector API is ran for retrieving user or resource data as
+    While the tests are running through grafton, a local version of
+    Manifold's Connector API is also ran for retrieving user or resource data as
     well as completing asynchronous operations.
 
     Grafton is [open source](https://github.com/manifoldco/grafton) with
@@ -31,7 +47,7 @@ info:
     [GitHub](https://github.com/manifoldco/grafton/releases).
 
     ## Using Grafton
-    The first step to use Grafton is to generate as a test master key which is
+    The first step to use Grafton is to generate a test master key which is
     used for signing requests.
 
     ```bash
@@ -42,10 +58,11 @@ info:
     ```
 
     Use the public master key contained in the generated file to validate
-    requests created by Grafton during testing. Once you've integrated, to
-    validate requests coming from the Manifold servers, you must use Manifold's
-    Master Public Signing Key.
+    requests created by Grafton during testing.
 
+    **IMPORTANT**: Once integrated and in production, you *must* be using
+    Manifold's Master Public Signing Key to validate requests coming from
+    the Manifold servers. See the Authentication section for details.
 
     To perform OAuth operations and subsequent requests against the local
     Manifold Connector API ran by Grafton you can use the following set of
@@ -72,10 +89,9 @@ info:
     ```
 
     Green check marks will be shown once for each passing test. Once all the
-    tests pass, you're ready to move onto the next phase of integration.
-
-    An example integration using Ruby and the Sinatra framework is available on
-    [GitHub](https://github.com/manifoldco/ruby-sinatra-sample-provider).
+    tests pass, you're ready to move onto the
+    [next phase of integration](https://docs.manifold.co/docs/integration_phases-oKYp5R7fOKK6wYgKSMi6K):
+    **Product and Plans creation**, and ultimately, **Stage testing**.
 
     Grafton and this documentation is a work in progress, we appreciate and
     welcome all feedback!
@@ -89,7 +105,7 @@ info:
     must be a first class citizen of our platform which are addressable so they
     can added, removed, and updated independent of the Resource lifecycle.
 
-    Grafton takes advantages of this in its credential rotation tests.
+    Grafton already takes advantages of this in its credential rotation strategies.
 
     **What's the difference between the `id` in the path and body of a PUT request?**
 
@@ -111,13 +127,15 @@ info:
     which do not support a region will receive the `all::global` region in the
     Provision request payload.
 
-    **What are the single and multiple credential types?**
+    **What are the `single` and `multiple` credential types?**
 
     The credential types allow Grafton to determine if your product supports
-    multiple live credential simultaneously or not. Supporting `multiple`
-    credentials means that your product can be accessed using different live
-    credentials. Supporting `single` credentials means that your product only
-    supports one live credential at a time.
+    multiple live credential simultaneously or not.
+
+    * `multiple` credentials support means that your product can be accessed using different live
+    credentials simultaneously.
+    * `single` credentials support means that your product only
+    supports one live credential simultaneously.
 
     Grafton defaults to `multiple` since it offers the best experience to
     developers especially when performing a credential rotation.
@@ -129,14 +147,14 @@ info:
     process managed my Manifold that results in a new credential being used
     instead of the initial one.
 
-    Grafton will choose the best rotation algorithm based on the type of
+    Grafton will choose the best rotation strategy based on the type of
     credentials supported: `single` or `multiple`.
 
     For `single` credentials, the initial credential is deleted first, and then
-    a new one is created in its place.
+    a new one is created in its place. This is the *replace* strategy.
 
     For `multiple` credentials, a new credential is created first, and then the
-    old one gets deleted.
+    old one gets deleted. This is the *swap* strategy.
 
     Grafton also ensures that the initial and new credentials are different.
 
@@ -159,6 +177,26 @@ info:
     Included in the signature is the request method, path, query parameters,
     various headers (including the Date and Host headers), and the request
     body.
+
+    Requests to `GET /v1/sso` are not signed by Manifold. Instead, a provider
+    must validate that the user has access to the resource by requesting `GET
+    /v1/resources/:id` from the Connector API using an `authorization_code`
+    granted access token.
+
+    ## Authentication libraries
+    Manifold provides the following SDKs, making it easy for a provider to verify
+    any incoming requests from Manifold:
+    - [Go](https://github.com/manifoldco/go-signature)
+    - [Node.js](https://github.com/manifoldco/node-signature)
+    - [Python](https://github.com/manifoldco/python-manifoldco-signature)
+    - [Ruby](https://github.com/manifoldco/ruby-manifoldco-signature)
+    - [Java](https://github.com/manifoldco/java-signature)
+    - [C#](https://github.com/manifoldco/csharp-signature)
+    - [Elixir](https://github.com/manifoldco/elixir-manifoldco-signature)
+    - [PHP](https://github.com/Ziggeo/manifold-php-signature) (Community Project)
+
+    Please reach out to [Manifold](mailto:support@manifold.co) if we're missing
+    the language of your choice.
 
     ## The Request Signing Process
 
@@ -224,7 +262,7 @@ info:
 
     ### Verify the Request Age
 
-    To prevent reply attacks, all providers should verify that value relayed
+    To prevent replay attacks, all providers should verify that value relayed
     within the `Date` ([RFC3339 Format](https://www.ietf.org/rfc/rfc3339.txt))
     header is within 5 minutes of the current time. If it is not, a 401
     error should be returned to the caller.
@@ -237,18 +275,6 @@ info:
     signature on the canonical form of the request, and that it was signed by
     the public key included in the `X-Signature` header.
 
-    ## Supported languages
-    Manifold provides the following SDKs, making it easy for a provider to verify
-    any incoming requests from Manifold:
-    - [Go](https://github.com/manifoldco/go-signature)
-    - [Node.js](https://github.com/manifoldco/node-signature)
-    - [PHP](https://github.com/Ziggeo/manifold-php-signature)
-    - [Python](https://github.com/manifoldco/python-manifoldco-signature)
-    - [Ruby](https://github.com/manifoldco/ruby-manifoldco-signature)
-
-    Please reach out to [Manifold](mailto:support@manifold.co) if we're missing
-    the language of your choice.
-
     ## Public Master Key
     The following is the public key used for generating endorsements encoded in
     base64.
@@ -257,7 +283,7 @@ info:
     PtISNzqQmQPBxNlUw3CdxsWczXbIwyExxlkRqZ7E690
     ```
 
-    This key is included as the default key in our signature checking libraries.
+    This key is already included in Manifold's signature checking SDKs.
 
     The Manifold master key was generated using a high quality entropy source
     on an air-gapped system. Access to the private portion of the key is
@@ -326,7 +352,7 @@ info:
 
     If Manifold does not receive the callback within 24 hours, the request will
     be performed again. As a result of supporting repeatable actions, the
-    provider should return whether or not the operation was succesful to
+    provider should return whether or not the operation was successful to
     Manifold. Expected behaviour in this scenario is documented on a route by
     route basis.
 
@@ -387,7 +413,7 @@ info:
     server to request data from Manifold to render or implement any dashboard
     functionality.
 
-    The granted access token will only be valid for 24hours. After the token
+    The granted access token will only be valid for 24 hours. After the token
     has expired, the user must complete the Sign-On flow from the Manifold
     dashboard to grant a new token.
 
@@ -403,6 +429,12 @@ produces:
 - application/json
 consumes:
 - application/json
+x-tagGroups:
+- name: API Endpoints
+  tags:
+  - Resource
+  - Credential
+  - Single Sign-On
 parameters:
   date:
     name: Date
@@ -889,6 +921,9 @@ paths:
         The access token is sensitive data that grants access to a user's
         data within Manifold. It should be treated with care.
 
+        Requests to this route will *not* be signed by Manifold as they are
+        performed by the user's browser.
+
         **IMPORTANT**: A malicious user *could* tamper with the `resource_id`
         query parameter. To prevent this, the provider *must* validate that the
         user has access to the targeted resource by requesting information
@@ -911,7 +946,7 @@ paths:
         pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
         format: base32ID
       tags:
-      - Single Sign-On (SSO)
+      - Single Sign-On
       responses:
         200:
           description: |
@@ -1104,6 +1139,10 @@ definitions:
         $ref: '#/definitions/Message'
       credentials:
         type: object
+        description: |
+          All key values must be strings and valid environment variable names.
+
+          Names must match this expression: `^[A-Z][A-Z0-9_]{0,127}$`
         additionalProperties:
           type: string
     additionalProperties: false

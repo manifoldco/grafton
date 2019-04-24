@@ -417,7 +417,10 @@ swagger:model PutCredentialsIDCreatedBody
 */
 type PutCredentialsIDCreatedBody struct {
 
-	// credentials
+	// All key values must be strings and valid environment variable names.
+	//
+	// Names must match this expression: `^[A-Z][A-Z0-9_]{0,127}$`
+	//
 	// Required: true
 	Credentials map[string]string `json:"credentials"`
 
