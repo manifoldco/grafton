@@ -34,6 +34,9 @@ type ResourceRequest struct {
 	// region
 	// Required: true
 	Region RegionSlug `json:"region"`
+
+	// settings
+	Settings ResourceSettings `json:"settings,omitempty"`
 }
 
 // Validate validates this resource request

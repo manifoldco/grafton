@@ -1096,6 +1096,8 @@ definitions:
         $ref: '#/definitions/RegionSlug'
       features:
         $ref: '#/definitions/FeatureMap'
+      settings:
+        $ref: '#/definitions/ResourceSettings'
     additionalProperties: false
     required:
     - id
@@ -1178,3 +1180,12 @@ definitions:
       - period_start
       - period_end
       - measures
+
+  ResourceSettings:
+    type: object
+    description: |
+      **ALPHA** Warning: this API may change in the future or completely removed. Do NOT used for
+      product system.
+      Object describing additional settings for the resource specified by the user during provision.
+    additionalProperties: 
+      type: string
