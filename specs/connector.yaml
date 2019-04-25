@@ -2,7 +2,6 @@ swagger: '2.0'
 info:
   title: Connector API
   description: |
-    # Introduction
     The Connector API allows Providers to query Manifold for data related to
     provisioned resources and users of those resources.
 

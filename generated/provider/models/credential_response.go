@@ -16,7 +16,10 @@ import (
 // swagger:model CredentialResponse
 type CredentialResponse struct {
 
-	// credentials
+	// All key values must be strings and valid environment variable names.
+	//
+	// Names must match this expression: `^[A-Z][A-Z0-9_]{0,127}$`
+	//
 	// Required: true
 	Credentials map[string]string `json:"credentials"`
 
