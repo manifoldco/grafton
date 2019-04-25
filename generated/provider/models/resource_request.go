@@ -36,7 +36,7 @@ type ResourceRequest struct {
 	Region RegionSlug `json:"region"`
 
 	// settings
-	Settings ResourceSettings `json:"settings,omitempty"`
+	Settings manifold.Metadata `json:"settings,omitempty"`
 }
 
 // Validate validates this resource request
