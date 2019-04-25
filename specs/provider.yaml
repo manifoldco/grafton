@@ -1096,7 +1096,7 @@ definitions:
         $ref: '#/definitions/RegionSlug'
       features:
         $ref: '#/definitions/FeatureMap'
-      settings:
+      metadata:
         $ref: '#/definitions/ResourceMetadata'
     additionalProperties: false
     required:

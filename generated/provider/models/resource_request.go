@@ -23,6 +23,9 @@ type ResourceRequest struct {
 	// Required: true
 	ID manifold.ID `json:"id"`
 
+	// metadata
+	Metadata manifold.Metadata `json:"metadata,omitempty"`
+
 	// plan
 	// Required: true
 	Plan manifold.Label `json:"plan"`
@@ -34,9 +37,6 @@ type ResourceRequest struct {
 	// region
 	// Required: true
 	Region RegionSlug `json:"region"`
-
-	// settings
-	Settings manifold.Metadata `json:"settings,omitempty"`
 }
 
 // Validate validates this resource request
