@@ -1,7 +1,10 @@
-# ![grafton](.github/grafton.png)
+<div align="center">
 
-Manifold's provider validation tool
+![grafton](.github/grafton.png)
 
+**Manifold's provider validation tool**
+
+[Manifold's Provider Documentation](https://docs.manifold.co/docs/introduction-29Q4oH7UReWEaKCYuoK0IK) |
 [Code of Conduct](./.github/CONDUCT.md) |
 [Contribution Guidelines](./.github/CONTRIBUTING.md) |
 [CHANGELOG](./CHANGELOG.md)
@@ -11,6 +14,11 @@ Manifold's provider validation tool
 [![Travis](https://img.shields.io/travis/manifoldco/grafton/master.svg)](https://travis-ci.org/manifoldco/grafton)
 [![Go Report Card](https://goreportcard.com/badge/github.com/manifoldco/grafton)](https://goreportcard.com/report/github.com/manifoldco/grafton)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](./LICENSE.md)
+
+</div>
+
+The [Manifold's Provider Documentation](https://docs.manifold.co/docs/introduction-29Q4oH7UReWEaKCYuoK0IK) is
+the best place to get started on adding your product to the Manifold's Marketplace.
 
 ## Introduction
 
@@ -79,6 +87,8 @@ grafton test --product=bonnets --plan=small --region=aws::us-east-1 \
     --new-plan=large \
     http://localhost:4567
 ```
+
+![Grafton test output](.github/grafton-test-output.png)
 
 3. **Mini-Marketplace Connector API**
 
