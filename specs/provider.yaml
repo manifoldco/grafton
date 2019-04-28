@@ -1184,7 +1184,7 @@ definitions:
   ResourceMetadata:
     type: object
     description: |
-      **ALPHA** Warning: this API may change in the future or completely removed. Do NOT used for
+      **ALPHA** Warning: this API may change in the future or completely removed. Do NOT use for
       product system.
       Object describing additional information for the resource specified by the user during provision.
     additionalProperties: true
