@@ -143,11 +143,6 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 			return "", false, err
 		}
 
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("Missing error message in response")
-			return "", false, graftonErr
-		}
-
 		return graftonErr.Error(), false, graftonErr
 	}
 
@@ -222,11 +217,6 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 			return nil, "", false, err
 		}
 
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("Missing error message in response")
-			return nil, "", false, graftonErr
-		}
-
 		return nil, graftonErr.Error(), false, graftonErr
 	}
 
@@ -294,11 +284,6 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 			return "", false, err
 		}
 
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("No error message in response")
-			return "", false, graftonErr
-		}
-
 		return graftonErr.Error(), false, graftonErr
 	}
 
@@ -355,11 +340,6 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 			return "", false, err
 		}
 
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("No error message in response")
-			return "", false, graftonErr
-		}
-
 		return graftonErr.Error(), false, graftonErr
 	}
 
@@ -408,11 +388,6 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 		default:
 			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
-		}
-
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("No error message in response")
-			return "", false, graftonErr
 		}
 
 		return graftonErr.Error(), false, graftonErr
@@ -478,11 +453,6 @@ func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 		default:
 			c.log.WithError(err).Info("Error unrecognized, returning directly")
 			return nil, err
-		}
-
-		if graftonErr == ErrMissingMsg {
-			c.log.WithError(err).Error("Missing error message in response")
-			return nil, graftonErr
 		}
 
 		return nil, graftonErr

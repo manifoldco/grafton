@@ -2,7 +2,9 @@ package grafton
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	swagerrs "github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
@@ -14,11 +16,17 @@ import (
 // ErrMissingMsg occurs when a provider's response is missing the Message field
 var ErrMissingMsg = errors.New("`message` field was missing from the response")
 
+func typeToNiceString(t merrors.Type) string {
+	nice := strings.Replace(string(t), "_", " ", -1)
+	return fmt.Sprintf("%d - %s%s", t.Code(), strings.ToUpper(nice[:1]), nice[1:])
+}
+
 // NewErrWithMsg creates a new Error from a string pointer, if the pointer is
 // nil then an ErrMissingMsg is returned instead.
 func NewErrWithMsg(t merrors.Type, m *string) error {
 	if m == nil {
-		return ErrMissingMsg
+		// Substitute the message with a human readable version of the type
+		return NewError(t, typeToNiceString(t))
 	}
 
 	return NewError(t, *m)
