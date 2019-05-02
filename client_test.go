@@ -292,8 +292,9 @@ func TestProvisionResource(t *testing.T) {
 
 		msg, _, err := callProvision(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		expectedMessage := typeToNiceString(errors.BadRequestError)
+		gm.Expect(msg).To(gm.Equal(expectedMessage))
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, expectedMessage)))
 	})
 
 	t.Run("401 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
@@ -327,7 +328,7 @@ func TestProvisionResource(t *testing.T) {
 
 		msg, async, err := callProvision(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(msg).To(gm.Equal(typeToNiceString(errors.InternalServerError)))
 		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 		gm.Expect(async).To(gm.BeFalse())
 	})
@@ -470,8 +471,9 @@ func TestProvisionCredentials(t *testing.T) {
 
 		_, msg, _, err := callProvisionCredentials(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		expectedMessage := typeToNiceString(errors.BadRequestError)
+		gm.Expect(msg).To(gm.Equal(expectedMessage))
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, expectedMessage)))
 	})
 
 	t.Run("404 not found valid response", withCode(http.StatusNotFound, func(url string) {
@@ -505,7 +507,7 @@ func TestProvisionCredentials(t *testing.T) {
 
 		_, msg, async, err := callProvisionCredentials(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(msg).To(gm.Equal(typeToNiceString(errors.InternalServerError)))
 		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 		gm.Expect(async).To(gm.BeFalse())
 	})
@@ -630,8 +632,9 @@ func TestChangePlan(t *testing.T) {
 
 		msg, _, err := callChangePlan(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		expectedMessage := typeToNiceString(errors.BadRequestError)
+		gm.Expect(msg).To(gm.Equal(expectedMessage))
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, expectedMessage)))
 	})
 
 	t.Run("401 bad unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
@@ -665,7 +668,7 @@ func TestChangePlan(t *testing.T) {
 
 		msg, async, err := callChangePlan(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(msg).To(gm.Equal(typeToNiceString(errors.InternalServerError)))
 		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 		gm.Expect(async).To(gm.BeFalse())
 	})
@@ -753,8 +756,9 @@ func TestDeprovisionCredentials(t *testing.T) {
 
 		msg, _, err := callDeprovisionCredentials(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		expectedMessage := typeToNiceString(errors.BadRequestError)
+		gm.Expect(msg).To(gm.Equal(expectedMessage))
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, expectedMessage)))
 	})
 
 	t.Run("401 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
@@ -788,7 +792,7 @@ func TestDeprovisionCredentials(t *testing.T) {
 
 		msg, async, err := callDeprovisionCredentials(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(msg).To(gm.Equal(typeToNiceString(errors.InternalServerError)))
 		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 		gm.Expect(async).To(gm.BeFalse())
 	})
@@ -876,8 +880,9 @@ func TestDeprovisionResource(t *testing.T) {
 
 		msg, _, err := callDeprovisionResource(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(ErrMissingMsg))
+		expectedMessage := typeToNiceString(errors.BadRequestError)
+		gm.Expect(msg).To(gm.Equal(expectedMessage))
+		gm.Expect(err).To(gm.MatchError(NewError(errors.BadRequestError, expectedMessage)))
 	})
 
 	t.Run("400 unauthorized valid response", withCode(http.StatusUnauthorized, func(url string) {
@@ -911,7 +916,7 @@ func TestDeprovisionResource(t *testing.T) {
 
 		msg, async, err := callDeprovisionResource(srv.URL)
 
-		gm.Expect(msg).To(gm.Equal(""))
+		gm.Expect(msg).To(gm.Equal(typeToNiceString(errors.InternalServerError)))
 		gm.Expect(IsFatal(err)).To(gm.BeFalse())
 		gm.Expect(async).To(gm.BeFalse())
 	})
