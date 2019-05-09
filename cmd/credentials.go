@@ -23,7 +23,20 @@ import (
 )
 
 const passwordMask = '●'
-const apiURL = "https://api.%s.manifold.co/v1"
+const defaultHostname = "manifold.co"
+const defaultScheme = "https"
+
+func apiURLPattern() string {
+	scheme := os.Getenv("MANIFOLD_SCHEME")
+	if scheme == "" {
+		scheme = defaultScheme
+	}
+	hostname := os.Getenv("MANIFOLD_HOSTNAME")
+	if hostname == "" {
+		hostname = defaultHostname
+	}
+	return fmt.Sprintf("%s://api.%s.%s/v1", scheme, "%s", hostname)
+}
 
 var credentialFlags = []cli.Flag{
 	cli.StringFlag{
@@ -193,7 +206,7 @@ func deleteCredentialsCmd(cliCtx *cli.Context) error {
 
 // NewConnector creates a new connector client with the provided 'token'
 func NewConnector(token string) (*client.Connector, error) {
-	u, err := url.Parse(fmt.Sprintf(apiURL, "connector"))
+	u, err := url.Parse(fmt.Sprintf(apiURLPattern(), "connector"))
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +262,7 @@ func login(ctx context.Context) (*manifold.Client, string, error) {
 	}
 	cfgs := []manifold.ConfigFunc{}
 
-	cfgs = append(cfgs, manifold.ForURLPattern(apiURL))
+	cfgs = append(cfgs, manifold.ForURLPattern(apiURLPattern()))
 	cfgs = append(cfgs, manifold.WithUserAgent("grafton-"+config.Version))
 
 	client := manifold.New(cfgs...)
