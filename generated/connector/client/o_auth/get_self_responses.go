@@ -66,7 +66,7 @@ func NewGetSelfOK() *GetSelfOK {
 
 /*GetSelfOK handles this case with default header values.
 
-The identity of the user or product represented by the access
+The identity of the user, provider or product represented by the access
 token.
 
 */
@@ -218,7 +218,7 @@ var getSelfBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -233,6 +233,8 @@ const (
 	GetSelfBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// GetSelfBadRequestBodyTypeNotFound captures enum value "not_found"
 	GetSelfBadRequestBodyTypeNotFound string = "not_found"
+	// GetSelfBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetSelfBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetSelfBadRequestBodyTypeInternal captures enum value "internal"
 	GetSelfBadRequestBodyTypeInternal string = "internal"
 	// GetSelfBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -310,7 +312,7 @@ var getSelfInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -325,6 +327,8 @@ const (
 	GetSelfInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// GetSelfInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	GetSelfInternalServerErrorBodyTypeNotFound string = "not_found"
+	// GetSelfInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetSelfInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetSelfInternalServerErrorBodyTypeInternal captures enum value "internal"
 	GetSelfInternalServerErrorBodyTypeInternal string = "internal"
 	// GetSelfInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -402,7 +406,7 @@ var getSelfUnauthorizedBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -417,6 +421,8 @@ const (
 	GetSelfUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// GetSelfUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	GetSelfUnauthorizedBodyTypeNotFound string = "not_found"
+	// GetSelfUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetSelfUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetSelfUnauthorizedBodyTypeInternal captures enum value "internal"
 	GetSelfUnauthorizedBodyTypeInternal string = "internal"
 	// GetSelfUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

@@ -243,7 +243,7 @@ var putCallbacksIdBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -258,6 +258,8 @@ const (
 	PutCallbacksIDBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// PutCallbacksIDBadRequestBodyTypeNotFound captures enum value "not_found"
 	PutCallbacksIDBadRequestBodyTypeNotFound string = "not_found"
+	// PutCallbacksIDBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCallbacksIDBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCallbacksIDBadRequestBodyTypeInternal captures enum value "internal"
 	PutCallbacksIDBadRequestBodyTypeInternal string = "internal"
 	// PutCallbacksIDBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -335,7 +337,7 @@ var putCallbacksIdInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -350,6 +352,8 @@ const (
 	PutCallbacksIDInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// PutCallbacksIDInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	PutCallbacksIDInternalServerErrorBodyTypeNotFound string = "not_found"
+	// PutCallbacksIDInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCallbacksIDInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCallbacksIDInternalServerErrorBodyTypeInternal captures enum value "internal"
 	PutCallbacksIDInternalServerErrorBodyTypeInternal string = "internal"
 	// PutCallbacksIDInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -427,7 +431,7 @@ var putCallbacksIdNotFoundBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -442,6 +446,8 @@ const (
 	PutCallbacksIDNotFoundBodyTypeUnauthorized string = "unauthorized"
 	// PutCallbacksIDNotFoundBodyTypeNotFound captures enum value "not_found"
 	PutCallbacksIDNotFoundBodyTypeNotFound string = "not_found"
+	// PutCallbacksIDNotFoundBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCallbacksIDNotFoundBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCallbacksIDNotFoundBodyTypeInternal captures enum value "internal"
 	PutCallbacksIDNotFoundBodyTypeInternal string = "internal"
 	// PutCallbacksIDNotFoundBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -519,7 +525,7 @@ var putCallbacksIdUnauthorizedBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -534,6 +540,8 @@ const (
 	PutCallbacksIDUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// PutCallbacksIDUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	PutCallbacksIDUnauthorizedBodyTypeNotFound string = "not_found"
+	// PutCallbacksIDUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCallbacksIDUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCallbacksIDUnauthorizedBodyTypeInternal captures enum value "internal"
 	PutCallbacksIDUnauthorizedBodyTypeInternal string = "internal"
 	// PutCallbacksIDUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

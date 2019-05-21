@@ -78,6 +78,13 @@ func unmarshalIdentity(data []byte, consumer runtime.Consumer) (Identity, error)
 		}
 		return &result, nil
 
+	case "provider":
+		var result Provider
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+
 	case "user":
 		var result User
 		if err := consumer.Consume(buf2, &result); err != nil {

@@ -248,7 +248,7 @@ var getResourcesIdUsersBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -263,6 +263,8 @@ const (
 	GetResourcesIDUsersBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// GetResourcesIDUsersBadRequestBodyTypeNotFound captures enum value "not_found"
 	GetResourcesIDUsersBadRequestBodyTypeNotFound string = "not_found"
+	// GetResourcesIDUsersBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetResourcesIDUsersBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetResourcesIDUsersBadRequestBodyTypeInternal captures enum value "internal"
 	GetResourcesIDUsersBadRequestBodyTypeInternal string = "internal"
 	// GetResourcesIDUsersBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -340,7 +342,7 @@ var getResourcesIdUsersInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -355,6 +357,8 @@ const (
 	GetResourcesIDUsersInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// GetResourcesIDUsersInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	GetResourcesIDUsersInternalServerErrorBodyTypeNotFound string = "not_found"
+	// GetResourcesIDUsersInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetResourcesIDUsersInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetResourcesIDUsersInternalServerErrorBodyTypeInternal captures enum value "internal"
 	GetResourcesIDUsersInternalServerErrorBodyTypeInternal string = "internal"
 	// GetResourcesIDUsersInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -432,7 +436,7 @@ var getResourcesIdUsersNotFoundBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -447,6 +451,8 @@ const (
 	GetResourcesIDUsersNotFoundBodyTypeUnauthorized string = "unauthorized"
 	// GetResourcesIDUsersNotFoundBodyTypeNotFound captures enum value "not_found"
 	GetResourcesIDUsersNotFoundBodyTypeNotFound string = "not_found"
+	// GetResourcesIDUsersNotFoundBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetResourcesIDUsersNotFoundBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetResourcesIDUsersNotFoundBodyTypeInternal captures enum value "internal"
 	GetResourcesIDUsersNotFoundBodyTypeInternal string = "internal"
 	// GetResourcesIDUsersNotFoundBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -524,7 +530,7 @@ var getResourcesIdUsersUnauthorizedBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -539,6 +545,8 @@ const (
 	GetResourcesIDUsersUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// GetResourcesIDUsersUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	GetResourcesIDUsersUnauthorizedBodyTypeNotFound string = "not_found"
+	// GetResourcesIDUsersUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	GetResourcesIDUsersUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// GetResourcesIDUsersUnauthorizedBodyTypeInternal captures enum value "internal"
 	GetResourcesIDUsersUnauthorizedBodyTypeInternal string = "internal"
 	// GetResourcesIDUsersUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

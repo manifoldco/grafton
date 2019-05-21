@@ -52,6 +52,13 @@ func (o *PutCredentialRotationsRotationIDReader) ReadResponse(response runtime.C
 		}
 		return nil, result
 
+	case 405:
+		result := NewPutCredentialRotationsRotationIDMethodNotAllowed()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 500:
 		result := NewPutCredentialRotationsRotationIDInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -169,6 +176,33 @@ func (o *PutCredentialRotationsRotationIDNotFound) readResponse(response runtime
 	return nil
 }
 
+// NewPutCredentialRotationsRotationIDMethodNotAllowed creates a PutCredentialRotationsRotationIDMethodNotAllowed with default headers values
+func NewPutCredentialRotationsRotationIDMethodNotAllowed() *PutCredentialRotationsRotationIDMethodNotAllowed {
+	return &PutCredentialRotationsRotationIDMethodNotAllowed{}
+}
+
+/*PutCredentialRotationsRotationIDMethodNotAllowed handles this case with default header values.
+
+Request method is known by the server but is not supported by the target resource.
+*/
+type PutCredentialRotationsRotationIDMethodNotAllowed struct {
+	Payload PutCredentialRotationsRotationIDMethodNotAllowedBody
+}
+
+func (o *PutCredentialRotationsRotationIDMethodNotAllowed) Error() string {
+	return fmt.Sprintf("[PUT /credential-rotations/{rotation_id}][%d] putCredentialRotationsRotationIdMethodNotAllowed  %+v", 405, o.Payload)
+}
+
+func (o *PutCredentialRotationsRotationIDMethodNotAllowed) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
 // NewPutCredentialRotationsRotationIDInternalServerError creates a PutCredentialRotationsRotationIDInternalServerError with default headers values
 func NewPutCredentialRotationsRotationIDInternalServerError() *PutCredentialRotationsRotationIDInternalServerError {
 	return &PutCredentialRotationsRotationIDInternalServerError{}
@@ -243,7 +277,7 @@ var putCredentialRotationsRotationIdBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -258,6 +292,8 @@ const (
 	PutCredentialRotationsRotationIDBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// PutCredentialRotationsRotationIDBadRequestBodyTypeNotFound captures enum value "not_found"
 	PutCredentialRotationsRotationIDBadRequestBodyTypeNotFound string = "not_found"
+	// PutCredentialRotationsRotationIDBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCredentialRotationsRotationIDBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCredentialRotationsRotationIDBadRequestBodyTypeInternal captures enum value "internal"
 	PutCredentialRotationsRotationIDBadRequestBodyTypeInternal string = "internal"
 	// PutCredentialRotationsRotationIDBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -335,7 +371,7 @@ var putCredentialRotationsRotationIdInternalServerErrorBodyTypeTypePropEnum []in
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -350,6 +386,8 @@ const (
 	PutCredentialRotationsRotationIDInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// PutCredentialRotationsRotationIDInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	PutCredentialRotationsRotationIDInternalServerErrorBodyTypeNotFound string = "not_found"
+	// PutCredentialRotationsRotationIDInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCredentialRotationsRotationIDInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCredentialRotationsRotationIDInternalServerErrorBodyTypeInternal captures enum value "internal"
 	PutCredentialRotationsRotationIDInternalServerErrorBodyTypeInternal string = "internal"
 	// PutCredentialRotationsRotationIDInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -374,6 +412,100 @@ func (o *PutCredentialRotationsRotationIDInternalServerErrorBody) validateType(f
 
 	// value enum
 	if err := o.validateTypeEnum("putCredentialRotationsRotationIdInternalServerError"+"."+"type", "body", *o.Type); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*PutCredentialRotationsRotationIDMethodNotAllowedBody put credential rotations rotation ID method not allowed body
+swagger:model PutCredentialRotationsRotationIDMethodNotAllowedBody
+*/
+type PutCredentialRotationsRotationIDMethodNotAllowedBody struct {
+
+	// Explanation of the errors
+	// Required: true
+	Message []string `json:"message"`
+
+	// The error type
+	// Required: true
+	Type *string `json:"type"`
+}
+
+// Validate validates this put credential rotations rotation ID method not allowed body
+func (o *PutCredentialRotationsRotationIDMethodNotAllowedBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateMessage(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := o.validateType(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *PutCredentialRotationsRotationIDMethodNotAllowedBody) validateMessage(formats strfmt.Registry) error {
+
+	if err := validate.Required("putCredentialRotationsRotationIdMethodNotAllowed"+"."+"message", "body", o.Message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var putCredentialRotationsRotationIdMethodNotAllowedBodyTypeTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		putCredentialRotationsRotationIdMethodNotAllowedBodyTypeTypePropEnum = append(putCredentialRotationsRotationIdMethodNotAllowedBodyTypeTypePropEnum, v)
+	}
+}
+
+const (
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeBadRequest captures enum value "bad_request"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeBadRequest string = "bad_request"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeUnauthorized captures enum value "unauthorized"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeUnauthorized string = "unauthorized"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeNotFound captures enum value "not_found"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeNotFound string = "not_found"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeMethodNotAllowed string = "method_not_allowed"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeInternal captures enum value "internal"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeInternal string = "internal"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeInvalidGrant captures enum value "invalid_grant"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeInvalidGrant string = "invalid_grant"
+	// PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeUnsupportedGrantType captures enum value "unsupported_grant_type"
+	PutCredentialRotationsRotationIDMethodNotAllowedBodyTypeUnsupportedGrantType string = "unsupported_grant_type"
+)
+
+// prop value enum
+func (o *PutCredentialRotationsRotationIDMethodNotAllowedBody) validateTypeEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, putCredentialRotationsRotationIdMethodNotAllowedBodyTypeTypePropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *PutCredentialRotationsRotationIDMethodNotAllowedBody) validateType(formats strfmt.Registry) error {
+
+	if err := validate.Required("putCredentialRotationsRotationIdMethodNotAllowed"+"."+"type", "body", o.Type); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := o.validateTypeEnum("putCredentialRotationsRotationIdMethodNotAllowed"+"."+"type", "body", *o.Type); err != nil {
 		return err
 	}
 
@@ -427,7 +559,7 @@ var putCredentialRotationsRotationIdNotFoundBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -442,6 +574,8 @@ const (
 	PutCredentialRotationsRotationIDNotFoundBodyTypeUnauthorized string = "unauthorized"
 	// PutCredentialRotationsRotationIDNotFoundBodyTypeNotFound captures enum value "not_found"
 	PutCredentialRotationsRotationIDNotFoundBodyTypeNotFound string = "not_found"
+	// PutCredentialRotationsRotationIDNotFoundBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCredentialRotationsRotationIDNotFoundBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCredentialRotationsRotationIDNotFoundBodyTypeInternal captures enum value "internal"
 	PutCredentialRotationsRotationIDNotFoundBodyTypeInternal string = "internal"
 	// PutCredentialRotationsRotationIDNotFoundBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -519,7 +653,7 @@ var putCredentialRotationsRotationIdUnauthorizedBodyTypeTypePropEnum []interface
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -534,6 +668,8 @@ const (
 	PutCredentialRotationsRotationIDUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// PutCredentialRotationsRotationIDUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	PutCredentialRotationsRotationIDUnauthorizedBodyTypeNotFound string = "not_found"
+	// PutCredentialRotationsRotationIDUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PutCredentialRotationsRotationIDUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PutCredentialRotationsRotationIDUnauthorizedBodyTypeInternal captures enum value "internal"
 	PutCredentialRotationsRotationIDUnauthorizedBodyTypeInternal string = "internal"
 	// PutCredentialRotationsRotationIDUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

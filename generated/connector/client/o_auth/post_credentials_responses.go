@@ -250,7 +250,7 @@ var postCredentialsBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -265,6 +265,8 @@ const (
 	PostCredentialsBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// PostCredentialsBadRequestBodyTypeNotFound captures enum value "not_found"
 	PostCredentialsBadRequestBodyTypeNotFound string = "not_found"
+	// PostCredentialsBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PostCredentialsBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PostCredentialsBadRequestBodyTypeInternal captures enum value "internal"
 	PostCredentialsBadRequestBodyTypeInternal string = "internal"
 	// PostCredentialsBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -342,7 +344,7 @@ var postCredentialsInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -357,6 +359,8 @@ const (
 	PostCredentialsInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// PostCredentialsInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	PostCredentialsInternalServerErrorBodyTypeNotFound string = "not_found"
+	// PostCredentialsInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PostCredentialsInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PostCredentialsInternalServerErrorBodyTypeInternal captures enum value "internal"
 	PostCredentialsInternalServerErrorBodyTypeInternal string = "internal"
 	// PostCredentialsInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -434,7 +438,7 @@ var postCredentialsNotFoundBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -449,6 +453,8 @@ const (
 	PostCredentialsNotFoundBodyTypeUnauthorized string = "unauthorized"
 	// PostCredentialsNotFoundBodyTypeNotFound captures enum value "not_found"
 	PostCredentialsNotFoundBodyTypeNotFound string = "not_found"
+	// PostCredentialsNotFoundBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PostCredentialsNotFoundBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PostCredentialsNotFoundBodyTypeInternal captures enum value "internal"
 	PostCredentialsNotFoundBodyTypeInternal string = "internal"
 	// PostCredentialsNotFoundBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -526,7 +532,7 @@ var postCredentialsUnauthorizedBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -541,6 +547,8 @@ const (
 	PostCredentialsUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// PostCredentialsUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	PostCredentialsUnauthorizedBodyTypeNotFound string = "not_found"
+	// PostCredentialsUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PostCredentialsUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PostCredentialsUnauthorizedBodyTypeInternal captures enum value "internal"
 	PostCredentialsUnauthorizedBodyTypeInternal string = "internal"
 	// PostCredentialsUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

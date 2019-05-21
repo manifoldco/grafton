@@ -101,7 +101,11 @@ APIS=$(patsubst specs/%.yaml,%,$(wildcard specs/*.yaml))
 API_CLIENTS=$(APIS:%=generated/%/client)
 generated-clients: $(API_CLIENTS)
 
-.PHONY: generated-clients
+refresh-specs:
+	curl https://docs.manifold.co/specs/provider.yaml > specs/provider.yaml
+	curl https://docs.manifold.co/specs/connector.yaml > specs/connector.yaml
+
+.PHONY: generated-clients refresh-specs
 
 #################################################
 # Building

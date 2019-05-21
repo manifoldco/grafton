@@ -66,9 +66,21 @@ type GetResourcesIDMeasuresParams struct {
 
 	*/
 	ID string
-	/*PeriodEnd*/
+	/*PeriodEnd
+	  The exclusive end of the period. URI encoded.
+	Example: `2018-06-01T00:00:00.000Z`
+	When URI encoded: `2018-06-01T00%3A00%3A00.000Z`
+
+
+	*/
 	PeriodEnd strfmt.DateTime
-	/*PeriodStart*/
+	/*PeriodStart
+	  The inclusive start of the period. URI encoded.
+	Example: `2018-05-01T00:00:00.000Z`
+	When URI encoded: `2018-05-01T00%3A00%3A00.000Z`
+
+
+	*/
 	PeriodStart strfmt.DateTime
 
 	timeout    time.Duration

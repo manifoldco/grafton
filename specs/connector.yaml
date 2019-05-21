@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   title: Connector API
   description: |
@@ -20,39 +20,35 @@ info:
 
     Access Tokens are valid for 24 hours.
 
-    OAuth Credentials are given to providers by Manifold and are scoped to a
-    specific product in the Manifold Catalog. All granted access tokens are
-    scoped to the product's credentials.
+    OAuth Credentials have two possible scopes:
+    * single specific product
+    * all products of the provider
 
-    To acquire a set of OAuth Credentials please contact [Manifold
-    Support](mailto:support@manifold.co).
-  version: '1.0.0'
+    OAuth Credentials are available from your Provider Dashboard on Manifold.
 
-# the domain of the service
+    Please contact [Manifold Support](mailto:support@manifold.co) for assistance.
+  version: 1.0.0
 host: api.connector.manifold.co
-schemes: [ https ]
-produces: [ application/json ]
-consumes: [ application/json ]
-
+schemes:
+- https
+produces:
+- application/json
+consumes:
+- application/json
+x-tagGroups:
+- name: API Endpoints
+  tags:
+  - OAuth
+  - Resource
+  - Callback
+  - CredentialRotation
 securityDefinitions:
-  tokenRequired:
-    x-manifold-audience: internal
-    type: apiKey
-    description: Authentication mechanism for dashboard users
-    name: Authorization
-    in: header
   oauth:
     type: oauth2
     description: Authentication mechanism for external provider services.
     flow: accessCode
     authorizationUrl: https://api.connector.manifold.co/v1/oauth/authorize
     tokenUrl: https://api.connector.manifold.co/v1/oauth/tokens
-  xInternalAuthRequired:
-    x-manifold-audience: internal
-    type: apiKey
-    name: X-Internal-Auth
-    in: header
-
 parameters:
   resource_id:
     name: id
@@ -61,7 +57,7 @@ parameters:
       ID of a Resource object, stored as a base32 encoded 18 byte identifier.
     required: true
     type: string
-    pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
     format: base32ID
   callback_id:
     name: id
@@ -70,95 +66,81 @@ parameters:
       ID of a Callback, stored as a base32 encoded 18 byte identifier.
     required: true
     type: string
-    pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
     format: base32ID
-
 responses:
   BadRequest:
     description: Request denied due to invalid request body, path, or headers.
-    schema: { $ref: '#/definitions/Error' }
+    schema:
+      $ref: '#/definitions/Error'
     examples:
       application/json:
         type: bad_request
-        message: ['Invalid Resource ID Provided']
-
+        message:
+        - Invalid Resource ID Provided
   Unauthorized:
     description: Request denied as the provided credentials are no longer valid.
-    schema: { $ref: '#/definitions/Error' }
+    schema:
+      $ref: '#/definitions/Error'
     examples:
       application/json:
         type: invalid_grant
-        message: ['Provided authorization_code is invalid or does not exist.']
-
+        message:
+        - Provided authorization_code is invalid or does not exist.
   NotFound:
     description: Request denied as the requested resource does not exist.
-    schema: { $ref: '#/definitions/Error' }
+    schema:
+      $ref: '#/definitions/Error'
     examples:
       application/json:
         type: not_found
-        message: ['Resource not found']
-
+        message:
+        - Resource not found
+  MethodNotAllowed:
+    description: Request method is known by the server but is not supported by the
+      target resource.
+    schema:
+      $ref: '#/definitions/Error'
+    examples:
+      application/json:
+        type: method_not_allowed
+        message:
+        - Method Not Allowed
   Internal:
     description: Request failed due to an internal server error.
-    schema: { $ref: '#/definitions/Error' }
+    schema:
+      $ref: '#/definitions/Error'
     examples:
       application/json:
         type: internal
-        message: ['Internal Server Error']
-
+        message:
+        - Internal Server Error
   TokenBadRequest:
     description: Request denied due to invalid request body, path, or headers.
-    schema: { $ref: '#/definitions/OAuthError' }
+    schema:
+      $ref: '#/definitions/OAuthError'
     examples:
       application/json:
         error: invalid_grant
-        error_description: 'Provided authorization_code is invalid or does not exist.'
-
+        error_description: Provided authorization_code is invalid or does not exist.
   TokenUnauthorized:
     description: Request denied as the provided credentials are no longer valid.
-    schema: { $ref: '#/definitions/OAuthError' }
+    schema:
+      $ref: '#/definitions/OAuthError'
     examples:
       application/json:
         error: invalid_client
-        error_description: 'Provided client_id and client_secret do not match'
-
-
+        error_description: Provided client_id and client_secret do not match
 security:
-  - oauth: []
-
+- oauth: []
 basePath: /v1
 paths:
-  /sso:
-    x-manifold-audience: browser
-    post:
-      summary: Create Authorization Code
-      description: |
-        Endpoint for creating an authorization code used by the user to issue
-        an SSO request against a providers API from the Dashboard.
-      security:
-        - tokenRequired: []
-      tags:
-        - OAuth
-      parameters:
-        - name: body
-          in: body
-          description: Authorization Code Request Body
-          required: true
-          schema: { $ref: '#/definitions/AuthCodeRequest' }
-      responses:
-        201:
-          description: An authorization code has been created.
-          schema: { $ref: '#/definitions/AuthorizationCode' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        500: { $ref: '#/responses/Internal' }
-
   /oauth/tokens:
     x-manifold-audience: provider
     post:
       consumes:
-        - application/json
-        - application/x-www-form-urlencoded
+      - application/json
+      - application/x-www-form-urlencoded
       summary: Create Access Token
       description: |
         A provider uses this endpoint to acquire a scoped access token which
@@ -171,7 +153,8 @@ paths:
           grant from a user for an access token giving them permission to act on
           the user's behalf.
         * `client_credentials` which allows a provider to grant themselves an
-          access token scoped to a product.
+          access token that is either scoped to all their products or to
+          a specific one.
 
         This endpoint is a part of the Single Sign-On flow invoked by users
         attempting to navigate to a resource's dashboard. A `code` is only
@@ -184,37 +167,41 @@ paths:
 
         The granted token will expire within 24 hours.
       tags:
-        - OAuth
+      - OAuth
       security: []
       parameters:
-        - name: Authorization
-          in: header
-          type: string
-          format: basic-auth
-          pattern: '^Basic [a-zA-Z0-9+/=]{100}$'
-          minLength: 106
-          maxLength: 106
-          description: |
-            Authorization header for basic access authentication containing the
-            OAuth2 `client_id` as user name, and OAuth2 `client_secret` as
-            password. The `client_id` and `client_secret` may be passed either
-            in the body of the request, or in this header.
+      - name: Authorization
+        in: header
+        type: string
+        format: basic-auth
+        pattern: ^Basic [a-zA-Z0-9+/=]{100}$
+        minLength: 106
+        maxLength: 106
+        description: |
+          Authorization header for basic access authentication containing the
+          OAuth2 `client_id` as user name, and OAuth2 `client_secret` as
+          password. The `client_id` and `client_secret` may be passed either
+          in the body of the request, or in this header.
 
-            Using this header is the **preferred** way to transmit `client_id`
-            and `client_secret`.
-        - name: body
-          in: body
-          description: OAuth Access Token Request Body
-          required: true
-          schema: { $ref: '#/definitions/AccessTokenRequest' }
+          Using this header is the **preferred** way to transmit `client_id`
+          and `client_secret`.
+      - name: body
+        in: body
+        description: OAuth Access Token Request Body
+        required: true
+        schema:
+          $ref: '#/definitions/AccessTokenRequest'
       responses:
         201:
           description: An access token has been created
-          schema: { $ref: '#/definitions/AccessToken' }
-        400: { $ref: '#/responses/TokenBadRequest' }
-        401: { $ref: '#/responses/TokenUnauthorized' }
-        500: { $ref: '#/responses/Internal' }
-
+          schema:
+            $ref: '#/definitions/AccessToken'
+        400:
+          $ref: '#/responses/TokenBadRequest'
+        401:
+          $ref: '#/responses/TokenUnauthorized'
+        500:
+          $ref: '#/responses/Internal'
   /self:
     x-manifold-audience: provider
     get:
@@ -229,19 +216,22 @@ paths:
         | Grant Type | Identity Type |
         | ---------- | ------------ |
         | `authorization_code` | `user` |
-        | `client_credentials` | `product` |
+        | `client_credentials` | `product` or `provider` |
       tags:
-        - OAuth
+      - OAuth
       responses:
         200:
           description: |
-            The identity of the user or product represented by the access
+            The identity of the user, provider or product represented by the access
             token.
-          schema: { $ref: '#/definitions/Identity' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        500: { $ref: '#/responses/Internal' }
-
+          schema:
+            $ref: '#/definitions/Identity'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        500:
+          $ref: '#/responses/Internal'
   /resources/{id}:
     x-manifold-audience: provider
     get:
@@ -257,18 +247,22 @@ paths:
         The `region` is the machine readable representation of the platform and
         location in which this resource has been provisioned.
       parameters:
-        - { $ref: '#/parameters/resource_id' }
+      - $ref: '#/parameters/resource_id'
       tags:
-        - Resource
+      - Resource
       responses:
         200:
           description: A resource.
-          schema: { $ref: '#/definitions/Resource' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+          schema:
+            $ref: '#/definitions/Resource'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /resources/{id}/users:
     x-manifold-audience: provider
     get:
@@ -281,20 +275,24 @@ paths:
         Instead, a provider is required to call this end-point to fetch the
         latest data.
       parameters:
-        - { $ref: '#/parameters/resource_id' }
+      - $ref: '#/parameters/resource_id'
       tags:
-        - Resource
+      - Resource
       responses:
         200:
           description: A list of users who have access to the Resource.
           schema:
             type: array
-            items: { $ref: '#/definitions/Profile' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+            items:
+              $ref: '#/definitions/Profile'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /resources/{id}/credentials:
     x-manifold-audience: provider
     get:
@@ -303,20 +301,24 @@ paths:
         A provider can call this endpoint to return a list of all the credentials
         related to a specific resource
       parameters:
-        - { $ref: '#/parameters/resource_id' }
+      - $ref: '#/parameters/resource_id'
       tags:
-        - Resource
+      - Resource
       responses:
         200:
           description: A list of credentials from the Resource.
           schema:
             type: array
-            items: { $ref: '#/definitions/ResourceCredentials' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+            items:
+              $ref: '#/definitions/ResourceCredentials'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /resources/{id}/measures:
     x-manifold-audience: provider
     get:
@@ -326,27 +328,32 @@ paths:
         A provider can call this endpoint to see how much Manifold has stored
         for feature usage of a resource. This is useful for testing and validation.
       parameters:
-        - { $ref: '#/parameters/resource_id' }
-        - name: period_start
-          in: query
-          type: string
-          format: datetime
-          description: The start of a billing period, must be the start of a month.
-        - name: period_end
-          in: query
-          type: string
-          format: datetime
-          description: The end of a billing period, must be the end of a month inclusive.
+      - $ref: '#/parameters/resource_id'
+      - name: period_start
+        in: query
+        type: string
+        format: datetime
+        description: The start of a billing period, must be the start of a month.
+      - name: period_end
+        in: query
+        type: string
+        format: datetime
+        description: The end of a billing period, must be the end of a month inclusive.
       tags:
-        - Resource
+      - Resource
       responses:
         200:
           description: An array of resource measures per billing period as queried
-          schema: { $ref: '#/definitions/ResourceMeasuresUsages' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
+          schema:
+            $ref: '#/definitions/ResourceMeasuresUsages'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
     put:
       summary: |
         **BETA** Set how much a resource has used of its features.
@@ -354,28 +361,32 @@ paths:
         **BETA** A provider can call this endpoint to set how much a resource
         has used of its features during a period of time.
       parameters:
-        - { $ref: '#/parameters/resource_id' }
-        - name: body
-          in: body
-          required: true
-          schema: { $ref: '#/definitions/ResourceMeasures' }
+      - $ref: '#/parameters/resource_id'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ResourceMeasures'
       tags:
-        - Resource
+      - Resource
       responses:
         204:
           description: Empty response
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /credential-rotations/{rotation_id}:
     x-manifold-audience: provider
     put:
-      summary: Start a credential rotation
+      summary: |
+        **ALPHA** Start a credential rotation
       description: |
-        **ALPHA**
-        A provider can call this endpoint to trigger a credential rotation for
+        **ALPHA** A provider can call this endpoint to trigger a credential rotation for
         a specific credential. This route supports being called multiple times
         with the same payload.
 
@@ -390,31 +401,36 @@ paths:
         Also make sure to reuse the `rotation_id` when retrying the same rotation to not
         trigger duplicate rotations.
       parameters:
-        - name: rotation_id
-          in: path
-          description: |
-            ID of a the credential-rotations, stored as a base32 encoded 18 byte identifier.
-          required: true
-          type: string
-        - name: body
-          in: body
-          description: Resource Provisioning Request
-          required: true
-          schema:
-            $ref: '#/definitions/CredentialRotationRequest'
+      - name: rotation_id
+        in: path
+        description: |
+          ID of a the credential-rotations, stored as a base32 encoded 18 byte identifier.
+        required: true
+        type: string
+      - name: body
+        in: body
+        description: Resource Provisioning Request
+        required: true
+        schema:
+          $ref: '#/definitions/CredentialRotationRequest'
       tags:
-        - CredentialRotation
+      - CredentialRotation
       responses:
         202:
           description: |
             Acknowledgement of the credential rotation request.
 
             Manifold will start proccessing the request asynchronously.
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        405:
+          $ref: '#/responses/MethodNotAllowed'
+        500:
+          $ref: '#/responses/Internal'
   /callbacks/{id}:
     x-manifold-audience: provider
     put:
@@ -445,212 +461,203 @@ paths:
         exists (e.g. `postgres://user:pw@host:5432/db`), please provide the
         credentials in that form.
       parameters:
-        - { $ref: '#/parameters/callback_id' }
-        - name: body
-          in: body
-          description: Response to Callback sent by the Provider
-          required: true
-          schema: { $ref: '#/definitions/CallbackResponse' }
+      - $ref: '#/parameters/callback_id'
+      - name: body
+        in: body
+        description: Response to Callback sent by the Provider
+        required: true
+        schema:
+          $ref: '#/definitions/CallbackResponse'
       tags:
-        - Callback
+      - Callback
       responses:
         204:
           description: |
             The callback payload has been accepted, Manifold is no longer
             waiting for the callback to be received to continue on with the
             current operation.
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /credentials/:
     x-manifold-audience: provider
     get:
       summary: Get list of OAuth credentials without secrets.
       description: |
         List all non-expired OAuth 2.0 credential pairs for a provider's product.
-        This does **not** return the secret.
+
+        One of the `product_id` or `provider_id` query parameters is required.
+
+        **IMPORTANT**: This does **not** return the secret.
+
+        Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+        in the context of a Manifold user.
       security:
-        - tokenRequired: []
+      - tokenRequired: []
       tags:
-        - OAuth
+      - OAuth
       parameters:
-        - name: product_id
-          in: query
-          description: |
-            ID of the Product to filter Resources by, stored as a
-            base32 encoded 18 byte identifier.
-          type: string
-          pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
-          format: base32ID
-          required: true
+      - name: product_id
+        in: query
+        description: |
+          ID of the Product to filter Resources by, stored as a
+          base32 encoded 18 byte identifier.
+        type: string
+        pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+        format: base32ID
+        required: false
+      - name: provider_id
+        in: query
+        description: |
+          **ALPHA** ID of the Provider to filter Resources by, stored as a
+          base32 encoded 18 byte identifier.
+        type: string
+        pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+        format: base32ID
+        required: false
       responses:
         200:
           description: List of OAuth 2.0 credentials.
           schema:
             type: array
-            items: { $ref: '#/definitions/OAuthCredentialGetResponse' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
+            items:
+              $ref: '#/definitions/OAuthCredentialGetResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
     post:
       summary: Create an OAuth credential pair
       description: |
-        Create an OAuth 2.0 credential pair for a provider's product.
-        `client_secret` is stored as an `scrypt` hash only; if the value is
-        lost after creation, it cannot be recovered.
+        Create an OAuth 2.0 credential pair for a provider.
+
+        That credential can either be scoped to all products of the provider
+        or to a specific product. This is done by providing the `product_id`.
+
+        `client_secret` is stored as an `scrypt` hash only. Therefore, If the
+        value is lost after creation, it cannot be recovered.
+
+        **IMPORTANT**: For security, Manifold expires all previously created
+        credentials of the same scope (product or provider) within 24 hours
+        of creating a new credential. This means that only the most recent
+        credential of a specific scope should be used.
+
+        Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+        in the context of a Manifold user.
       security:
-        - tokenRequired: []
+      - tokenRequired: []
       tags:
-        - OAuth
+      - OAuth
       parameters:
-        - name: body
-          in: body
-          description: A product id and description for the credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateRequest' }
+      - name: body
+        in: body
+        description: |
+          Scoping details of the credentials (provider_id or product_id) as well
+          as a description for the credential pair.
+        schema:
+          $ref: '#/definitions/OAuthCredentialCreateRequest'
       responses:
         200:
           description: The created OAuth 2.0 credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateResponse' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
+          schema:
+            $ref: '#/definitions/OAuthCredentialCreateResponse'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
   /credentials/{id}:
     x-manifold-audience: provider
     delete:
       summary: Delete an OAuth credential pair
       description: |
-        Delete an OAuth 2.0 credential pair for a provider's product.
+        Delete an OAuth 2.0 credential pair.
+
+        Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+        in the context of a Manifold user.
       security:
-        - tokenRequired: []
+      - tokenRequired: []
       tags:
-        - OAuth
+      - OAuth
       parameters:
-        - name: id
-          in: path
-          description: |
-            ID of the credential to delete, stored as a base32 encoded 18 byte
-            identifier.
-          required: true
-          type: string
-          pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
-          format: base32ID
+      - name: id
+        in: path
+        description: |
+          ID of the credential to delete, stored as a base32 encoded 18 byte
+          identifier.
+        required: true
+        type: string
+        pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
+        format: base32ID
       responses:
         204:
           description: Empty response
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
-  /internal/credentials:
-    x-manifold-audience: internal
-    post:
-      summary: Create an OAuth credential pair
-      description: |
-        Create an OAuth 2.0 credential pair for a provider's product.
-        `client_secret` is stored as an `scrypt` hash only; if the value is
-        lost after creation, it cannot be recovered.
-      security: [ xInternalAuthRequired: [] ]
-      tags:
-        - OAuth
-      parameters:
-        - name: body
-          in: body
-          description: A product id and description for the credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateRequest' }
-      responses:
-        200:
-          description: The created OAuth 2.0 credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialCreateResponse' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
-  /internal/credentials/{id}:
-    x-manifold-audience: internal
-    get:
-      summary: Get an OAuth credential pair
-      description: |
-        Retrieve an existing OAuth 2.0 credential pair. This does **not** return
-        the secret.
-      security: [ xInternalAuthRequired: [] ]
-      tags:
-        - OAuth
-      parameters:
-        - name: id
-          in: path
-          description: The ID of the credential pair to retrieve.
-          required: true
-          type: string
-          pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
-          format: base32ID
-      responses:
-        200:
-          description: The OAuth 2.0 credential pair.
-          schema: { $ref: '#/definitions/OAuthCredentialGetResponse' }
-        400: { $ref: '#/responses/BadRequest' }
-        401: { $ref: '#/responses/Unauthorized' }
-        404: { $ref: '#/responses/NotFound' }
-        500: { $ref: '#/responses/Internal' }
-
-
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/Internal'
 definitions:
   ID:
     type: string
     description: A base32 encoded 18 byte identifier.
-    pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
     format: base32ID
     x-go-type:
       type: ID
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   OptionalID:
     type: string
     description: A base32 encoded 18 byte identifier.
-    pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
     format: base32ID
     x-nullable: true
     x-go-type:
       type: ID
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   Label:
     type: string
     description: A machine readable unique label, which is url safe.
-    pattern: '^[a-z0-9][a-z0-9\-\_]{1,128}$'
+    pattern: ^[a-z0-9][a-z0-9\-\_]{1,128}$
     x-go-type:
       type: Label
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   Name:
     type: string
     description: A name of an entity which is displayed to a human.
-    pattern: '^[a-zA-Z][a-z0-9A-Z \-_]{2,128}$'
+    pattern: ^[a-zA-Z][a-z0-9A-Z \-_]{2,128}$
     x-go-type:
       type: Name
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   RegionSlug:
     type: string
     description: |
-        Combination of the cloud platform and location to provision this
-        resource within.
-    pattern: '^([a-z0-9][a-z0-9\-_]{1,63})::([a-z0-9][a-z0-9\-_]{1,63})$'
-
+      Combination of the cloud platform and location to provision this
+      resource within.
+    pattern: ^([a-z0-9][a-z0-9\-_]{1,63})::([a-z0-9][a-z0-9\-_]{1,63})$
   Code:
     type: string
     minLength: 13
@@ -658,7 +665,6 @@ definitions:
     description: |
       An authorization code used by a provider in exchange for a scoped
       Access Token.
-
   Email:
     type: string
     format: email
@@ -666,62 +672,63 @@ definitions:
     x-go-type:
       type: Email
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   UserRole:
     type: string
-    enum: ['owner', 'member', 'admin']
-
+    enum:
+    - owner
+    - member
+    - admin
   Error:
     type: object
     properties:
       type:
         type: string
         enum:
-          - bad_request
-          - unauthorized
-          - not_found
-          - internal
-          - invalid_grant
-          - unsupported_grant_type
+        - bad_request
+        - unauthorized
+        - not_found
+        - method_not_allowed
+        - internal
+        - invalid_grant
+        - unsupported_grant_type
         description: The error type
       message:
         type: array
         description: Explanation of the errors
-        items: { type: string }
+        items:
+          type: string
     x-go-type:
       type: Error
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   OAuthError:
     type: object
     properties:
       error:
         type: string
         enum:
-          - invalid_request
-          - invalid_client
-          - invalid_grant
-          - unauthorized_client
-          - unsupported_grant_type
-          - invalid_scope
-          - access_denied
+        - invalid_request
+        - invalid_client
+        - invalid_grant
+        - unauthorized_client
+        - unsupported_grant_type
+        - invalid_scope
+        - access_denied
         description: The error type
       error_description:
         type: string
         description: Explanation of the error
     additionalProperties: false
     required:
-      - error
+    - error
     x-go-type:
       type: OAuthError
       import:
-        package: 'github.com/manifoldco/go-connector'
+        package: github.com/manifoldco/go-connector
         alias: connector
-
   AuthCodeRequest:
     description: HTTP Request Body of an Auth Code
     type: object
@@ -729,195 +736,257 @@ definitions:
       body:
         type: object
         properties:
-          resource_id: { $ref: '#/definitions/ID' }
+          resource_id:
+            $ref: '#/definitions/ID'
         additionalProperties: false
         required:
-          - resource_id
+        - resource_id
     additionalProperties: false
     required:
-      - body
-
+    - body
   AuthorizationCode:
     type: object
     properties:
-      id: { $ref: '#/definitions/ID' }
-      version: { type: string, enum: ['1'] }
-      type: { type: string, enum: ['authorization_code'] }
+      id:
+        $ref: '#/definitions/ID'
+      version:
+        type: string
+        enum:
+        - "1"
+      type:
+        type: string
+        enum:
+        - authorization_code
       body:
         type: object
         properties:
-          user_id: { $ref: '#/definitions/ID' }
-          team_id: { $ref: '#/definitions/OptionalID' }
-          resource_id: { $ref: '#/definitions/ID' }
-          created_at: { type: string, format: datetime }
-          expires_at: { type: string, format: datetime }
-          code: { $ref: '#/definitions/Code' }
-          redirect_uri: { type: string, format: url }
+          user_id:
+            $ref: '#/definitions/ID'
+          team_id:
+            $ref: '#/definitions/OptionalID'
+          resource_id:
+            $ref: '#/definitions/ID'
+          created_at:
+            type: string
+            format: datetime
+          expires_at:
+            type: string
+            format: datetime
+          code:
+            $ref: '#/definitions/Code'
+          redirect_uri:
+            type: string
+            format: url
         additionalProperties: false
         required:
-          - user_id
-          - resource_id
-          - created_at
-          - expires_at
-          - code
-          - redirect_uri
+        - user_id
+        - resource_id
+        - created_at
+        - expires_at
+        - code
+        - redirect_uri
     additionalProperties: false
     required:
-      - id
-      - version
-      - type
-      - body
+    - id
+    - version
+    - type
+    - body
     x-go-type:
       type: OAuthAuthorizationCode
       import:
-        package: 'github.com/manifoldco/grafton/marketplace/primitives'
-
+        package: github.com/manifoldco/grafton/marketplace/primitives
   OAuthClientID:
     description: |
       Client ID portion of the OAuth Credentials used for accessing the
       Manifold Connector API.
     type: string
-    pattern: '^[0-9abcdefghjkmnpqrtuvwxyz]{29}$'
+    pattern: ^[0-9abcdefghjkmnpqrtuvwxyz]{29}$
     format: base32ID
     x-go-type:
       type: ID
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   OAuthClientSecret:
     type: string
     minLength: 43
     maxLength: 43
-    pattern: '^[a-zA-Z0-9_-]{43}$'
+    pattern: ^[a-zA-Z0-9_-]{43}$
     description: |
       Client Secret portion of the OAuth Credentials used for accessing the
       Manifold Connector API. A client secret is a 32byte base64 encoded value.
 
       This value must be kept a secret.
-
   AccessTokenRequest:
     description: HTTP Request Body of an Access Token
-    discriminator: "grant_type"
+    discriminator: grant_type
     type: object
     properties:
-      grant_type: { type: string, enum: ['authorization_code', 'client_credentials'] }
-      client_id: { $ref: '#/definitions/OAuthClientID' }
-      client_secret: { $ref: '#/definitions/OAuthClientSecret' }
+      grant_type:
+        type: string
+        enum:
+        - authorization_code
+        - client_credentials
+      client_id:
+        $ref: '#/definitions/OAuthClientID'
+      client_secret:
+        $ref: '#/definitions/OAuthClientSecret'
     additionalProperties: false
     required:
-      - grant_type
-
+    - grant_type
   client_credentials:
     type: object
     allOf:
-      - { $ref: '#/definitions/AccessTokenRequest' }
-
+    - $ref: '#/definitions/AccessTokenRequest'
   authorization_code:
     type: object
     allOf:
-      - { $ref: '#/definitions/AccessTokenRequest' }
-      - type: object
-        properties:
-          code: { $ref: '#/definitions/Code' }
-        additionalProperties: false
-        required:
-          - code
-
+    - $ref: '#/definitions/AccessTokenRequest'
+    - type: object
+      properties:
+        code:
+          $ref: '#/definitions/Code'
+      additionalProperties: false
+      required:
+      - code
   AccessToken:
     description: |
       A granted access token used for performing requests on behalf o a user
       or provider against the Manifold Connector API.
     type: object
     properties:
-      access_token: { type: string, maxLength: 295 }
-      token_type: { type: string, enum: ['bearer'] }
-      expires_in: { type: integer  }
+      access_token:
+        type: string
+        maxLength: 295
+      token_type:
+        type: string
+        enum:
+        - bearer
+      expires_in:
+        type: integer
     additionalProperties: false
     required:
-      - access_token
-      - token_type
-      - expires_in
-
+    - access_token
+    - token_type
+    - expires_in
   Identity:
     description: The underlying actor represented by the current Access Token.
-    discriminator: "type"
+    discriminator: type
     type: object
     properties:
-      type: { type: string, enum: ['user', 'product'] }
+      type:
+        type: string
+        enum:
+        - user
+        - product
+        - provider
     additionalProperties: false
     required:
-      - type
-
+    - type
+  provider:
+    allOf:
+    - $ref: '#/definitions/Identity'
+    - type: object
+      properties:
+        target:
+          type: object
+          properties:
+            name:
+              $ref: '#/definitions/Name'
+            label:
+              $ref: '#/definitions/Label'
+          additionalProperties: false
+          required:
+          - name
+          - label
+      required:
+      - target
   product:
     allOf:
-      - { $ref: '#/definitions/Identity' }
-      - type: object
-        properties:
-          target:
-            type: object
-            properties:
-              name: { $ref: '#/definitions/Name' }
-              label: { $ref: '#/definitions/Label' }
-            additionalProperties: false
-            required:
-              - name
-              - label
-        required:
-          - target
-
+    - $ref: '#/definitions/Identity'
+    - type: object
+      properties:
+        target:
+          type: object
+          properties:
+            name:
+              $ref: '#/definitions/Name'
+            label:
+              $ref: '#/definitions/Label'
+          additionalProperties: false
+          required:
+          - name
+          - label
+      required:
+      - target
   user:
     allOf:
-      - { $ref: '#/definitions/Identity' }
-      - type: object
-        properties:
-          target:
-            type: object
-            properties:
-              id: { $ref: '#/definitions/ID' }
-              name: { $ref: '#/definitions/Name' }
-              email: { $ref: '#/definitions/Email' }
-              teams:
-                type: array
-                items: { $ref: '#/definitions/Team' }
-              projects:
-                type: array
-                items: { $ref: '#/definitions/Project' }
-              resources:
-                type: array
-                items: { $ref: '#/definitions/Resource' }
-            additionalProperties: false
-            required:
-              - name
-              - email
-        required:
-          - target
-
+    - $ref: '#/definitions/Identity'
+    - type: object
+      properties:
+        target:
+          type: object
+          properties:
+            id:
+              $ref: '#/definitions/ID'
+            name:
+              $ref: '#/definitions/Name'
+            email:
+              $ref: '#/definitions/Email'
+            teams:
+              type: array
+              items:
+                $ref: '#/definitions/Team'
+            projects:
+              type: array
+              items:
+                $ref: '#/definitions/Project'
+            resources:
+              type: array
+              items:
+                $ref: '#/definitions/Resource'
+          additionalProperties: false
+          required:
+          - name
+          - email
+      required:
+      - target
   Team:
     type: object
     properties:
-      id: { $ref: '#/definitions/ID' }
-      label: { $ref: '#/definitions/Label' }
-      name: { $ref: '#/definitions/Name' }
-      user_role: { $ref: '#/definitions/UserRole' }
+      id:
+        $ref: '#/definitions/ID'
+      label:
+        $ref: '#/definitions/Label'
+      name:
+        $ref: '#/definitions/Name'
+      user_role:
+        $ref: '#/definitions/UserRole'
       projects:
         type: array
-        items: { $ref: '#/definitions/Project' }
+        items:
+          $ref: '#/definitions/Project'
       resources:
         type: array
-        items: { $ref: '#/definitions/Resource' }
-
+        items:
+          $ref: '#/definitions/Resource'
   Project:
     type: object
     properties:
-      id: { $ref: '#/definitions/ID' }
-      label: { $ref: '#/definitions/Label' }
-      name: { $ref: '#/definitions/Name' }
-      description: { type: string, minLength: 1, maxLength: 1000 }
+      id:
+        $ref: '#/definitions/ID'
+      label:
+        $ref: '#/definitions/Label'
+      name:
+        $ref: '#/definitions/Name'
+      description:
+        type: string
+        minLength: 1
+        maxLength: 1000
       resources:
         type: array
-        items: { $ref: '#/definitions/Resource' }
-
+        items:
+          $ref: '#/definitions/Resource'
   Profile:
     description: |
       A view of a Manifold User.
@@ -926,15 +995,18 @@ definitions:
       date information.
     type: object
     properties:
-      id: { $ref: '#/definitions/ID' }
-      name: { $ref: '#/definitions/Name' }
-      email: { $ref: '#/definitions/Email' }
-      role: { $ref: '#/definitions/UserRole' }
+      id:
+        $ref: '#/definitions/ID'
+      name:
+        $ref: '#/definitions/Name'
+      email:
+        $ref: '#/definitions/Email'
+      role:
+        $ref: '#/definitions/UserRole'
     additionalProperties: false
     required:
-      - name
-      - email
-
+    - name
+    - email
   FeatureMap:
     type: object
     description: A map of feature labels to selected values for customizable features
@@ -946,9 +1018,8 @@ definitions:
     x-go-type:
       type: FeatureMap
       import:
-        package: 'github.com/manifoldco/go-manifold'
+        package: github.com/manifoldco/go-manifold
         alias: manifold
-
   Resource:
     description: |
       A view of a Resource provisioned through Manifold.
@@ -957,65 +1028,86 @@ definitions:
       date information.
     type: object
     properties:
-      id: { $ref: '#/definitions/ID' }
-      product: { $ref: '#/definitions/Label' }
-      plan: { $ref: '#/definitions/Label' }
-      region: { $ref: '#/definitions/RegionSlug' }
-      features: { $ref: '#/definitions/FeatureMap' }
+      id:
+        $ref: '#/definitions/ID'
+      product:
+        $ref: '#/definitions/Label'
+      plan:
+        $ref: '#/definitions/Label'
+      region:
+        $ref: '#/definitions/RegionSlug'
+      features:
+        $ref: '#/definitions/FeatureMap'
       name:
         $ref: '#/definitions/Name'
-        description: "This field is deprecated in favor of label"
-      label: { $ref: '#/definitions/Label' }
-      created_at: { type: string, format: datetime }
-      updated_at: { type: string, format: datetime }
-
+        description: This field is deprecated in favor of label
+      label:
+        $ref: '#/definitions/Label'
+      created_at:
+        type: string
+        format: datetime
+      updated_at:
+        type: string
+        format: datetime
   ResourceMeasures:
     type: object
     properties:
-      body: { $ref: '#/definitions/ResourceMeasuresBody' }
+      body:
+        $ref: '#/definitions/ResourceMeasuresBody'
     additionalProperties: false
     required:
-      - body
-
+    - body
   ResourceMeasuresBody:
     type: object
     properties:
-      resource_id: { $ref: '#/definitions/ID' }
-      period_start: { type: string, format: datetime }
-      period_end: { type: string, format: datetime }
+      resource_id:
+        $ref: '#/definitions/ID'
+      period_start:
+        type: string
+        format: datetime
+      period_end:
+        type: string
+        format: datetime
       measures:
         type: object
         additionalProperties:
           type: integer
     additionalProperties: false
     required:
-      - resource_id
-      - period_start
-      - period_end
-      - measures
-
+    - resource_id
+    - period_start
+    - period_end
+    - measures
   ResourceMeasuresUsages:
     type: array
-    items: { $ref: '#/definitions/ResourceMeasuresUsage' }
-
+    items:
+      $ref: '#/definitions/ResourceMeasuresUsage'
   ResourceMeasuresUsage:
     type: object
     properties:
-      updated_at: { type: string, format: datetime }
-      period_start: { type: string, format: datetime }
-      period_end: { type: string, format: datetime }
+      updated_at:
+        type: string
+        format: datetime
+      period_start:
+        type: string
+        format: datetime
+      period_end:
+        type: string
+        format: datetime
       measures:
         type: array
-        items: { $ref: '#/definitions/ResourceMeasure' }
-
+        items:
+          $ref: '#/definitions/ResourceMeasure'
   ResourceMeasure:
     type: object
     properties:
       feature:
         type: object
         properties:
-          label: { $ref: '#/definitions/Label' }
-          name: { $ref: '#/definitions/Name' }
+          label:
+            $ref: '#/definitions/Label'
+          name:
+            $ref: '#/definitions/Name'
         additionalProperties: false
       feature_value:
         type: object
@@ -1023,36 +1115,46 @@ definitions:
           label:
             type: string
             description: A machine readable unique label, which is url safe.
-            pattern: '^[a-z0-9][a-z0-9-_\.]{1,128}$'
+            pattern: ^[a-z0-9][a-z0-9-_\.]{1,128}$
             x-go-type:
               type: FeatureValueLabel
               import:
-                package: "github.com/manifoldco/go-manifold"
+                package: github.com/manifoldco/go-manifold
                 alias: manifold
-          name: { $ref: '#/definitions/Name' }
+          name:
+            $ref: '#/definitions/Name'
         additionalProperties: false
-      usage: { type: integer, x-nullable: false }
-      max: { type: integer, x-nullable: true }
-      suffix: { type: string, x-nullable: true }
+      usage:
+        type: integer
+        x-nullable: false
+      max:
+        type: integer
+        x-nullable: true
+      suffix:
+        type: string
+        x-nullable: true
     additionalProperties: false
     required:
-      - usage
-      - feature
-      - feature_value
-
+    - usage
+    - feature
+    - feature_value
   CredentialRotationRequest:
     description: |
       The information on the credential rotation to perform.
     type: object
     properties:
-      resource_id: { $ref: '#/definitions/ID' }
-      credential_id: { $ref: '#/definitions/ID' }
-      reason: { type: string, minLength: 3, maxLength: 256 }
+      resource_id:
+        $ref: '#/definitions/ID'
+      credential_id:
+        $ref: '#/definitions/ID'
+      reason:
+        type: string
+        minLength: 3
+        maxLength: 256
     required:
-      - resource_id
-      - credential_id
-      - reason
-
+    - resource_id
+    - credential_id
+    - reason
   CallbackResponse:
     type: object
     description: |
@@ -1061,63 +1163,94 @@ definitions:
       Credentials can only be specified *if* the callback corresponds with a
       credential provisioning request.
     properties:
-      state: { type: string, enum: ['done', 'error' ] }
-      message: { type: string, minLength: 3, maxLength: 256 }
-      credentials: { type: object, additionalProperties: { type: string } }
+      state:
+        type: string
+        enum:
+        - done
+        - error
+      message:
+        type: string
+        minLength: 3
+        maxLength: 256
+      credentials:
+        type: object
+        additionalProperties:
+          type: string
     additionalProperties: false
     required:
-      - state
-      - message
-
+    - state
+    - message
   ResourceCredentials:
     type: object
     properties:
       custom_names:
         type: object
         description: Map of configuration variable aliases to original names
-        additionalProperties: { type: string }
+        additionalProperties:
+          type: string
       keys:
         type: object
         description: |
           Map of configuration variable names to values, names
           must IEEE 1003.1 - 2001 Standard (checked in code).
-        additionalProperties: { type: string }
+        additionalProperties:
+          type: string
       created_on:
         type: string
         format: datetime
-    required: [ keys, created_on ]
+    required:
+    - keys
+    - created_on
     additionalProperties: false
-
   OAuthCredentialCreateRequest:
     type: object
     properties:
-      product_id: { $ref: '#/definitions/ID' }
+      product_id:
+        description: |
+          Product identifier to scope the credential to a single product.
+        $ref: '#/definitions/OptionalID'
+      provider_id:
+        description: |
+          **ALPHA** Provider identifier to scope the credential to
+          all products of a provider.
+        $ref: '#/definitions/OptionalID'
       description:
         type: string
         minLength: 3
         maxLength: 256
         description: |
           A human readable description of this credential pair.
-    required: [ product_id, description ]
+    required:
+    - description
     additionalProperties: false
-
   OAuthCredentialGetResponse:
     allOf:
-      - type: object
-        properties:
-          id: { $ref: '#/definitions/OAuthClientID' }
-          created_at: { type: string, format: datetime }
-          updated_at: { type: string, format: datetime }
-          expires_at: { type: string, format: datetime }
-        required: [ id, created_at, updated_at ]
-        additionalProperties: false
-      - { $ref: '#/definitions/OAuthCredentialCreateRequest' }
-
+    - type: object
+      properties:
+        id:
+          $ref: '#/definitions/OAuthClientID'
+        created_at:
+          type: string
+          format: datetime
+        updated_at:
+          type: string
+          format: datetime
+        expires_at:
+          type: string
+          format: datetime
+      required:
+      - id
+      - created_at
+      - updated_at
+      additionalProperties: false
+    - $ref: '#/definitions/OAuthCredentialCreateRequest'
   OAuthCredentialCreateResponse:
     allOf:
-      - type: object
-        properties:
-          secret: { $ref: '#/definitions/OAuthClientSecret' }
-        required: [ secret ]
-        additionalProperties: false
-      - { $ref: '#/definitions/OAuthCredentialGetResponse' }
+    - type: object
+      properties:
+        secret:
+          $ref: '#/definitions/OAuthClientSecret'
+      required:
+      - secret
+      additionalProperties: false
+    - $ref: '#/definitions/OAuthCredentialGetResponse'

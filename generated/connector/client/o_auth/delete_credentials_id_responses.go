@@ -240,7 +240,7 @@ var deleteCredentialsIdBadRequestBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -255,6 +255,8 @@ const (
 	DeleteCredentialsIDBadRequestBodyTypeUnauthorized string = "unauthorized"
 	// DeleteCredentialsIDBadRequestBodyTypeNotFound captures enum value "not_found"
 	DeleteCredentialsIDBadRequestBodyTypeNotFound string = "not_found"
+	// DeleteCredentialsIDBadRequestBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	DeleteCredentialsIDBadRequestBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// DeleteCredentialsIDBadRequestBodyTypeInternal captures enum value "internal"
 	DeleteCredentialsIDBadRequestBodyTypeInternal string = "internal"
 	// DeleteCredentialsIDBadRequestBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -332,7 +334,7 @@ var deleteCredentialsIdInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -347,6 +349,8 @@ const (
 	DeleteCredentialsIDInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// DeleteCredentialsIDInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	DeleteCredentialsIDInternalServerErrorBodyTypeNotFound string = "not_found"
+	// DeleteCredentialsIDInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	DeleteCredentialsIDInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// DeleteCredentialsIDInternalServerErrorBodyTypeInternal captures enum value "internal"
 	DeleteCredentialsIDInternalServerErrorBodyTypeInternal string = "internal"
 	// DeleteCredentialsIDInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -424,7 +428,7 @@ var deleteCredentialsIdNotFoundBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -439,6 +443,8 @@ const (
 	DeleteCredentialsIDNotFoundBodyTypeUnauthorized string = "unauthorized"
 	// DeleteCredentialsIDNotFoundBodyTypeNotFound captures enum value "not_found"
 	DeleteCredentialsIDNotFoundBodyTypeNotFound string = "not_found"
+	// DeleteCredentialsIDNotFoundBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	DeleteCredentialsIDNotFoundBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// DeleteCredentialsIDNotFoundBodyTypeInternal captures enum value "internal"
 	DeleteCredentialsIDNotFoundBodyTypeInternal string = "internal"
 	// DeleteCredentialsIDNotFoundBodyTypeInvalidGrant captures enum value "invalid_grant"
@@ -516,7 +522,7 @@ var deleteCredentialsIdUnauthorizedBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -531,6 +537,8 @@ const (
 	DeleteCredentialsIDUnauthorizedBodyTypeUnauthorized string = "unauthorized"
 	// DeleteCredentialsIDUnauthorizedBodyTypeNotFound captures enum value "not_found"
 	DeleteCredentialsIDUnauthorizedBodyTypeNotFound string = "not_found"
+	// DeleteCredentialsIDUnauthorizedBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	DeleteCredentialsIDUnauthorizedBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// DeleteCredentialsIDUnauthorizedBodyTypeInternal captures enum value "internal"
 	DeleteCredentialsIDUnauthorizedBodyTypeInternal string = "internal"
 	// DeleteCredentialsIDUnauthorizedBodyTypeInvalidGrant captures enum value "invalid_grant"

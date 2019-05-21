@@ -310,7 +310,7 @@ var postOauthTokensInternalServerErrorBodyTypeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["bad_request","unauthorized","not_found","method_not_allowed","internal","invalid_grant","unsupported_grant_type"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -325,6 +325,8 @@ const (
 	PostOauthTokensInternalServerErrorBodyTypeUnauthorized string = "unauthorized"
 	// PostOauthTokensInternalServerErrorBodyTypeNotFound captures enum value "not_found"
 	PostOauthTokensInternalServerErrorBodyTypeNotFound string = "not_found"
+	// PostOauthTokensInternalServerErrorBodyTypeMethodNotAllowed captures enum value "method_not_allowed"
+	PostOauthTokensInternalServerErrorBodyTypeMethodNotAllowed string = "method_not_allowed"
 	// PostOauthTokensInternalServerErrorBodyTypeInternal captures enum value "internal"
 	PostOauthTokensInternalServerErrorBodyTypeInternal string = "internal"
 	// PostOauthTokensInternalServerErrorBodyTypeInvalidGrant captures enum value "invalid_grant"

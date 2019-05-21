@@ -25,7 +25,10 @@ type Client struct {
 /*
 DeleteCredentialsID deletes an o auth credential pair
 
-Delete an OAuth 2.0 credential pair for a provider's product.
+Delete an OAuth 2.0 credential pair.
+
+Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+in the context of a Manifold user.
 
 */
 func (a *Client) DeleteCredentialsID(params *DeleteCredentialsIDParams, authInfo runtime.ClientAuthInfoWriter) (*DeleteCredentialsIDNoContent, error) {
@@ -58,7 +61,13 @@ func (a *Client) DeleteCredentialsID(params *DeleteCredentialsIDParams, authInfo
 GetCredentials gets list of o auth credentials without secrets
 
 List all non-expired OAuth 2.0 credential pairs for a provider's product.
-This does **not** return the secret.
+
+One of the `product_id` or `provider_id` query parameters is required.
+
+**IMPORTANT**: This does **not** return the secret.
+
+Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+in the context of a Manifold user.
 
 */
 func (a *Client) GetCredentials(params *GetCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*GetCredentialsOK, error) {
@@ -88,39 +97,6 @@ func (a *Client) GetCredentials(params *GetCredentialsParams, authInfo runtime.C
 }
 
 /*
-GetInternalCredentialsID gets an o auth credential pair
-
-Retrieve an existing OAuth 2.0 credential pair. This does **not** return
-the secret.
-
-*/
-func (a *Client) GetInternalCredentialsID(params *GetInternalCredentialsIDParams, authInfo runtime.ClientAuthInfoWriter) (*GetInternalCredentialsIDOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetInternalCredentialsIDParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetInternalCredentialsID",
-		Method:             "GET",
-		PathPattern:        "/internal/credentials/{id}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &GetInternalCredentialsIDReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetInternalCredentialsIDOK), nil
-
-}
-
-/*
 GetSelf currents identity
 
 A provider can call this endpoint to return the identity represented by
@@ -132,7 +108,7 @@ underlying identity will be different.
 | Grant Type | Identity Type |
 | ---------- | ------------ |
 | `authorization_code` | `user` |
-| `client_credentials` | `product` |
+| `client_credentials` | `product` or `provider` |
 
 */
 func (a *Client) GetSelf(params *GetSelfParams, authInfo runtime.ClientAuthInfoWriter) (*GetSelfOK, error) {
@@ -164,9 +140,21 @@ func (a *Client) GetSelf(params *GetSelfParams, authInfo runtime.ClientAuthInfoW
 /*
 PostCredentials creates an o auth credential pair
 
-Create an OAuth 2.0 credential pair for a provider's product.
-`client_secret` is stored as an `scrypt` hash only; if the value is
-lost after creation, it cannot be recovered.
+Create an OAuth 2.0 credential pair for a provider.
+
+That credential can either be scoped to all products of the provider
+or to a specific product. This is done by providing the `product_id`.
+
+`client_secret` is stored as an `scrypt` hash only. Therefore, If the
+value is lost after creation, it cannot be recovered.
+
+**IMPORTANT**: For security, Manifold expires all previously created
+credentials of the same scope (product or provider) within 24 hours
+of creating a new credential. This means that only the most recent
+credential of a specific scope should be used.
+
+Can only be called through [Grafton's credentials command](https://github.com/manifoldco/grafton)
+in the context of a Manifold user.
 
 */
 func (a *Client) PostCredentials(params *PostCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*PostCredentialsOK, error) {
@@ -196,40 +184,6 @@ func (a *Client) PostCredentials(params *PostCredentialsParams, authInfo runtime
 }
 
 /*
-PostInternalCredentials creates an o auth credential pair
-
-Create an OAuth 2.0 credential pair for a provider's product.
-`client_secret` is stored as an `scrypt` hash only; if the value is
-lost after creation, it cannot be recovered.
-
-*/
-func (a *Client) PostInternalCredentials(params *PostInternalCredentialsParams, authInfo runtime.ClientAuthInfoWriter) (*PostInternalCredentialsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostInternalCredentialsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostInternalCredentials",
-		Method:             "POST",
-		PathPattern:        "/internal/credentials",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &PostInternalCredentialsReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostInternalCredentialsOK), nil
-
-}
-
-/*
 PostOauthTokens creates access token
 
 A provider uses this endpoint to acquire a scoped access token which
@@ -242,7 +196,8 @@ There are two grant types used for requesting an access token:
   grant from a user for an access token giving them permission to act on
   the user's behalf.
 * `client_credentials` which allows a provider to grant themselves an
-  access token scoped to a product.
+  access token that is either scoped to all their products or to
+  a specific one.
 
 This endpoint is a part of the Single Sign-On flow invoked by users
 attempting to navigate to a resource's dashboard. A `code` is only
@@ -278,39 +233,6 @@ func (a *Client) PostOauthTokens(params *PostOauthTokensParams) (*PostOauthToken
 		return nil, err
 	}
 	return result.(*PostOauthTokensCreated), nil
-
-}
-
-/*
-PostSso creates authorization code
-
-Endpoint for creating an authorization code used by the user to issue
-an SSO request against a providers API from the Dashboard.
-
-*/
-func (a *Client) PostSso(params *PostSsoParams, authInfo runtime.ClientAuthInfoWriter) (*PostSsoCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostSsoParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostSso",
-		Method:             "POST",
-		PathPattern:        "/sso",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &PostSsoReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostSsoCreated), nil
 
 }
 
