@@ -63,7 +63,9 @@ for the post credentials operation typically these are written to a http.Request
 type PostCredentialsParams struct {
 
 	/*Body
-	  A product id and description for the credential pair.
+	  Scoping details of the credentials (provider_id or product_id) as well
+	as a description for the credential pair.
+
 
 	*/
 	Body *models.OAuthCredentialCreateRequest

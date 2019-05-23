@@ -101,7 +101,7 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 
 	body := &models.OAuthCredentialCreateRequest{
 		Description: &desc,
-		ProductID:   product.ID,
+		ProductID:   &product.ID,
 	}
 	params.SetBody(body)
 
@@ -139,7 +139,8 @@ func listCredentialsCmd(cliCtx *cli.Context) error {
 	}
 
 	params := o_auth.NewGetCredentialsParamsWithContext(ctx)
-	params.SetProductID(product.ID.String())
+	pID := product.ID.String()
+	params.SetProductID(&pID)
 
 	res, err := connector.OAuth.GetCredentials(params, nil)
 	if err != nil {

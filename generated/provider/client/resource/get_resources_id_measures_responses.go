@@ -81,8 +81,8 @@ func NewGetResourcesIDMeasuresOK() *GetResourcesIDMeasuresOK {
 
 A response should contain a measures map in which the key represents a
 resource feature and the value is the most updated usage value of the
-feature. This usage value is assumed to be the sum total of usage
-for that feature for the billing period
+feature. This usage value is assumed to be the total sum of the usage
+for that feature for the given billing period.
 
 */
 type GetResourcesIDMeasuresOK struct {

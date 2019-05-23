@@ -23,10 +23,9 @@ type Client struct {
 }
 
 /*
-PutCredentialRotationsRotationID starts a credential rotation
+PutCredentialRotationsRotationID as l p h a start a credential rotation
 
-**ALPHA**
-A provider can call this endpoint to trigger a credential rotation for
+**ALPHA** A provider can call this endpoint to trigger a credential rotation for
 a specific credential. This route supports being called multiple times
 with the same payload.
 

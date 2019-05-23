@@ -86,14 +86,19 @@ func (a *Client) DeleteResourcesID(params *DeleteResourcesIDParams) (*DeleteReso
 /*
 GetResourcesIDMeasures gets how much a resource has used its features
 
-Manifold will call this endpoint daily to get usage information about a
-resource and its features.
+Manifold will call this endpoint hourly to get usage information about
+the metered features of a resource.
 
 The provider should only need to hold information about the time left
 in the current month and the previous month.
 
 Months are defined by the Manifold billing period which starts at the
 first of each month in UTC-0 and ends at the start of the next.
+
+It can be defined as `[period_start, period_end)`
+where `period_start` is inclusive, and `period_end` is exclusive.
+
+Period start and end are represented with the [RFC3339 Format](https://www.ietf.org/rfc/rfc3339.txt).
 
 */
 func (a *Client) GetResourcesIDMeasures(params *GetResourcesIDMeasuresParams) (*GetResourcesIDMeasuresOK, *GetResourcesIDMeasuresNoContent, error) {

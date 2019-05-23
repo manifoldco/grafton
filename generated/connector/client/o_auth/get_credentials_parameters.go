@@ -66,7 +66,14 @@ type GetCredentialsParams struct {
 
 
 	*/
-	ProductID string
+	ProductID *string
+	/*ProviderID
+	  **ALPHA** ID of the Provider to filter Resources by, stored as a
+	base32 encoded 18 byte identifier.
+
+
+	*/
+	ProviderID *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -107,14 +114,25 @@ func (o *GetCredentialsParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithProductID adds the productID to the get credentials params
-func (o *GetCredentialsParams) WithProductID(productID string) *GetCredentialsParams {
+func (o *GetCredentialsParams) WithProductID(productID *string) *GetCredentialsParams {
 	o.SetProductID(productID)
 	return o
 }
 
 // SetProductID adds the productId to the get credentials params
-func (o *GetCredentialsParams) SetProductID(productID string) {
+func (o *GetCredentialsParams) SetProductID(productID *string) {
 	o.ProductID = productID
+}
+
+// WithProviderID adds the providerID to the get credentials params
+func (o *GetCredentialsParams) WithProviderID(providerID *string) *GetCredentialsParams {
+	o.SetProviderID(providerID)
+	return o
+}
+
+// SetProviderID adds the providerId to the get credentials params
+func (o *GetCredentialsParams) SetProviderID(providerID *string) {
+	o.ProviderID = providerID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -125,13 +143,36 @@ func (o *GetCredentialsParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 	}
 	var res []error
 
-	// query param product_id
-	qrProductID := o.ProductID
-	qProductID := qrProductID
-	if qProductID != "" {
-		if err := r.SetQueryParam("product_id", qProductID); err != nil {
-			return err
+	if o.ProductID != nil {
+
+		// query param product_id
+		var qrProductID string
+		if o.ProductID != nil {
+			qrProductID = *o.ProductID
 		}
+		qProductID := qrProductID
+		if qProductID != "" {
+			if err := r.SetQueryParam("product_id", qProductID); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if o.ProviderID != nil {
+
+		// query param provider_id
+		var qrProviderID string
+		if o.ProviderID != nil {
+			qrProviderID = *o.ProviderID
+		}
+		qProviderID := qrProviderID
+		if qProviderID != "" {
+			if err := r.SetQueryParam("provider_id", qProviderID); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if len(res) > 0 {
