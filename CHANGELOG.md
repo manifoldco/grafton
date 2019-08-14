@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Add the optional `platform_id` field to the resource provisioning payload.
+
+  That new field will allow advanced platform use cases.
+
 ## [0.15.0] - 2019-04-22
 
 Grafton ❤️  Credential rotations! 🎉🎉
