@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.15.3] - 2019-08-15
+
 ### Added
 
 - Add `platformID` to `ResourceBody` of the client.
