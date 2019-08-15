@@ -48,6 +48,7 @@ type ResourceBody struct {
 	Region     string
 	ImportCode string
 	Features   map[string]interface{}
+	PlatformID *manifold.ID
 }
 
 // New creates a new Client for Grafton.
@@ -107,11 +108,12 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	model ResourceBody) (string, bool, error) {
 
 	body := models.ResourceRequest{
-		ID:       model.ID,
-		Product:  manifold.Label(model.Product),
-		Plan:     manifold.Label(model.Plan),
-		Region:   models.RegionSlug(model.Region),
-		Features: model.Features,
+		ID:         model.ID,
+		Product:    manifold.Label(model.Product),
+		Plan:       manifold.Label(model.Plan),
+		Region:     models.RegionSlug(model.Region),
+		Features:   model.Features,
+		PlatformID: model.PlatformID,
 	}
 
 	cbURL, err := deriveCallbackURL(c.connectorURL, cbID)

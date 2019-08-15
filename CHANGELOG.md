@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Add `platformID` to `ResourceBody` of the client.
+
 ## [0.15.2] - 2019-08-14
 
 - Add the optional `platform_id` field to the resource provisioning payload.
