@@ -664,8 +664,8 @@ paths:
         **Managing Plan Upgrade and Downgrade Options**
 
         To block a plan change request simply return a `400 Bad Request` response
-        with an error message describing why the change is not allowed. Our system 
-        will handle that and communicate to the user.
+        with an error message describing why the change is not allowed. Manifold 
+        will handle the response and communicate it to the user.
 
         When staging or publishing your product in the Manifold marketplace, we
         can also define a per plan whitelist of plans that can be changed to.
