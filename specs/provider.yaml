@@ -660,6 +660,17 @@ paths:
 
         If the resource's plan matches the given plan then a `200 Success` or
         `204 No Content` response should be returned.
+
+        **Managing Plan Upgrade and Downgrade Options**
+
+        To block a plan change request simply return a `400 Bad Request` response
+        with an error message describing why the change is not allowed. Manifold 
+        will handle the response and communicate it to the user.
+
+        When staging or publishing your product in the Manifold marketplace, we
+        can also define a per plan whitelist of plans that can be changed to.
+        This constraint allows us to block the user from even making the request
+        in the first place.
       tags:
       - Resource
       parameters:
