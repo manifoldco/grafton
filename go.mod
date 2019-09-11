@@ -20,7 +20,7 @@ require (
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
 	github.com/gobuffalo/packr v1.13.7
-	github.com/golangci/golangci-lint v1.16.0
+	github.com/golangci/golangci-lint v1.18.0
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
 	github.com/gorilla/context v1.1.1 // indirect
@@ -44,7 +44,9 @@ require (
 	github.com/urfave/cli v1.20.0
 	golang.org/x/crypto v0.0.0-20190411141940-e7b772b7007a
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
+	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 )
 
 replace sourcegraph.com/sourcegraph/go-diff v0.5.1 => github.com/sourcegraph/go-diff v0.5.1
+
+go 1.13
