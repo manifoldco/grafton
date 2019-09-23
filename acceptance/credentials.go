@@ -48,7 +48,7 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError), "Message: %s", e.Error())
 	})
 
 	ErrorCase("with already provisioned credentials - same content acts as created", func() {
@@ -88,7 +88,7 @@ var creds = Feature("credentials", "Create a credential set", func(ctx context.C
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError), "Message: %s", e.Error())
 	})
 })
 
@@ -118,7 +118,7 @@ var _ = creds.TearDown("Delete a credential set", func(ctx context.Context) {
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError), "Message: %s", e.Error())
 	})
 })
 

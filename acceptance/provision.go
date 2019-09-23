@@ -50,7 +50,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError), "Message: %s", e.Error())
 	})
 
 	ErrorCase("with a faulty plan name", func() {
@@ -73,7 +73,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError), "Message: %s", e.Error())
 	})
 
 	ErrorCase("with a faulty region", func() {
@@ -96,7 +96,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.BadRequestError), "Message: %s", e.Error())
 	})
 
 	ErrorCase("with a bad signature", func() {
@@ -120,7 +120,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.UnauthorizedError), "Message: %s", e.Error())
 	})
 
 	ErrorCase("with an already provisioned resource - same content acts as created", func() {
@@ -166,7 +166,7 @@ var provision = Feature("provision", "Provision a resource", func(ctx context.Co
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.ConflictError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.ConflictError), "Message: %s", e.Error())
 	})
 })
 
@@ -197,7 +197,7 @@ var _ = provision.TearDown("Deprovision a resource", func(ctx context.Context) {
 		)
 
 		e := err.(*grafton.Error)
-		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError))
+		gm.Expect(e.Type).Should(gm.Equal(merrors.NotFoundError), "Message: %s", e.Error())
 	})
 })
 var _ = provision.RequiredFlags("product", "plan", "region", "new-plan")
