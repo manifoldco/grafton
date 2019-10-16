@@ -193,6 +193,8 @@ github.com/manifoldco/go-jwt v0.1.2 h1:tLGWBdky2s/obG0An/xmrCcuveVXM3gDMg+ZZMLLe
 github.com/manifoldco/go-jwt v0.1.2/go.mod h1:Ik4HvBpDZlh+oZPTqgReKC162ciXfPaIwdBnjz6YF6U=
 github.com/manifoldco/go-manifold v0.10.11 h1:NKP3g5y2dUrV4YqS10/Ig/Pqx4Fi7r/yiCzZLjKjNsU=
 github.com/manifoldco/go-manifold v0.10.11/go.mod h1:t0Ba47xYYlUNrzXlenmbqTMDjM/y7qqTNnjDJKvCcuY=
+github.com/manifoldco/go-manifold v0.13.1 h1:8e4ohkpTfIuIu+25Sjdc+TpY2rez9ZUJSLU2z73JtGY=
+github.com/manifoldco/go-manifold v0.13.1/go.mod h1:Irc48E+9xqN53jDNPe9osjMS4oRoX4nUHBc/EH0Kk60=
 github.com/manifoldco/go-signature v1.0.2 h1:ZVC9MDQ2zEbwYkyxtT4seFENxVhYI0ReSPd3ji+/kVM=
 github.com/manifoldco/go-signature v1.0.2/go.mod h1:7YiF1hftYRYZydtohw8WwDvXQSplGIZW326hpSSi72w=
 github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4 h1:zNtxporN4V2l47+9kRel4xPgHv+0LsRgfU3aNgKwaUs=
