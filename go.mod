@@ -30,7 +30,7 @@ require (
 	github.com/manifoldco/go-base64 v1.0.2
 	github.com/manifoldco/go-connector v0.0.3
 	github.com/manifoldco/go-jwt v0.1.2
-	github.com/manifoldco/go-manifold v0.10.11
+	github.com/manifoldco/go-manifold v0.13.2
 	github.com/manifoldco/go-signature v1.0.2
 	github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4
 	github.com/onsi/ginkgo v1.7.0 // indirect
