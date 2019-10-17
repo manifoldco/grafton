@@ -36,7 +36,7 @@ require (
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.2
 	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.0.5
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.2.1 // indirect
 	github.com/toqueteos/webbrowser v1.1.0 // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
