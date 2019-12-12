@@ -127,24 +127,40 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
+
+	c.log.WithFields(logrus.Fields{
+		"url":         c.url,
+		"resource_id": model.ID,
+		"platform_id": model.PlatformID,
+		"product":     model.Product,
+		"plan":        model.Plan,
+		"region":      model.Region,
+	}).Info("Sending PUT resource/{id} request to provider")
+
 	res, acceptedRes, noContent, err := c.api.Resource.PutResourcesID(p)
 
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *resource.PutResourcesIDBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *resource.PutResourcesIDUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *resource.PutResourcesIDConflict:
+			statusCode = 402
 			graftonErr = NewErrWithMsg(merrors.ConflictError, e.Payload.Message)
 		case *resource.PutResourcesIDInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Info("Error unrecognized, returning directly")
 			return "", false, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return graftonErr.Error(), false, graftonErr
 	}
 
@@ -152,15 +168,22 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	callback := false
 	switch {
 	case res != nil:
+		c.log.WithField("status_code", 201).Info("Received response from provider")
 		msgPtr = res.Payload.Message
 	case acceptedRes != nil:
+		c.log.WithFields(logrus.Fields{
+			"status_code":  202,
+			"callback_url": cbURL,
+		}).Info("Received response from provider, will be awaiting a callback")
 		callback = true
 		msgPtr = acceptedRes.Payload.Message
 	case noContent != nil:
+		c.log.WithField("status_code", 204).Info("Received response from provider, no content")
 		return "", false, nil
 	}
 
 	if msgPtr == nil {
+		c.log.Error("Received no message from the provider and the response was not a 204. Failing due to missing message.")
 		return "", false, ErrMissingMsg
 	}
 
@@ -199,26 +222,39 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
 
+	c.log.WithFields(logrus.Fields{
+		"url":           c.url,
+		"resource_id":   resID,
+		"credential_id": credID,
+	}).Info("Sending PUT credentials/{id} request to provider")
+
 	res, accepted, err := c.api.Credential.PutCredentialsID(p)
 
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *credential.PutCredentialsIDBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *credential.PutCredentialsIDUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *credential.PutCredentialsIDConflict:
+			statusCode = 402
 			graftonErr = NewErrWithMsg(merrors.ConflictError, e.Payload.Message)
 		case *credential.PutCredentialsIDNotFound:
+			statusCode = 404
 			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
 		case *credential.PutCredentialsIDInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Error("Error unrecognized, returning directly")
 			return nil, "", false, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return nil, graftonErr.Error(), false, graftonErr
 	}
 
@@ -232,10 +268,17 @@ func (c *Client) ProvisionCredentials(ctx context.Context, cbID, resID, credID m
 			msg = *res.Payload.Message
 		}
 
+		c.log.WithField("status_code", 201).Info("Received response from provider")
 		creds = res.Payload.Credentials
 	case accepted != nil:
+		c.log.WithFields(logrus.Fields{
+			"status_code":  202,
+			"callback_url": cbURL,
+		}).Info("Received response from provider, will be awaiting a callback")
+
 		// A message must be provided on a 202 Response
 		if accepted.Payload.Message == nil {
+			c.log.Error("Received no message from the provider. Failing due to missing message.")
 			return nil, "", false, ErrMissingMsg
 		}
 
@@ -269,23 +312,35 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 	p.SetXCallbackURL(cbURL)
 	p.SetContext(ctx)
 
+	c.log.WithFields(logrus.Fields{
+		"url":         c.url,
+		"resource_id": resourceID,
+		"new_plan":    newPlan,
+	}).Info("Sending PATCH resource/{id} request to provider")
+
 	res, accepted, noContent, err := c.api.Resource.PatchResourcesID(p)
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *resource.PatchResourcesIDBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *resource.PatchResourcesIDNotFound:
+			statusCode = 404
 			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
 		case *resource.PatchResourcesIDUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *resource.PatchResourcesIDInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return graftonErr.Error(), false, graftonErr
 	}
 
@@ -293,14 +348,21 @@ func (c *Client) ChangePlan(ctx context.Context, cbID, resourceID manifold.ID, n
 	callback := accepted != nil
 	switch {
 	case res != nil:
+		c.log.WithField("status_code", 201).Info("Received response from provider")
 		msgPtr = res.Payload.Message
 	case accepted != nil:
+		c.log.WithFields(logrus.Fields{
+			"status_code":  202,
+			"callback_url": cbURL,
+		}).Info("Received response from provider, will be awaiting a callback")
 		msgPtr = accepted.Payload.Message
 	case noContent != nil:
+		c.log.WithField("status_code", 204).Info("Received response from provider, no content")
 		return "", false, nil
 	}
 
 	if msgPtr == nil {
+		c.log.Error("Received no message from the provider and the response was not a 204. Failing due to missing message.")
 		return "", false, ErrMissingMsg
 	}
 
@@ -325,33 +387,52 @@ func (c *Client) DeprovisionCredentials(ctx context.Context, cbID, credentialID 
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 
+	c.log.WithFields(logrus.Fields{
+		"url":           c.url,
+		"credential_id": credentialID,
+	}).Info("Sending DELETE credentials/{id} request to provider")
+
 	accepted, _, err := c.api.Credential.DeleteCredentialsID(p)
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *credential.DeleteCredentialsIDBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *credential.DeleteCredentialsIDNotFound:
+			statusCode = 404
 			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
 		case *credential.DeleteCredentialsIDUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *credential.DeleteCredentialsIDInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
 	if callback {
+		c.log.WithFields(logrus.Fields{
+			"status_code":  202,
+			"callback_url": cbURL,
+		}).Info("Received response from provider, will be awaiting a callback")
+
 		if accepted.Payload.Message == nil {
+			c.log.Error("Received no message from the provider. Failing due to missing message.")
 			return "", false, ErrMissingMsg
 		}
 
 		msg = *accepted.Payload.Message
+	} else {
+		c.log.WithField("status_code", 201).Info("Received response from provider")
 	}
 
 	return msg, callback, err
@@ -375,33 +456,52 @@ func (c *Client) DeprovisionResource(ctx context.Context, cbID, resourceID manif
 	p.SetXCallbackID(cbID.String())
 	p.SetXCallbackURL(cbURL)
 
+	c.log.WithFields(logrus.Fields{
+		"url":         c.url,
+		"resource_id": resourceID,
+	}).Info("Sending DELETE resource/{id} request to provider")
+
 	accepted, _, err := c.api.Resource.DeleteResourcesID(p)
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *resource.DeleteResourcesIDBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *resource.DeleteResourcesIDNotFound:
+			statusCode = 404
 			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
 		case *resource.DeleteResourcesIDUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *resource.DeleteResourcesIDInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Error("Unrecognized error, returning directly")
 			return "", false, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return graftonErr.Error(), false, graftonErr
 	}
 
 	callback := accepted != nil
 	if callback {
+		c.log.WithFields(logrus.Fields{
+			"status_code":  202,
+			"callback_url": cbURL,
+		}).Info("Received response from provider, will be awaiting a callback")
+
 		if accepted.Payload.Message == nil {
+			c.log.Error("Received no message from the provider. Failing due to missing message.")
 			return "", false, ErrMissingMsg
 		}
 
 		msg = *accepted.Payload.Message
+	} else {
+		c.log.WithField("status_code", 201).Info("Received response from provider")
 	}
 
 	return msg, callback, err
@@ -439,28 +539,42 @@ func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 	p.SetPeriodStart(periodStart)
 	p.SetPeriodEnd(periodEnd)
 
+	c.log.WithFields(logrus.Fields{
+		"url":          c.url,
+		"resource_id":  rid.String(),
+		"period_start": start.String(),
+		"period_end":   end.String(),
+	}).Info("Sending GET resource/{id}/measures request to provider")
+
 	content, empty, err := c.api.Resource.GetResourcesIDMeasures(p)
 
 	if err != nil {
 		var graftonErr error
+		statusCode := 0
 		switch e := err.(type) {
 		case *resource.GetResourcesIDMeasuresBadRequest:
+			statusCode = 400
 			graftonErr = NewErrWithMsg(merrors.BadRequestError, e.Payload.Message)
 		case *resource.GetResourcesIDMeasuresUnauthorized:
+			statusCode = 401
 			graftonErr = NewErrWithMsg(merrors.UnauthorizedError, e.Payload.Message)
 		case *resource.GetResourcesIDMeasuresNotFound:
+			statusCode = 404
 			graftonErr = NewErrWithMsg(merrors.NotFoundError, e.Payload.Message)
 		case *resource.GetResourcesIDMeasuresInternalServerError:
+			statusCode = 500
 			graftonErr = NewErrWithMsg(merrors.InternalServerError, e.Payload.Message)
 		default:
 			c.log.WithError(err).Info("Error unrecognized, returning directly")
 			return nil, err
 		}
 
+		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
 		return nil, graftonErr
 	}
 
 	if empty != nil {
+		c.log.WithField("status_code", 204).Info("Received response from provider")
 		return &models.ResourceMeasures{
 			ResourceID:  rid,
 			PeriodStart: &periodStart,
@@ -468,5 +582,6 @@ func (c *Client) PullResourceMeasures(ctx context.Context, rid manifold.ID,
 		}, nil
 	}
 
+	c.log.WithField("status_code", 201).Info("Received response from provider")
 	return content.Payload, nil
 }
