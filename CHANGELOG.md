@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Add more details on error cases where a different status code was received.
+- Add more helpful logs when using grafton to send request to an API with logging enabled.
 
 ## [0.15.3] - 2019-08-15
 
