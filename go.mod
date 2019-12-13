@@ -19,7 +19,7 @@ require (
 	github.com/go-swagger/go-swagger v0.0.0-20170414161553-fbc64c262a83
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
-	github.com/gobuffalo/packr v1.13.7
+	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.21.0
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
