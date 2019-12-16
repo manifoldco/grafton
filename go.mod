@@ -1,10 +1,18 @@
 module github.com/manifoldco/grafton
 
 require (
+	github.com/PuerkitoBio/purell v1.1.0 // indirect
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/client9/misspell v0.3.4
+	github.com/go-openapi/analysis v0.0.0-20170813233457-8ed83f2ea9f0 // indirect
 	github.com/go-openapi/errors v0.19.2
+	github.com/go-openapi/inflect v0.0.0-20130829110746-b1f6470ffb9c // indirect
+	github.com/go-openapi/jsonpointer v0.0.0-20170102174223-779f45308c19 // indirect
+	github.com/go-openapi/jsonreference v0.0.0-20161105162150-36d33bfe519e // indirect
+	github.com/go-openapi/loads v0.0.0-20170520182102-a80dea3052f0 // indirect
 	github.com/go-openapi/runtime v0.0.0-20170303002511-e66a4c440602
+	github.com/go-openapi/spec v0.0.0-20170928160009-48c2a7185575 // indirect
 	github.com/go-openapi/strfmt v0.19.3
 	github.com/go-openapi/swag v0.19.5
 	github.com/go-openapi/validate v0.0.0-20170921144055-dc8a684882cf
@@ -14,6 +22,9 @@ require (
 	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.21.0
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/handlers v1.4.0 // indirect
+	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/manifoldco/go-base32 v1.0.3
 	github.com/manifoldco/go-base64 v1.0.2
 	github.com/manifoldco/go-connector v0.0.3
@@ -24,7 +35,9 @@ require (
 	github.com/onsi/gomega v1.7.1
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
+	github.com/toqueteos/webbrowser v1.1.0 // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
+	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli/v2 v2.0.0
 	golang.org/x/crypto v0.0.0-20190923035154-9ee001bba392
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
