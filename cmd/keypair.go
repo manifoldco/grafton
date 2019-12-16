@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/crypto/ed25519"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/manifoldco/go-base64"
 	"github.com/manifoldco/go-signature"

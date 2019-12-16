@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func init() {
-	cmd := cli.Command{
+	cmd := &cli.Command{
 		Name:   "generate",
 		Usage:  "Generates public and private signing keys for testing Manifold API integrations locally",
 		Action: generateCmd,

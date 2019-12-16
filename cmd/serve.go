@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/manifoldco/grafton/connector"
 	"github.com/manifoldco/grafton/marketplace"
@@ -16,50 +16,50 @@ import (
 var pathRegex = regexp.MustCompile(`^(?:.*\/)?v1\/?$`)
 
 func init() {
-	cmd := cli.Command{
+	cmd := &cli.Command{
 		Name:   "serve",
 		Usage:  "Serves a local version of of the Connector API",
 		Action: serveCmd,
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:   "product",
-				Usage:  "The label of the product being provisioned",
-				EnvVar: "PRODUCT",
+			&cli.StringFlag{
+				Name:    "product",
+				Usage:   "The label of the product being provisioned",
+				EnvVars: []string{"PRODUCT"},
 			},
-			cli.StringFlag{
-				Name:   "plan",
-				Usage:  "The label of the plan being provisioned",
-				EnvVar: "PLAN",
+			&cli.StringFlag{
+				Name:    "plan",
+				Usage:   "The label of the plan being provisioned",
+				EnvVars: []string{"PLAN"},
 			},
-			cli.StringFlag{
-				Name:   "region",
-				Usage:  "The label of the region being provisioned",
-				EnvVar: "REGION",
+			&cli.StringFlag{
+				Name:    "region",
+				Usage:   "The label of the region being provisioned",
+				EnvVars: []string{"REGION"},
 			},
-			cli.StringFlag{
-				Name:   "client-id",
-				Usage:  "Client ID to use for SSO and local Connector API testing",
-				EnvVar: "OAUTH2_CLIENT_ID",
+			&cli.StringFlag{
+				Name:    "client-id",
+				Usage:   "Client ID to use for SSO and local Connector API testing",
+				EnvVars: []string{"OAUTH2_CLIENT_ID"},
 			},
-			cli.StringFlag{
-				Name:   "client-secret",
-				Usage:  "Client secret to use for SSO and local Connector API testing",
-				EnvVar: "OAUTH2_CLIENT_SECRET",
+			&cli.StringFlag{
+				Name:    "client-secret",
+				Usage:   "Client secret to use for SSO and local Connector API testing",
+				EnvVars: []string{"OAUTH2_CLIENT_SECRET"},
 			},
-			cli.StringFlag{
-				Name:   "provider-api",
-				Usage:  "URL for the provider API, for the Marketplace to connect with",
-				EnvVar: "PROVIDER_API",
+			&cli.StringFlag{
+				Name:    "provider-api",
+				Usage:   "URL for the provider API, for the Marketplace to connect with",
+				EnvVars: []string{"PROVIDER_API"},
 			},
-			cli.UintFlag{
-				Name:   "connector-port",
-				Usage:  "Local port for running the fake Connector API for SSO and Async testing",
-				EnvVar: "CONNECTOR_PORT",
+			&cli.UintFlag{
+				Name:    "connector-port",
+				Usage:   "Local port for running the fake Connector API for SSO and Async testing",
+				EnvVars: []string{"CONNECTOR_PORT"},
 			},
-			cli.UintFlag{
-				Name:   "marketplace-port",
-				Usage:  "Local port for running the fake Marketplace Web Server for SSO and Async testing",
-				EnvVar: "MARKETPLACE_PORT",
+			&cli.UintFlag{
+				Name:    "marketplace-port",
+				Usage:   "Local port for running the fake Marketplace Web Server for SSO and Async testing",
+				EnvVars: []string{"MARKETPLACE_PORT"},
 			},
 		},
 	}

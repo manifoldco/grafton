@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/manifoldco/grafton/config"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func init() {
-	versionCmd := cli.Command{
+	versionCmd := &cli.Command{
 		Name:   "version",
 		Usage:  "Display version of utility",
 		Action: versionLookup,
