@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	cmd := cli.Command{
+	cmd := &cli.Command{
 		Name:   "generate",
 		Usage:  "Generates public and private signing keys for testing Manifold API integrations locally",
 		Action: generateCmd,

@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	cmd := cli.Command{
+	cmd := &cli.Command{
 		Name:      "test",
 		Usage:     "Tests the API endpoints required to integrate with Manifold",
 		ArgsUsage: "[url]",

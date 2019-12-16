@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	versionCmd := cli.Command{
+	versionCmd := &cli.Command{
 		Name:   "version",
 		Usage:  "Display version of utility",
 		Action: versionLookup,

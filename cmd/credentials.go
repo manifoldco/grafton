@@ -50,7 +50,7 @@ var credentialFlags = []cli.Flag{
 }
 
 func init() {
-	cmd := cli.Command{
+	cmd := &cli.Command{
 		Name:  "credentials",
 		Usage: "Manage OAuth 2 credential pairs for Manifold.co",
 		Subcommands: []*cli.Command{
