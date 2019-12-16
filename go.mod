@@ -11,14 +11,14 @@ require (
 	github.com/go-swagger/go-swagger v0.0.0-20170414161553-fbc64c262a83
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
-	github.com/gobuffalo/packr v1.13.7
+	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.21.0
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
 	github.com/manifoldco/go-base32 v1.0.3
 	github.com/manifoldco/go-base64 v1.0.2
 	github.com/manifoldco/go-connector v0.0.3
 	github.com/manifoldco/go-jwt v0.1.2
-	github.com/manifoldco/go-manifold v0.13.2
+	github.com/manifoldco/go-manifold v0.14.0
 	github.com/manifoldco/go-signature v1.0.2
 	github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4
 	github.com/onsi/gomega v1.7.1

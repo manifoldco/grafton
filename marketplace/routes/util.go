@@ -53,7 +53,7 @@ func respondWithHTML(rw http.ResponseWriter, name string, v interface{}, code in
 	tpl := template.New("layout.html")
 
 	// Parse in Route Page
-	pageHTML, err := templates.MustString(name + ".html")
+	pageHTML, err := templates.FindString(name + ".html")
 	if err != nil {
 		fmt.Fprint(rw, err.Error())
 		return
@@ -65,7 +65,7 @@ func respondWithHTML(rw http.ResponseWriter, name string, v interface{}, code in
 	}
 
 	// Parse in Layout
-	layoutHTML, err := templates.MustString("layout.html")
+	layoutHTML, err := templates.FindString("layout.html")
 	if err != nil {
 		fmt.Fprint(rw, err.Error())
 		return

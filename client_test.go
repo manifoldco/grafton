@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	gm "github.com/onsi/gomega"
+	"github.com/sirupsen/logrus"
 
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/go-manifold/errors"
@@ -22,7 +23,7 @@ func (stubSigner) Sign([]byte) (*signature.Signature, error) { return &signature
 func callProvision(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{}, nil)
+	c := New(sURL, &url.URL{}, stubSigner{}, logrus.NewEntry(logrus.New()))
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -46,7 +47,7 @@ func callProvision(rawURL string) (string, bool, error) {
 func callProvisionCredentials(rawURL string) (map[string]string, string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{}, nil)
+	c := New(sURL, &url.URL{}, stubSigner{}, logrus.NewEntry(logrus.New()))
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -57,7 +58,7 @@ func callProvisionCredentials(rawURL string) (map[string]string, string, bool, e
 func callChangePlan(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
-	c := New(sURL, &url.URL{}, stubSigner{}, nil)
+	c := New(sURL, &url.URL{}, stubSigner{}, logrus.NewEntry(logrus.New()))
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
@@ -73,7 +74,7 @@ func callDeprovisionCredentials(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
 
-	c := New(sURL, &url.URL{}, stubSigner{}, nil)
+	c := New(sURL, &url.URL{}, stubSigner{}, logrus.NewEntry(logrus.New()))
 
 	cbID := manifold.ID{}
 	credID := manifold.ID{}
@@ -85,7 +86,7 @@ func callDeprovisionResource(rawURL string) (string, bool, error) {
 	ctx := context.Background()
 	sURL, _ := url.Parse(rawURL)
 
-	c := New(sURL, &url.URL{}, stubSigner{}, nil)
+	c := New(sURL, &url.URL{}, stubSigner{}, logrus.NewEntry(logrus.New()))
 
 	cbID := manifold.ID{}
 	resID := manifold.ID{}
