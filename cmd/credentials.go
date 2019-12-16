@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/promptui"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/manifoldco/grafton/config"
@@ -39,11 +39,11 @@ func apiURLPattern() string {
 }
 
 var credentialFlags = []cli.Flag{
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:  "provider",
 		Usage: "The label of the provider",
 	},
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:  "product",
 		Usage: "The label of the product",
 	},
@@ -53,7 +53,7 @@ func init() {
 	cmd := cli.Command{
 		Name:  "credentials",
 		Usage: "Manage OAuth 2 credential pairs for Manifold.co",
-		Subcommands: []cli.Command{
+		Subcommands: []*cli.Command{
 			{
 				Name:   "list",
 				Usage:  "List all existing credentials for a product",
@@ -175,12 +175,12 @@ func deleteCredentialsCmd(cliCtx *cli.Context) error {
 
 	args := cliCtx.Args()
 
-	if len(args) != 1 {
+	if args.Len() != 1 {
 		cli.ShowCommandHelpAndExit(cliCtx, cliCtx.Command.Name, -1)
 		return nil
 	}
 
-	id := args[0]
+	id := args.First()
 
 	_, token, err := login(ctx)
 	if err != nil {

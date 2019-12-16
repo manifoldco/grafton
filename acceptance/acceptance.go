@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/onsi/gomega"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	manifold "github.com/manifoldco/go-manifold"
 

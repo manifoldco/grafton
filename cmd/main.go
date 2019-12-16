@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/manifoldco/grafton/config"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var cmds []cli.Command

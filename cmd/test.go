@@ -11,7 +11,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/manifoldco/go-manifold"
 	"github.com/manifoldco/promptui"
@@ -31,84 +31,83 @@ func init() {
 		Usage:     "Tests the API endpoints required to integrate with Manifold",
 		ArgsUsage: "[url]",
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:   "product",
-				Usage:  "The label of the product being provisioned",
-				EnvVar: "PRODUCT",
+			&cli.StringFlag{
+				Name:    "product",
+				Usage:   "The label of the product being provisioned",
+				EnvVars: []string{"PRODUCT"},
 			},
-			cli.StringFlag{
-				Name:   "plan",
-				Usage:  "The label of the plan for the provisioning resource",
-				EnvVar: "PLAN",
+			&cli.StringFlag{
+				Name:    "plan",
+				Usage:   "The label of the plan for the provisioning resource",
+				EnvVars: []string{"PLAN"},
 			},
-			cli.StringFlag{
-				Name:   "plan-features",
-				Usage:  "A JSON object describing the selected features for the provisioning resource",
-				EnvVar: "PLAN_FEATURES",
+			&cli.StringFlag{
+				Name:    "plan-features",
+				Usage:   "A JSON object describing the selected features for the provisioning resource",
+				EnvVars: []string{"PLAN_FEATURES"},
 			},
-			cli.StringFlag{
-				Name:   "new-plan",
-				Usage:  "The plan to resize the instance to from the original plan",
-				EnvVar: "NEW_PLAN",
+			&cli.StringFlag{
+				Name:    "new-plan",
+				Usage:   "The plan to resize the instance to from the original plan",
+				EnvVars: []string{"NEW_PLAN"},
 			},
-			cli.StringFlag{
-				Name:   "new-plan-features",
-				Usage:  "A JSON object describing the selected features for the resizing from the original plan",
-				EnvVar: "NEW_PLAN_FEATURES",
+			&cli.StringFlag{
+				Name:    "new-plan-features",
+				Usage:   "A JSON object describing the selected features for the resizing from the original plan",
+				EnvVars: []string{"NEW_PLAN_FEATURES"},
 			},
-			cli.StringFlag{
-				Name:   "region",
-				Usage:  "The label of the region which the resource will be provision in",
-				EnvVar: "REGION",
+			&cli.StringFlag{
+				Name:    "region",
+				Usage:   "The label of the region which the resource will be provision in",
+				EnvVars: []string{"REGION"},
 			},
-			cli.StringFlag{
-				Name:   "import-code",
-				Usage:  "The import code to import an existing resource for that resource",
-				EnvVar: "IMPORT_CODE",
+			&cli.StringFlag{
+				Name:    "import-code",
+				Usage:   "The import code to import an existing resource for that resource",
+				EnvVars: []string{"IMPORT_CODE"},
 			},
-			cli.StringSliceFlag{
-				Name:   "exclude",
-				Usage:  "Exclude running these feature tests (and those that depend on it)",
-				EnvVar: "EXCLUDE",
+			&cli.StringSliceFlag{
+				Name:    "exclude",
+				Usage:   "Exclude running these feature tests (and those that depend on it)",
+				EnvVars: []string{"EXCLUDE"},
 			},
-			cli.BoolFlag{
-				Name:   "no-error-cases",
-				Usage:  "Skip running the error case tests",
-				EnvVar: "NO_ERROR_CASES",
+			&cli.BoolFlag{
+				Name:    "no-error-cases",
+				Usage:   "Skip running the error case tests",
+				EnvVars: []string{"NO_ERROR_CASES"},
 			},
-			cli.StringFlag{
-				Name:   "log",
-				Usage:  "Informational logging level during tests. One of (off, info, verbose)",
-				EnvVar: "LOG",
-				Value:  "off",
+			&cli.StringFlag{
+				Name:    "log",
+				Usage:   "Informational logging level during tests. One of (off, info, verbose)",
+				EnvVars: []string{"LOG"},
+				Value:   "off",
 			},
-
-			cli.StringFlag{
-				Name:   "client-id",
-				Usage:  "Client ID to use for SSO and local Connector API testing",
-				EnvVar: "OAUTH2_CLIENT_ID",
+			&cli.StringFlag{
+				Name:    "client-id",
+				Usage:   "Client ID to use for SSO and local Connector API testing",
+				EnvVars: []string{"OAUTH2_CLIENT_ID"},
 			},
-			cli.StringFlag{
-				Name:   "client-secret",
-				Usage:  "Client secret to use for SSO and local Connector API testing",
-				EnvVar: "OAUTH2_CLIENT_SECRET",
+			&cli.StringFlag{
+				Name:    "client-secret",
+				Usage:   "Client secret to use for SSO and local Connector API testing",
+				EnvVars: []string{"OAUTH2_CLIENT_SECRET"},
 			},
-			cli.UintFlag{
-				Name:   "connector-port",
-				Usage:  "Local port for running the fake Connector API for SSO and Async testing",
-				EnvVar: "CONNECTOR_PORT",
+			&cli.UintFlag{
+				Name:    "connector-port",
+				Usage:   "Local port for running the fake Connector API for SSO and Async testing",
+				EnvVars: []string{"CONNECTOR_PORT"},
 			},
-			cli.StringFlag{
-				Name:   "callback-timeout",
-				Usage:  "duration to wait (max. 24hours) for a callback (default: 5m)",
-				EnvVar: "CALLBACK_TIMEOUT",
+			&cli.StringFlag{
+				Name:    "callback-timeout",
+				Usage:   "duration to wait (max. 24hours) for a callback (default: 5m)",
+				EnvVars: []string{"CALLBACK_TIMEOUT"},
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "resource-measures",
 				Usage: "Optional measures map to be returned by resource measures",
 				Value: `{"feature-a": 0, "feature-b": 1000}`,
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "credential",
 				Usage: "Describes the credential type that is supported by this product. One of (single, multiple)",
 				Value: "multiple",
@@ -174,8 +173,8 @@ func testCmd(ctx *cli.Context) error {
 		}
 	}
 
-	if len(args) > 0 {
-		url = args[0]
+	if args.Len() > 0 {
+		url = args.First()
 	}
 
 	purl, err := nurl.Parse(url)

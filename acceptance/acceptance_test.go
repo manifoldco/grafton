@@ -5,7 +5,7 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func TestValidate(t *testing.T) {
