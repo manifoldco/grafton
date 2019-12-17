@@ -13,7 +13,7 @@ require (
 	github.com/go-openapi/loads v0.0.0-20170520182102-a80dea3052f0 // indirect
 	github.com/go-openapi/runtime v0.0.0-20170303002511-e66a4c440602
 	github.com/go-openapi/spec v0.0.0-20170928160009-48c2a7185575 // indirect
-	github.com/go-openapi/strfmt v0.19.3
+	github.com/go-openapi/strfmt v0.19.4
 	github.com/go-openapi/swag v0.19.5
 	github.com/go-openapi/validate v0.0.0-20170921144055-dc8a684882cf
 	github.com/go-swagger/go-swagger v0.0.0-20170414161553-fbc64c262a83
