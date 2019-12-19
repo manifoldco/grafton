@@ -32,7 +32,7 @@ require (
 	github.com/manifoldco/go-manifold v0.14.0
 	github.com/manifoldco/go-signature v1.0.2
 	github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4
-	github.com/onsi/gomega v1.7.1
+	github.com/onsi/gomega v1.8.0
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/toqueteos/webbrowser v1.1.0 // indirect
