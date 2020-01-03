@@ -6,7 +6,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/client9/misspell v0.3.4
 	github.com/go-openapi/analysis v0.0.0-20170813233457-8ed83f2ea9f0 // indirect
-	github.com/go-openapi/errors v0.19.2
+	github.com/go-openapi/errors v0.19.3
 	github.com/go-openapi/inflect v0.0.0-20130829110746-b1f6470ffb9c // indirect
 	github.com/go-openapi/jsonpointer v0.0.0-20170102174223-779f45308c19 // indirect
 	github.com/go-openapi/jsonreference v0.0.0-20161105162150-36d33bfe519e // indirect
