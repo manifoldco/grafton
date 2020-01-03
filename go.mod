@@ -44,6 +44,4 @@ require (
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
 )
 
-replace sourcegraph.com/sourcegraph/go-diff v0.5.1 => github.com/sourcegraph/go-diff v0.5.1
-
 go 1.13
