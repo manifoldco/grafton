@@ -38,7 +38,7 @@ require (
 	github.com/toqueteos/webbrowser v1.1.0 // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
 	github.com/tylerb/graceful v1.2.15 // indirect
-	github.com/urfave/cli/v2 v2.0.0
+	github.com/urfave/cli/v2 v2.1.1
 	golang.org/x/crypto v0.0.0-20190923035154-9ee001bba392
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
