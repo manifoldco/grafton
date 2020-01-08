@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.16.0] - 2020-01-08
+
 ### Added
 
 - Add more details on error cases where a different status code was received.
