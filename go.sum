@@ -244,6 +244,8 @@ github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63 h1:nTT4s92Dgz2HlrB
 github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/manifoldco/go-base32 v1.0.3 h1:2SLNR6xB4cG8EprThvg0G1L11EeB+9EDvha3SR9R9Sc=
 github.com/manifoldco/go-base32 v1.0.3/go.mod h1:XHIMAef8u5al0h89lwFnd4M5u/ETPyiCAHDbMQNt+aY=
+github.com/manifoldco/go-base32 v1.0.4 h1:lnBhqi+F1C4+PETGMX4Lf4vvkFr4cejbYm3DVHiYzKU=
+github.com/manifoldco/go-base32 v1.0.4/go.mod h1:GA524Bo+DrbSK/IJdfRINdQznHPQXwf0pDD3pkHJ6zo=
 github.com/manifoldco/go-base64 v1.0.2 h1:AlGdzVTcm1k5CIQV8wT1xuFs8fqRhRedF/2ZH7LWMxk=
 github.com/manifoldco/go-base64 v1.0.2/go.mod h1:d+3bjrkSiKZzUADHU05oGBE7HO/8OlRCQMKsZwRDmm0=
 github.com/manifoldco/go-connector v0.0.3 h1:5K9/1TbgrwLmCS481d2qsF1MsuS/S9OSRJVdOoT+PKw=
