@@ -250,6 +250,8 @@ github.com/manifoldco/go-connector v0.0.3 h1:5K9/1TbgrwLmCS481d2qsF1MsuS/S9OSRJV
 github.com/manifoldco/go-connector v0.0.3/go.mod h1:q5jOdeThBNovOTImsPY0V/uaHqCeAn/n3riVBZnp3+8=
 github.com/manifoldco/go-jwt v0.1.2 h1:tLGWBdky2s/obG0An/xmrCcuveVXM3gDMg+ZZMLLePc=
 github.com/manifoldco/go-jwt v0.1.2/go.mod h1:Ik4HvBpDZlh+oZPTqgReKC162ciXfPaIwdBnjz6YF6U=
+github.com/manifoldco/go-jwt v0.2.0 h1:6jBQgmv3JMId1h3iqU9u2FqujA8VXdVMufyp27axX9U=
+github.com/manifoldco/go-jwt v0.2.0/go.mod h1:uzxKj97axPf7zC7SA4G8YfJCwC1fRf5YjQJiX/iVibo=
 github.com/manifoldco/go-manifold v0.10.11/go.mod h1:t0Ba47xYYlUNrzXlenmbqTMDjM/y7qqTNnjDJKvCcuY=
 github.com/manifoldco/go-manifold v0.14.0 h1:iHzzxvBw8fom5eox6VTMgPH58QmxiAc28pgTAmENF7I=
 github.com/manifoldco/go-manifold v0.14.0/go.mod h1:Irc48E+9xqN53jDNPe9osjMS4oRoX4nUHBc/EH0Kk60=
