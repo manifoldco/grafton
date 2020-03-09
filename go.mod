@@ -33,7 +33,7 @@ require (
 	github.com/manifoldco/go-signature v1.0.3
 	github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4
 	github.com/onsi/gomega v1.8.1
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/toqueteos/webbrowser v1.1.0 // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
