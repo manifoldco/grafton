@@ -256,6 +256,8 @@ github.com/manifoldco/go-base32 v1.0.4 h1:lnBhqi+F1C4+PETGMX4Lf4vvkFr4cejbYm3DVH
 github.com/manifoldco/go-base32 v1.0.4/go.mod h1:GA524Bo+DrbSK/IJdfRINdQznHPQXwf0pDD3pkHJ6zo=
 github.com/manifoldco/go-base64 v1.0.2 h1:AlGdzVTcm1k5CIQV8wT1xuFs8fqRhRedF/2ZH7LWMxk=
 github.com/manifoldco/go-base64 v1.0.2/go.mod h1:d+3bjrkSiKZzUADHU05oGBE7HO/8OlRCQMKsZwRDmm0=
+github.com/manifoldco/go-base64 v1.0.3 h1:cKnyd39OvI2bGzslPxP8pvnJ+SmThhC4sNKm9a2fT8U=
+github.com/manifoldco/go-base64 v1.0.3/go.mod h1:nA1lnhHBeim4XixFn1cOFoACJkuNpVLagw4qUKE7H8s=
 github.com/manifoldco/go-connector v0.0.3 h1:5K9/1TbgrwLmCS481d2qsF1MsuS/S9OSRJVdOoT+PKw=
 github.com/manifoldco/go-connector v0.0.3/go.mod h1:q5jOdeThBNovOTImsPY0V/uaHqCeAn/n3riVBZnp3+8=
 github.com/manifoldco/go-jwt v0.1.2 h1:tLGWBdky2s/obG0An/xmrCcuveVXM3gDMg+ZZMLLePc=
@@ -267,6 +269,8 @@ github.com/manifoldco/go-manifold v0.14.0 h1:iHzzxvBw8fom5eox6VTMgPH58QmxiAc28pg
 github.com/manifoldco/go-manifold v0.14.0/go.mod h1:Irc48E+9xqN53jDNPe9osjMS4oRoX4nUHBc/EH0Kk60=
 github.com/manifoldco/go-signature v1.0.2 h1:ZVC9MDQ2zEbwYkyxtT4seFENxVhYI0ReSPd3ji+/kVM=
 github.com/manifoldco/go-signature v1.0.2/go.mod h1:7YiF1hftYRYZydtohw8WwDvXQSplGIZW326hpSSi72w=
+github.com/manifoldco/go-signature v1.0.3 h1:XcFYxblbUYkqOuDv7MbiUxUnIXRTiIs9jwX1/r8aKlc=
+github.com/manifoldco/go-signature v1.0.3/go.mod h1:KdnxV2sl0p0LsJKCd0/u8u4oDriWHNSmhDEWUuR1s4A=
 github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4 h1:zNtxporN4V2l47+9kRel4xPgHv+0LsRgfU3aNgKwaUs=
 github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4/go.mod h1:Qr+HrTC9bwokrkg5IsBOUZYbIFuLE8wzazmgj+/aLxw=
 github.com/matoous/godox v0.0.0-20190911065817-5d6d842e92eb h1:RHba4YImhrUVQDHUCe2BNSOz4tVy2yGyXhvYDvxGgeE=
