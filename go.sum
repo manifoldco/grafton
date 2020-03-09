@@ -256,6 +256,8 @@ github.com/manifoldco/go-base32 v1.0.4 h1:lnBhqi+F1C4+PETGMX4Lf4vvkFr4cejbYm3DVH
 github.com/manifoldco/go-base32 v1.0.4/go.mod h1:GA524Bo+DrbSK/IJdfRINdQznHPQXwf0pDD3pkHJ6zo=
 github.com/manifoldco/go-base64 v1.0.2 h1:AlGdzVTcm1k5CIQV8wT1xuFs8fqRhRedF/2ZH7LWMxk=
 github.com/manifoldco/go-base64 v1.0.2/go.mod h1:d+3bjrkSiKZzUADHU05oGBE7HO/8OlRCQMKsZwRDmm0=
+github.com/manifoldco/go-base64 v1.0.3 h1:cKnyd39OvI2bGzslPxP8pvnJ+SmThhC4sNKm9a2fT8U=
+github.com/manifoldco/go-base64 v1.0.3/go.mod h1:nA1lnhHBeim4XixFn1cOFoACJkuNpVLagw4qUKE7H8s=
 github.com/manifoldco/go-connector v0.0.3 h1:5K9/1TbgrwLmCS481d2qsF1MsuS/S9OSRJVdOoT+PKw=
 github.com/manifoldco/go-connector v0.0.3/go.mod h1:q5jOdeThBNovOTImsPY0V/uaHqCeAn/n3riVBZnp3+8=
 github.com/manifoldco/go-jwt v0.1.2 h1:tLGWBdky2s/obG0An/xmrCcuveVXM3gDMg+ZZMLLePc=
