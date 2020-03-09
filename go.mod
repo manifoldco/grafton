@@ -26,7 +26,7 @@ require (
 	github.com/gorilla/handlers v1.4.0 // indirect
 	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/manifoldco/go-base32 v1.0.4
-	github.com/manifoldco/go-base64 v1.0.2
+	github.com/manifoldco/go-base64 v1.0.3
 	github.com/manifoldco/go-connector v0.0.3
 	github.com/manifoldco/go-jwt v0.2.0
 	github.com/manifoldco/go-manifold v0.14.0
