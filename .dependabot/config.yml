@@ -4,3 +4,10 @@ update_configs:
   - package_manager: "go:modules"
     directory: "/"
     update_schedule: "daily"
+    automerged_updates:
+      - match:
+          dependency_type: "all"
+          update_type: "all"
+    ignored_updates:
+      - match:
+          dependency_name: "*openapi*"
