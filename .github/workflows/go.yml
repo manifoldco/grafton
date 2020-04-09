@@ -1,0 +1,54 @@
+name: Go
+on: [push]
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup go git
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+        run: git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/manifoldco/".insteadOf "https://github.com/manifoldco/"
+
+      - uses: actions/cache@v1.0.1
+        id: modcache
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Get dependencies
+        if: steps.modcache.outputs.cache-hit != 'true'
+        run: go get -v -d ./...
+
+      - name: Run tests
+        run: go run github.com/magefile/mage -v ci
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          token: ${{secrets.CODECOV_TOKEN}} #required
+
+      - name: Release
+        if: github.ref == 'refs/heads/master' # only run on master branch
+        run: |
+          curl -LO https://releases.manifold.co/manifold-cli/$(MANIFOLD_VERSION)/manifold-cli_$(MANIFOLD_VERSION)_linux_amd64.tar.gz
+          tar xvf manifold-cli_*
+          curl -LO https://releases.manifold.co/promulgate/$(PROMULGATE_VERSION)/promulgate_$(PROMULGATE_VERSION)_linux_amd64.tar.gz
+          tar xvf promulgate_*
+          go run github.com/magefile/mage -v releasegrafton
+        env:
+          MANIFOLD_VERSION: 0.15.1
+          PROMULGATE_VERSION: 0.0.9
