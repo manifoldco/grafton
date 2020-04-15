@@ -31,7 +31,7 @@ func Version() (string, error) {
 	return version, nil
 }
 
-// BuildZips compiles and zips grafton for all the three major operating systems we support
+// Build compiles and zips grafton for all the three major operating systems we support
 func Build() { mg.SerialDeps(BuildZipDarwinAmd64, BuildZipLinuxAmd64, BuildZipWindowAmd64) }
 
 // BuildZipDarwinAmd64 compiles and zips grafton for the darwin AMD64 architecture.

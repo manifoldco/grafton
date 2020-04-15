@@ -20,12 +20,14 @@ require (
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
 	github.com/gobuffalo/packr v1.30.1
+	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
 	github.com/golangci/golangci-lint v1.23.8
+	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.4.0 // indirect
 	github.com/jessevdk/go-flags v1.4.0 // indirect
-	github.com/magefile/mage v1.9.0 // indirect
+	github.com/magefile/mage v1.9.0
 	github.com/manifoldco/go-base32 v1.0.4
 	github.com/manifoldco/go-base64 v1.0.3
 	github.com/manifoldco/go-connector v0.0.3
@@ -40,9 +42,9 @@ require (
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
 	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli/v2 v2.2.0
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/crypto v0.0.0-20191122220453-ac88ee75c92c
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
-	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 )
 
 go 1.13

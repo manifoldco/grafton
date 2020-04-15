@@ -8,7 +8,7 @@ import (
 	"github.com/manifoldco/grafton/scripts/grimoire/cast"
 )
 
-// ReleaseGrafton is a combined command that will both build and release the zip files using packr and
+// Release is a combined command that will both build and release the zip files using packr and
 // promulgate.
 func Release() {
 	mg.SerialDeps(Build, ReleaseZips)
