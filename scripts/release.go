@@ -10,8 +10,8 @@ import (
 
 // ReleaseGrafton is a combined command that will both build and release the zip files using packr and
 // promulgate.
-func ReleaseGrafton() {
-	mg.SerialDeps(BuildZips, ReleaseZips)
+func Release() {
+	mg.SerialDeps(Build, ReleaseZips)
 }
 
 // ReleaseZips uses promulgate and the manifold CLI to release the current set of zips at the

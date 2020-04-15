@@ -43,7 +43,7 @@ jobs:
           tar xvf manifold-cli_*
           curl -LO https://releases.manifold.co/promulgate/$(PROMULGATE_VERSION)/promulgate_$(PROMULGATE_VERSION)_linux_amd64.tar.gz
           tar xvf promulgate_*
-          go run github.com/magefile/mage -v releasegrafton
+          go run github.com/magefile/mage -v release
         env:
           MANIFOLD_VERSION: 0.15.1
           PROMULGATE_VERSION: 0.0.9
