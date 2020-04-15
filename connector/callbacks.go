@@ -29,7 +29,7 @@ func processCallbackHandler(c *FakeConnector, capturer *RequestCapturer) http.Ha
 			return
 		}
 
-		if r.Header.Get(http.CanonicalHeaderKey("content-type")) != "application/json" {
+		if r.Header.Get("content-type") != "application/json" {
 			respondWithError(rw, errInvalidContentType)
 			return
 		}

@@ -9,4 +9,6 @@ import (
 	"github.com/gordonklaus/ineffassign"                  // lint
 	"github.com/tsenart/deadcode"                         // lint
 	"golang.org/x/lint/golint"                            // lint
+	"github.com/magefile/mage"
+	"github.com/gobuffalo/packr"
 )
