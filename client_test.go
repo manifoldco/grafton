@@ -2,7 +2,6 @@ package grafton
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -280,7 +279,7 @@ func TestProvisionResource(t *testing.T) {
 		msg, _, err := callProvision(srv.URL)
 
 		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(fmt.Errorf("&{<nil>} (*resource.PutResourcesIDBadRequestBody) is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface")))
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
 	})
 
 	t.Run("400 bad request with missing message", func(t *testing.T) {
@@ -459,7 +458,7 @@ func TestProvisionCredentials(t *testing.T) {
 		_, msg, _, err := callProvisionCredentials(srv.URL)
 
 		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(fmt.Errorf("&{<nil>} (*credential.PutCredentialsIDBadRequestBody) is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface")))
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
 	})
 
 	t.Run("400 bad request with missing message", func(t *testing.T) {
@@ -620,7 +619,7 @@ func TestChangePlan(t *testing.T) {
 		msg, _, err := callChangePlan(srv.URL)
 
 		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(fmt.Errorf("&{<nil>} (*resource.PatchResourcesIDBadRequestBody) is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface")))
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
 	})
 
 	t.Run("400 bad request with missing message", func(t *testing.T) {
@@ -744,7 +743,7 @@ func TestDeprovisionCredentials(t *testing.T) {
 		msg, _, err := callDeprovisionCredentials(srv.URL)
 
 		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(fmt.Errorf("&{<nil>} (*credential.DeleteCredentialsIDBadRequestBody) is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface")))
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
 	})
 
 	t.Run("400 bad request with missing message", func(t *testing.T) {
@@ -868,7 +867,7 @@ func TestDeprovisionResource(t *testing.T) {
 		msg, _, err := callDeprovisionResource(srv.URL)
 
 		gm.Expect(msg).To(gm.Equal(""))
-		gm.Expect(err).To(gm.MatchError(fmt.Errorf("&{<nil>} (*resource.DeleteResourcesIDBadRequestBody) is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface")))
+		gm.Expect(err).To(gm.MatchError(`no consumer: "text/html"`))
 	})
 
 	t.Run("400 bad request with missing message", func(t *testing.T) {
