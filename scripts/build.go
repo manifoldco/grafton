@@ -80,7 +80,7 @@ func buildBinary(os, arch, file, input string) error {
 	ldFlags := fmt.Sprintf("-w -X github.com/manifoldco/grafton/config.Version=%s", tag)
 	output := fmt.Sprintf("build/%s/bin/%s", osArch, file)
 	prefix := fmt.Sprintf("PREFIX=build/%s GOOS=%s GOARCH=%s", osArch, os, arch)
-	command := prefix + " " + `CGO_ENABLED=0 packr build -i --ldflags="%s" -o %s %s`
+	command := prefix + " " + `CGO_ENABLED=0 $HOME/go/bin/packr build -i --ldflags="%s" -o %s %s`
 	err = cast.Sh(command, ldFlags, output, input)
 	if err != nil {
 		return err
