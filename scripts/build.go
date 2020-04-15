@@ -5,13 +5,16 @@ import (
 	"strings"
 
 	"github.com/magefile/mage/mg"
-	"github.com/manifoldco/logo/grimoire/cast"
+
+	"github.com/manifoldco/grafton/scripts/grimoire/cast"
 )
 
 var version = ""
 
 var git = cast.PrepShOutput("git")
 
+// Version extracts the current version of grafton and return it.
+// THe version is cached for future uses.
 func Version() (string, error) {
 	if version != "" {
 		return version, nil
@@ -28,9 +31,10 @@ func Version() (string, error) {
 	return version, nil
 }
 
-// Build compiles a local version of the code into bin/.
+// BuildZips compiles and zips grafton for all the three major operating systems we support
 func BuildZips() { mg.SerialDeps(BuildZipDarwinAmd64, BuildZipLinuxAmd64, BuildZipWindowAmd64) }
 
+// BuildZipDarwinAmd64 compiles and zips grafton for the darwin AMD64 architecture.
 func BuildZipDarwinAmd64() error {
 	err := buildBinary("darwin", "amd64", "grafton", "./cmd")
 	if err != nil {
@@ -40,6 +44,7 @@ func BuildZipDarwinAmd64() error {
 	return zipBinary("darwin", "amd64", "tar.gz", "grafton")
 }
 
+// BuildZipLinuxAmd64 compiles and zips grafton for the linux AMD64 architecture.
 func BuildZipLinuxAmd64() error {
 	err := buildBinary("linux", "amd64", "grafton", "./cmd")
 	if err != nil {
@@ -49,6 +54,7 @@ func BuildZipLinuxAmd64() error {
 	return zipBinary("linux", "amd64", "tar.gz", "grafton")
 }
 
+// BuildZipWindowAmd64 compiles and zips grafton for the windows AMD64 architecture.
 func BuildZipWindowAmd64() error {
 	err := buildBinary("windows", "amd64", "grafton.exe", "./cmd")
 	if err != nil {

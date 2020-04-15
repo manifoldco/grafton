@@ -5,13 +5,17 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"github.com/manifoldco/logo/grimoire/cast"
+	"github.com/manifoldco/grafton/scripts/grimoire/cast"
 )
 
+// ReleaseGrafton is a combined command that will both build and release the zip files using packr and
+// promulgate.
 func ReleaseGrafton() {
 	mg.SerialDeps(BuildZips, ReleaseZips)
 }
 
+// ReleaseZips uses promulgate and the manifold CLI to release the current set of zips at the
+// location where the command is run.
 func ReleaseZips() error {
 	tag, err := Version()
 	if err != nil {

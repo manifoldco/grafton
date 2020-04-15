@@ -231,7 +231,7 @@ func failHandler(message string, callerskip ...int) {
 	panic(testFailurePanic)
 }
 
-var errFatal = errors.New("Fatal error")
+var errFatal = errors.New("Fatal error") //nolint:golint,unused
 
 // FatalErr will cause a feature test to fail, and abort running the rest of it.
 func FatalErr(format string, args ...interface{}) error {

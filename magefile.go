@@ -4,11 +4,7 @@ package main
 
 import (
 	// mage:import
-	_ "github.com/manifoldco/logo/grimoire"
-	// mage:import
-	"github.com/manifoldco/logo/grimoire/build"
+	_ "github.com/manifoldco/grafton/scripts/grimoire"
 	// mage:import
 	_ "github.com/manifoldco/grafton/scripts"
 )
-
-var _ = build.SetStartingOffset(0)
