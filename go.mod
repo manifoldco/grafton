@@ -27,7 +27,6 @@ require (
 	github.com/manifoldco/go-jwt v0.2.0
 	github.com/manifoldco/go-manifold v0.15.0
 	github.com/manifoldco/go-signature v1.0.3
-	github.com/manifoldco/logo v0.11.507
 	github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4
 	github.com/onsi/gomega v1.9.0
 	github.com/pkg/errors v0.9.1
