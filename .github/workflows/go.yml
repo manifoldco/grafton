@@ -39,9 +39,9 @@ jobs:
       - name: Release
         if: github.ref == 'refs/heads/master' # only run on master branch
         run: |
-          curl -LO https://releases.manifold.co/manifold-cli/$(MANIFOLD_VERSION)/manifold-cli_$(MANIFOLD_VERSION)_linux_amd64.tar.gz
+          curl -LO "https://releases.manifold.co/manifold-cli/${MANIFOLD_VERSION}/manifold-cli_${MANIFOLD_VERSION}_linux_amd64.tar.gz"
           tar xvf manifold-cli_*
-          curl -LO https://releases.manifold.co/promulgate/$(PROMULGATE_VERSION)/promulgate_$(PROMULGATE_VERSION)_linux_amd64.tar.gz
+          curl -LO "https://releases.manifold.co/promulgate/${PROMULGATE_VERSION}/promulgate_${PROMULGATE_VERSION}_linux_amd64.tar.gz"
           tar xvf promulgate_*
           go run github.com/magefile/mage -v release
         env:
