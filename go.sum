@@ -467,8 +467,6 @@ github.com/manifoldco/go-signature v1.0.3/go.mod h1:KdnxV2sl0p0LsJKCd0/u8u4oDriW
 github.com/manifoldco/grafton v0.16.0/go.mod h1:9+73GUM4ExYtN2OV/kpmQ4kfqgPfOnqnUQCZ6USO8s8=
 github.com/manifoldco/healthz v1.2.0/go.mod h1:i9V6dTxdXThdndn6WyMfaCF8i0xD7bf4ihwT8qUDVbc=
 github.com/manifoldco/kuberesolver v1.1.0/go.mod h1:f2W7buhDd+BRHTtdKe0/ARCAI4RqSC0dYWdCR5jobeY=
-github.com/manifoldco/logo v0.11.507 h1:BOXACtma98AOTFyVUQB/ItpzChWe7o7WK/3ekC+m5ak=
-github.com/manifoldco/logo v0.11.507/go.mod h1:EKXnG67vEgdohE385znIIl6ccahzDZRm9PepvK/i9JA=
 github.com/manifoldco/promptui v0.3.3-0.20190411181407-35bab80e16a4/go.mod h1:Qr+HrTC9bwokrkg5IsBOUZYbIFuLE8wzazmgj+/aLxw=
 github.com/markbates/errx v1.1.0/go.mod h1:PLa46Oex9KNbVDZhKel8v1OT7hD5JZ2eI7AHhA0wswc=
 github.com/markbates/oncer v1.0.0/go.mod h1:Z59JA581E9GP6w96jai+TGqafHPW+cPfRxz2aSZ0mcI=

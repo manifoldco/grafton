@@ -20,6 +20,35 @@ func Sh(format string, a ...interface{}) error {
 	return sh.RunWith(envs, cmd, args...)
 }
 
+// DirSh formats the provided string and arguments, tokenizes the result using
+// shell style rules, and then executes the result in a way similar to mage's
+// sh.RunWith under the provided working directory.
+func DirSh(dir, format string, a ...interface{}) error {
+	envs, cmd, args, err := parse(format, a...)
+	if err != nil {
+		return err
+	}
+
+	return runWith(dir, envs, cmd, args...)
+}
+
+// DirPrepSh prepares an Sh invocation with the provided prefix. when the returned
+// func is executed, prefix and suffix are joined with a space, then passed in
+// to Sh along with any values for a.
+//
+// This version allows giving a directory to execute in.
+// If you only wish to pass values for a, use "" for suffix.
+func DirPrepSh(prefix string) func(dir, suffix string, a ...interface{}) error {
+	return func(dir, suffix string, a ...interface{}) error {
+		format := prefix
+		if suffix != "" {
+			format = fmt.Sprintf("%s %s", format, suffix)
+		}
+
+		return DirSh(dir, format, a...)
+	}
+}
+
 // ShOutput formats the provided string and arguments, tokenizes the result using
 // shell style rules, and then executes the result with mage's sh.OutputWith
 func ShOutput(format string, a ...interface{}) (string, error) {

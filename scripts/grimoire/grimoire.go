@@ -4,7 +4,7 @@ package grimoire
 import (
 	"github.com/magefile/mage/mg"
 
-	"github.com/manifoldco/logo/grimoire/cast"
+	"github.com/manifoldco/grafton/scripts/grimoire/cast"
 )
 
 // Some convenience methods
