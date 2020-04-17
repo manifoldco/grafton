@@ -97,6 +97,6 @@ func zipBinary(os, arch, extension, input string) error {
 
 	osArch := fmt.Sprintf("%s_%s", os, arch)
 
-	command := fmt.Sprintf("tar -czf grafton_%s_%s.%s build/%s/bin/%s", osArch, tag, extension, osArch, input)
+	command := fmt.Sprintf("tar -czf build/grafton_%s_%s.%s build/%s/bin/%s", tag, osArch, extension, osArch, input)
 	return cast.Sh(command)
 }
