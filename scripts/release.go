@@ -22,6 +22,6 @@ func ReleaseZips() error {
 		return err
 	}
 
-	command := fmt.Sprintf("manifold run -t manifold -p promulgate -- promulgate release v%s", tag)
+	command := fmt.Sprintf("./manifold run -t manifold -p promulgate -- ./promulgate release v%s", tag)
 	return cast.Sh(command)
 }
