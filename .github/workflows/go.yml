@@ -37,7 +37,7 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}} #required
 
       - name: Release
-        if: github.ref == 'refs/heads/master' # only run on master branch
+        if: startsWith(github.ref, 'refs/tags') # only run on tag creation
         run: |
           curl -LO "https://releases.manifold.co/manifold-cli/${MANIFOLD_VERSION}/manifold-cli_${MANIFOLD_VERSION}_linux_amd64.tar.gz"
           tar xvf manifold-cli_*
