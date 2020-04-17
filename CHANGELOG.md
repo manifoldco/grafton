@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.16.1] - 2020-04-17
+
+### Changed
+
+- Changed makefiles to the mage build system to bring back some of the automated releases on tags.
+
 ## [0.16.0] - 2020-01-08
 
 ### Added
