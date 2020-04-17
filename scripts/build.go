@@ -86,7 +86,7 @@ func buildBinary(os, arch, file, input string) error {
 		return err
 	}
 
-	return cast.Sh("packr clean")
+	return cast.Sh("$HOME/go/bin/packr clean")
 }
 
 func zipBinary(os, arch, extension, input string) error {
