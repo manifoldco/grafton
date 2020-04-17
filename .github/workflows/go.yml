@@ -47,3 +47,4 @@ jobs:
         env:
           MANIFOLD_VERSION: 0.15.1
           PROMULGATE_VERSION: 0.0.9
+          MANIFOLD_API_TOKEN: ${{ secrets.MANIFOLD_API_TOKEN }}
