@@ -27,7 +27,7 @@ func Version() (string, error) {
 
 	parts := strings.Split(desc, "-")
 
-	version = parts[0]
+	version = strings.Replace(parts[0], "v", "", 1)
 	return version, nil
 }
 
