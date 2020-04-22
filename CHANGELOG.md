@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.16.2] - 2020-04-22
+
+### Changed
+
+- Changed provider credentials rotation so it uses the provider ID only when rotating a credential.
+
 ## [0.16.1] - 2020-04-17
 
 ### Changed
