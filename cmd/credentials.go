@@ -41,11 +41,7 @@ func apiURLPattern() string {
 var credentialFlags = []cli.Flag{
 	&cli.StringFlag{
 		Name:  "provider",
-		Usage: "The label of the provider",
-	},
-	&cli.StringFlag{
-		Name:  "product",
-		Usage: "The label of the product",
+		Usage: "The label of the provider to rotate the credentials for",
 	},
 }
 
@@ -56,13 +52,13 @@ func init() {
 		Subcommands: []*cli.Command{
 			{
 				Name:   "list",
-				Usage:  "List all existing credentials for a product",
+				Usage:  "List all existing credentials for a provider",
 				Flags:  credentialFlags,
 				Action: listCredentialsCmd,
 			},
 			{
 				Name:   "rotate",
-				Usage:  "Creates a new credential and sets the old one to expire in 24h",
+				Usage:  "Creates a new credential for a provider and sets the old one to expire in 24h",
 				Flags:  credentialFlags,
 				Action: createCredentialsCmd,
 			},
@@ -86,7 +82,7 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 		return cli.NewExitError(err.Error(), -1)
 	}
 
-	product, err := findProduct(ctx, cliCtx, client)
+	provider, err := findProvider(ctx, cliCtx, client)
 	if err != nil {
 		return cli.NewExitError("Failed to find product: "+err.Error(), -1)
 	}
@@ -101,7 +97,7 @@ func createCredentialsCmd(cliCtx *cli.Context) error {
 
 	body := &models.OAuthCredentialCreateRequest{
 		Description: &desc,
-		ProductID:   &product.ID,
+		ProviderID:  &provider.ID,
 	}
 	params.SetBody(body)
 
@@ -128,9 +124,9 @@ func listCredentialsCmd(cliCtx *cli.Context) error {
 		return cli.NewExitError(err.Error(), -1)
 	}
 
-	product, err := findProduct(ctx, cliCtx, client)
+	provider, err := findProvider(ctx, cliCtx, client)
 	if err != nil {
-		return cli.NewExitError("Failed to find product "+err.Error(), -1)
+		return cli.NewExitError("Failed to find provider "+err.Error(), -1)
 	}
 
 	connector, err := NewConnector(token)
@@ -139,8 +135,8 @@ func listCredentialsCmd(cliCtx *cli.Context) error {
 	}
 
 	params := o_auth.NewGetCredentialsParamsWithContext(ctx)
-	pID := product.ID.String()
-	params.SetProductID(&pID)
+	pID := provider.ID.String()
+	params.SetProviderID(&pID)
 
 	res, err := connector.OAuth.GetCredentials(params, nil)
 	if err != nil {
@@ -279,19 +275,13 @@ func login(ctx context.Context) (*manifold.Client, string, error) {
 	return client, token, nil
 }
 
-func findProduct(ctx context.Context, cliCtx *cli.Context, client *manifold.Client) (*manifold.Product, error) {
+func findProvider(ctx context.Context, cliCtx *cli.Context, client *manifold.Client) (*manifold.Provider, error) {
 	providerLabel := cliCtx.String("provider")
 	if providerLabel == "" {
 		return nil, errors.New("--provider flag missing")
 	}
 
-	productLabel := cliCtx.String("product")
-	if productLabel == "" {
-		return nil, errors.New("--product flag missing")
-	}
-
 	var provider *manifold.Provider
-	var product *manifold.Product
 
 	provList := client.Providers.List(ctx, nil)
 
@@ -313,26 +303,5 @@ func findProduct(ctx context.Context, cliCtx *cli.Context, client *manifold.Clie
 		return nil, fmt.Errorf("Provider %q not found", providerLabel)
 	}
 
-	opts := manifold.ProductsListOpts{ProviderID: &provider.ID}
-
-	prodList := client.Products.List(ctx, &opts)
-	defer prodList.Close()
-
-	for prodList.Next() {
-		p, err := prodList.Current()
-		if err != nil {
-			return nil, err
-		}
-
-		if p.Body.Label == productLabel {
-			product = p
-			break
-		}
-	}
-
-	if product == nil {
-		return nil, fmt.Errorf("Provider %q not found", providerLabel)
-	}
-
-	return product, nil
+	return provider, nil
 }
