@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Changed provider credentials rotation so it uses the provider ID only when rotating a credential.
+- Changed provider credentials rotation so it uses the provider ID instead of a product ID.
+
+### Removed
+
+- Removed the `--product` flag from the `credentials rotate` command.
 
 ## [0.16.1] - 2020-04-17
 
