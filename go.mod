@@ -21,7 +21,7 @@ require (
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
 	github.com/gobuffalo/packr v1.30.1
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
-	github.com/golangci/golangci-lint v1.25.0
+	github.com/golangci/golangci-lint v1.25.1
 	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
 	github.com/gorilla/context v1.1.1 // indirect
