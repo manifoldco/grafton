@@ -4,7 +4,7 @@
 
 **Manifold's provider validation tool**
 
-[Manifold's Provider Documentation](https://docs.manifold.co/docs/introduction-29Q4oH7UReWEaKCYuoK0IK) |
+[Manifold's Provider Documentation](https://provider-api-docs.manifold.co/?tab=provider) |
 [Code of Conduct](./.github/CONDUCT.md) |
 [Contribution Guidelines](./.github/CONTRIBUTING.md) |
 [CHANGELOG](./CHANGELOG.md)
@@ -17,7 +17,7 @@
 
 </div>
 
-The [Manifold's Provider Documentation](https://docs.manifold.co/docs/introduction-29Q4oH7UReWEaKCYuoK0IK) is
+The [Manifold's Provider Documentation](https://provider-api-docs.manifold.co/?tab=provider) is
 the best place to get started on adding your product to the Manifold's Marketplace.
 
 ## Introduction
