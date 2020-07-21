@@ -21,7 +21,7 @@ require (
 	github.com/go-zoo/bone v0.0.0-20160911183509-fd0aebc74e90
 	github.com/gobuffalo/packr v1.30.1
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
-	github.com/golangci/golangci-lint v1.27.0
+	github.com/golangci/golangci-lint v1.29.0
 	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf
 	github.com/gordonklaus/ineffassign v0.0.0-20180909121442-1003c8bd00dc
 	github.com/gorilla/context v1.1.1 // indirect
@@ -42,9 +42,9 @@ require (
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9
 	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli/v2 v2.2.0
-	golang.org/x/crypto v0.0.0-20191122220453-ac88ee75c92c
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/lint v0.0.0-20190930215403-16217165b5de
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344
 )
 
 go 1.13
