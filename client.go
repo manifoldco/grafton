@@ -129,12 +129,13 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 	p.SetContext(ctx)
 
 	c.log.WithFields(logrus.Fields{
-		"url":         c.url,
-		"resource_id": model.ID,
-		"platform_id": model.PlatformID,
-		"product":     model.Product,
-		"plan":        model.Plan,
-		"region":      model.Region,
+		"url":          c.url,
+		"callback_url": cbURL,
+		"resource_id":  model.ID,
+		"platform_id":  model.PlatformID,
+		"product":      model.Product,
+		"plan":         model.Plan,
+		"region":       model.Region,
 	}).Info("Sending PUT resource/{id} request to provider")
 
 	res, acceptedRes, noContent, err := c.api.Resource.PutResourcesID(p)
@@ -160,7 +161,10 @@ func (c *Client) ProvisionResource(ctx context.Context, cbID manifold.ID,
 			return "", false, err
 		}
 
-		c.log.WithError(graftonErr).WithField("status_code", statusCode).Error("Received an error from provider")
+		c.log.WithError(graftonErr).WithFields(logrus.Fields{
+			"status_code":  statusCode,
+			"callback_url": cbURL,
+		}).Error("Received an error from provider")
 		return graftonErr.Error(), false, graftonErr
 	}
 
